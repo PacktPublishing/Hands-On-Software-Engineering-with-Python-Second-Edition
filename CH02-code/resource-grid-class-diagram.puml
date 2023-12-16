@@ -1,0 +1,33 @@
+@startuml
+
+' To render this diagram, copy the tezt o fthis file, go to the PlantUML online server
+' at https://www.plantuml.com/plantuml/uml/, and paste it into the field at the top of the page.
+' From there, the diagram can be downloaded as a PNG or an SVG file, whichever is preferred.
+' It's also possible to change the main direction of the diagram by uncommenting
+' the "left to right direction" line below, and to control the direction of connecting
+' lines by adding "l", "r", "u" or "d" between the dashes or dots in those
+
+!theme mars
+skinparam monochrome true
+skinparam linetype ortho
+hide empty members
+
+left to right direction
+
+class MapNode {
+    <int> x
+    <int> y
+    <int> z
+    <MapNodeResources*> resources
+}
+
+class MapNodeResources {
+    <None> add(<str> name, <float> value)
+    <str> get(<str> name)
+    <None> remove(<str> name)
+    <None> set(<str> name, <float> value)
+}
+
+MapNode --o MapNodeResources
+
+@enduml

@@ -1,0 +1,54 @@
+"""
+Examples of type-annotation as of Python 3.6
+"""
+
+# Additions to the built-in typing module:
+# • AsyncContextManager
+# • ChainMap
+# • Collection
+# • ContextManager
+# • Counter
+# • Deque
+# • NoReturn
+# • Variable Annotation Syntax
+
+import os
+from typing import Any, Dict, List, Union
+
+
+def example_function(
+    str_arg: str,
+    int_arg: int,
+    float_arg: float,
+    bool_arg: bool,
+    list_arg: List[Any],
+    dict_arg: Dict[str, Any],
+    *args: Union[int, float],
+    **kwargs: Any
+) -> None:
+    print(
+        f'{__file__.split(os.sep)[-1].split(".")[0]}'
+        '::example_function called:'
+    )
+    print(f'str_arg ..... ({type(str_arg).__name__}) {str_arg}')
+    print(f'int_arg ..... ({type(int_arg).__name__}) {int_arg}')
+    print(f'float_arg ... ({type(float_arg).__name__}) {float_arg}')
+    print(f'bool_arg .... ({type(bool_arg).__name__}) {bool_arg}')
+    print(f'list_arg .... ({type(list_arg).__name__}) {list_arg}')
+    print(f'dict_arg .... ({type(dict_arg).__name__}) {dict_arg}')
+    print(f'args ........ ({type(args).__name__}) {args}')
+    print(f'kwargs ...... ({type(kwargs).__name__}) {kwargs}')
+
+
+if __name__ == '__main__':
+    from inspect import getfullargspec
+    from pprint import pprint
+    example_function(
+        'str_arg', 1, 2.345, True,
+        ['list', 'values', 6, 7.89],
+        {'name': 'string', 'value': 2},
+        0, 1.234,
+        kw1='kwarg-string', kw2=5, kw3=6.789
+    )
+    print('== Annotations of example_function '.ljust(59, '='))
+    pprint(getfullargspec(example_function).annotations)

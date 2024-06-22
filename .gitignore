@@ -100,3 +100,5 @@ cython_debug/
 
 # Items to ignore relating to this project in particular
 scratch-space/
+
+CH08-code/unit-test-examples.geany

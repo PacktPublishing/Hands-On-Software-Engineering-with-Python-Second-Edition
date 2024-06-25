@@ -1,3 +1,14 @@
+#!/usr/bin/env python3.11
+"""
+A unit-test suite for the example main.py module, using Python's
+built-in unittest library for testing target classes, and pytest
+test-functions for testing target functions.
+
+Example:
+--------
+pytest -v tests/pytest-example/test_main.py
+"""
+
 import unittest
 
 import pytest

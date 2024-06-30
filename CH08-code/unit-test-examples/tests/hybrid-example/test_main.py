@@ -15,6 +15,7 @@ import pytest
 
 from main import main_function, MainClass
 
+
 def test_main_function():
     assert main_function() is None
 

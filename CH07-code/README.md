@@ -1,1 +1,26 @@
 # CH07-code README
+
+- [`property_decoration_example.py`](property_decoration_example.py) — The complete example `Person` class, with all of the `property` definitions mentioned in the main text.
+- Annotation examples, showing the changes in function/method annotation for Python versions 3.0, and 3.5 through 3.11:
+  - Examples relating to the use of `__future__` imports:
+    - [`future_example.py`](future_example.py)
+    - [`no_future_example.py`](no_future_example.py)
+  - [`annotations_examples_30.py`](annotations_examples_30.py)
+  - [`annotations_examples_35.py`](annotations_examples_35.py)
+  - [`annotations_examples_36.py`](annotations_examples_36.py)
+  - [`annotations_examples_37.py`](annotations_examples_37.py)
+  - [`annotations_examples_38.py`](annotations_examples_38.py)
+  - [`annotations_examples_39.py`](annotations_examples_39.py)
+  - [`annotations_examples_310.py`](annotations_examples_310.py)
+  - [`annotations_examples_311.py`](annotations_examples_311.py)
+- Type-checking examples:
+  - [`type_checking_example_01.py`](type_checking_example_01.py)
+  - [`type_checking_example_02.py`](type_checking_example_02.py)
+  - [`typeguard_example_311.py`](typeguard_example_311.py)
+- Examples relating to data contracts
+  - [`class_with_type_checking_example.py`](class_with_type_checking_example.py)
+  - [`dataclass_typechecked_example.py`](dataclass_typechecked_example.py)
+  - [`data_contract_function_example.py`](data_contract_function_example.py)
+  - [`property_decoration_example.py`](property_decoration_example.py)
+- [`observability_logging_example.py`](observability_logging_example.py)
+- [`namespace-example`](namespace-example) — A well-formed, if incomplete, Python namespace.

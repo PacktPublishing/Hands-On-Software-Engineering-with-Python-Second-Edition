@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "example-project"
+version = "0.1.0"
+description = ""
+authors = ["Brian Allbee <brian.allbee@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.32.3"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.0.0"
+pytest = "^8.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

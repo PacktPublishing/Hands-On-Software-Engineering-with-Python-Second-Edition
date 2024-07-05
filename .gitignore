@@ -102,3 +102,5 @@ cython_debug/
 scratch-space/
 
 CH08-code/unit-test-examples.geany
+
+*.geany

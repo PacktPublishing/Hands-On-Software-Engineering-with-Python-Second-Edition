@@ -1,0 +1,86 @@
+@startuml
+
+' title A structural key for the package/namespace diagrams later
+
+' This can be rendered, then saved as a PNG or SVG image/document by copying this text,
+' going to https://www.plantuml.com/plantuml/uml, and pasting it into the large text box
+' at the top of that page.
+' Just below that text-box are PNG and SVG links that can be saved as the relevant file-type
+
+left to right direction
+
+!theme mars
+
+skinparam monochrome true
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 60
+'skinparam ranksep 30
+
+allow_mixing
+
+hide empty members
+
+namespace Multiple_Repositories <<Frame>> {
+
+    note as top_level_frame
+        This is a collection of top-level namespaces.
+        It is **not** an installable package.
+    end note
+
+    namespace namespace <<Rectangle>> {
+
+        note as top_level_namespace
+            This is a top-level namespace.
+            It is **not** an installable package.
+        end note
+
+        package package-in-namespace <<Folder>> {
+
+            note as top_level_package
+                This is an **installable package**,
+                containing zero-to-many child **namespaces**
+            end note
+
+            namespace namespace-in-package <<Rectangle>> {
+                note as child_namespace
+                    This is a **child namespace**,
+                    installed as part of its
+                    **parent package**
+                end note
+
+                interface Interface
+
+                note right
+                    This is an interface
+                end note
+
+                abstract class AbstractClass
+
+                AbstractClass .r.|> Interface : implements
+
+                note right
+                    This is an abstract class
+                end note
+
+                class Class
+
+                Class -r-|> AbstractClass : extends
+
+                note right
+                    This is a concrete class
+                end note
+
+                component [Function(<Class> instance)] as function <<Function>>
+
+                function .r.> Class : uses
+
+                note right of function
+                    This is a function
+                end note
+            }
+        }
+    }
+}
+
+@enduml

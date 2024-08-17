@@ -1,0 +1,126 @@
+@startuml
+
+' title The "summary" namespace diagram for the "original" Hand Made Stuff codebase as of the start of Chapter 9
+
+' This can be rendered, then saved as a PNG or SVG image/document by copying this text,
+' going to https://www.plantuml.com/plantuml/uml, and pasting it into the large text box
+' at the top of that page.
+' Just below that text-box are PNG and SVG links that can be saved as the relevant file-type
+
+'left to right direction
+
+!theme mars
+
+skinparam monochrome true
+skinparam componentStyle rectangle
+skinparam linetype ortho
+'skinparam nodesep 30
+'skinparam ranksep 30
+
+allow_mixing
+
+hide empty members
+namespace All_HMS_code <<Frame>> {
+
+    package hms_artisan <<Folder>> {
+
+        namespace artisan_objects <<Rectangle>> {
+
+            class Artisan
+
+            Artisan --|> All_HMS_code.hms_core.business_objects.BaseArtisan
+            Artisan --|> All_HMS_code.hms_artisan.data_storage.JSONFileDataObject
+
+            class Order
+
+            Order --|> All_HMS_code.hms_artisan.data_storage.JSONFileDataObject
+            Order ..> All_HMS_code.hms_core.business_objects.Address : duplicates\nstructure of
+
+            class Product
+
+            Product --|> All_HMS_code.hms_artisan.data_storage.JSONFileDataObject
+            Product --|> All_HMS_code.hms_core.business_objects.BaseProduct
+
+        }
+
+        namespace data_storage <<Rectangle>> {
+
+            class JSONFileDataObject
+
+            JSONFileDataObject --|> All_HMS_code.hms_core.data_objects.BaseDataObject
+
+        }
+
+    }
+
+    package hms_core <<Folder>> {
+
+        namespace business_objects <<Rectangle>> {
+
+            class Address
+
+            abstract class BaseArtisan
+
+            BaseArtisan --o Address
+
+            abstract class BaseCustomer
+
+            BaseCustomer --o Address
+
+            abstract class BaseOrder
+
+            BaseOrder --|> HasProducts
+
+            abstract class BaseProduct
+
+            abstract class HasProducts
+
+            HasProducts --o BaseProduct
+
+        }
+
+        namespace co_objects <<Rectangle>> {
+
+            class Artisan {
+            }
+
+            Artisan --|> All_HMS_code.hms_core.business_objects.BaseArtisan
+            Artisan --|> All_HMS_code.hms_core.data_storage.HMSMongoDataObject
+
+            class Product {
+            }
+
+            Product --|> All_HMS_code.hms_core.business_objects.BaseProduct
+            Product --|> All_HMS_code.hms_core.data_storage.HMSMongoDataObject
+
+        }
+
+        namespace data_objects <<Rectangle>> {
+
+            abstract class BaseDataObject
+
+        }
+
+        namespace daemons <<Rectangle>> {
+
+            note as no_daemons
+                This namespace
+                will be removed
+            end note
+        }
+
+        namespace data_storage <<Rectangle>> {
+
+            note as no_core_data_storage
+                This namespace
+                will be removed
+            end note
+
+        }
+
+    }
+
+}
+
+@enduml
+

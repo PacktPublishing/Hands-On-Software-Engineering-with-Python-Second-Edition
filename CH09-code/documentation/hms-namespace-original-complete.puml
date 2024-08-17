@@ -1,0 +1,221 @@
+@startuml
+
+' title The detailed namespace diagram for the "original" Hand Made Stuff codebase as of the start of Chapter 9
+
+' This can be rendered, then saved as a PNG or SVG image/document by copying this text,
+' going to https://www.plantuml.com/plantuml/uml, and pasting it into the large text box
+' at the top of that page.
+' Just below that text-box are PNG and SVG links that can be saved as the relevant file-type
+
+'left to right direction
+
+!theme mars
+
+skinparam monochrome true
+skinparam componentStyle rectangle
+skinparam linetype ortho
+'skinparam nodesep 30
+'skinparam ranksep 30
+
+allow_mixing
+
+hide empty members
+
+namespace All_HMS_code <<Frame>> {
+
+    package hms_artisan <<Folder>> {
+
+        namespace artisan_objects <<Rectangle>> {
+
+            class Artisan {
+                <Address> address
+                <str|None> company_name
+                <str<email>> contact_email
+                <str> contact_name
+                <str<URL>> website
+            }
+
+            Artisan --|> All_HMS_code.hms_core.business_objects.BaseArtisan
+            Artisan --|> All_HMS_code.hms_artisan.data_storage.JSONFileDataObject
+
+            class Order {
+                <str> name
+                <str> street_address
+                <str|None> building_address
+                <str> city
+                <str|None> region
+                <str|None> postal_code
+                <str|None> country
+                <dict[oid:int]> items
+            }
+
+            Order --|> All_HMS_code.hms_artisan.data_storage.JSONFileDataObject
+            Order ..> All_HMS_code.hms_core.business_objects.Address : duplicates\nstructure of
+
+            class Product {
+                {static} <str> _file_store_dir
+                <str> name
+                <str> summary
+                <str> description
+                <str> dimensions
+                <dict[str:str]> metadata
+                <bool> available
+                <bool> store_available
+                <int> shipping_weight
+                {static} _load_objects(<bool> force_load)
+                {static} from_data_dict(<dict> data_dict)
+            }
+
+            Product --|> All_HMS_code.hms_artisan.data_storage.JSONFileDataObject
+            Product --|> All_HMS_code.hms_core.business_objects.BaseProduct
+
+        }
+
+        namespace data_storage <<Rectangle>> {
+
+            class JSONFileDataObject {
+
+                <None> _create()
+                <None> _update()
+                <None> save()
+                {static} _load_objects(<bool> force_load)
+                {static} delete(<UUID> *oids)
+                {static} get(<UUID> *oids, <dict <str:str>> **criteria)
+            }
+
+            JSONFileDataObject --|> All_HMS_code.hms_core.data_objects.BaseDataObject
+
+        }
+
+    }
+
+    package hms_core <<Folder>> {
+
+        namespace business_objects <<Rectangle>> {
+
+            class Address {
+                <str> street_address
+                <str|None> building_address
+                <str> city
+                <str|None> region
+                <str|None> postal_code
+                <str|None> country
+            }
+
+            abstract class BaseArtisan {
+
+                <Address> address
+                <str|None> company_name
+                <str<email>> contact_email
+                <str> contact_name
+                <str<URL>> website
+
+            }
+            BaseArtisan --o Address
+
+            abstract class BaseCustomer {
+
+                <str> name
+                <Address> billing_address
+                <Address> shipping_address
+
+            }
+            BaseCustomer --o Address
+
+            abstract class BaseOrder {
+                <BaseCustomer> customer
+            }
+            BaseOrder --|> HasProducts
+
+            abstract class BaseProduct {
+                <str> name
+                <str> summary
+                <str> description
+                <str> dimensions
+                <dict[str:str]> metadata
+                <bool> available
+                <bool> store_available
+                <int> shipping_weight
+
+                <None> remove_metadata(<str> key)
+                <None> set_metadata(<str> key, <str> value)
+            }
+
+            abstract class HasProducts {
+                <BaseProduct*> products
+
+                {abstract} <None> add_product(<BaseProduct> product)
+                {abstract} <BaseProduct> remove_product(<BaseProduct> product)
+            }
+
+            HasProducts --o BaseProduct
+
+        }
+
+        namespace co_objects <<Rectangle>> {
+
+            class Artisan {
+            }
+
+            Artisan --|> All_HMS_code.hms_core.business_objects.BaseArtisan
+            Artisan --|> All_HMS_code.hms_core.data_storage.HMSMongoDataObject
+
+            class Product {
+            }
+
+            Product --|> All_HMS_code.hms_core.business_objects.BaseProduct
+            Product --|> All_HMS_code.hms_core.data_storage.HMSMongoDataObject
+
+        }
+
+        namespace data_objects <<Rectangle>> {
+
+            abstract class BaseDataObject {
+                <datetime> created
+                <bool> is_active
+                <bool> is_deleted
+                <bool> is_dirty
+                <bool> is_new
+                <datetime> modified
+                <UUID> oid
+
+                {abstract}{static} delete(<UUID> *oids)
+                {abstract}{static} from_data_dict(<dict> data_dict)
+                {abstract}{static} get(<UUID> *oids, <object> **criteria)
+                {abstract}{static} sort(<BaseDataObject*> objects, <str> sort_by)
+                
+                {abstract} matches(<object> **criteria)
+                {abstract} _create()
+                {abstract} _update()
+                save()
+            }
+
+        }
+
+        namespace daemons <<Rectangle>> {
+
+            note as no_daemons
+                This namespace
+                will be removed
+            end note
+        }
+
+        namespace data_storage <<Rectangle>> {
+
+            note as no_core_data_storage
+                This namespace
+                will be removed
+            end note
+
+        }
+
+    }
+
+    note as no_inits
+        The ""_ _init_ _"" methods
+        are omitted for space
+    end note
+}
+
+@enduml
+

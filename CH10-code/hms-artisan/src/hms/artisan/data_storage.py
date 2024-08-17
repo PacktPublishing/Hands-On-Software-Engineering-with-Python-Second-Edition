@@ -350,7 +350,9 @@ class JSONFileDataObject(
                 self._set_is_dirty(False)
                 self._set_is_new(False)
                 # - Update it in the loaded objects
-                self.__class__._loaded_objects[self.oid] = self
+                self.__class__._loaded_objects[
+                    self.oid
+                ] = self
             except PermissionError:
                 # - Raise a more informative error
                 raise PermissionError(
@@ -486,7 +488,7 @@ class JSONFileDataObject(
                     # - If data-structure or -content is
                     #   a problem, raise an error with
                     #   helpful information
-                    except (TypeError, ValueError) as error:
+                    except (TypeError, ValueError) as err:
                         raise error.__class__(
                             '%s could not load object-'
                             'data from the data-store '
@@ -495,8 +497,8 @@ class JSONFileDataObject(
                             'expected (%s: %s)' %
                             (
                                 cls.__name__, item_file,
-                                error.__class__.__name__,
-                                error
+                                err.__class__.__name__,
+                                err
                             )
                         )
                     # - Other errors will simply surface,
@@ -543,7 +545,11 @@ class JSONFileDataObject(
                 'try again' %
                 (
                     cls.__name__, len(failed_deletions),
-                    ('files' if len(failed_deletions) > 1 else 'file'),
+                    (
+                        'files'
+                        if len(failed_deletions) > 1
+                        else 'file'
+                    ),
                     ', '.join(failed_deletions)
                 )
             )

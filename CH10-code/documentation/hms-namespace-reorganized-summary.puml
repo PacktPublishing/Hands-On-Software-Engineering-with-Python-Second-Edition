@@ -1,6 +1,6 @@
 @startuml
 
-' title The detailed namespace diagram for the Hand Made Stuff codebase as of the start of Chapter 9
+' title The summary namespace diagram for the Hand Made Stuff codebase as of the start of Chapter 10
 
 ' This can be rendered, then saved as a PNG or SVG image/document by copying this text,
 ' going to https://www.plantuml.com/plantuml/uml, and pasting it into the large text box

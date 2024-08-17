@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 """
-Provides classes and functionality for data-storage
-configuration and implementation for the Artisan
-application.
+TODO: Document the module.
+Provides classes and functionality for SOME_PURPOSE
 """
 
 #######################################
@@ -44,7 +43,7 @@ from uuid import UUID
 # Third-party imports needed          #
 #######################################
 
-from hms.core.data_objects import BaseDataObject
+from hms_core.data_objects import BaseDataObject
 
 #######################################
 # Local imports needed                #
@@ -80,11 +79,11 @@ class JSONFileDataObject(
     BaseDataObject, metaclass=abc.ABCMeta
 ):
     """
-    Provides baseline functionality, interface
-    requirements, and type-identity for objects that can
-    persist their state-data as JSON files in a local
-    file-system file-cache
-    """
+Provides baseline functionality, interface requirements,
+and type-identity for objects that can persist their
+state-data as JSON files in a local file-system file-
+cache
+"""
     ###################################
     # Class attributes/constants      #
     ###################################
@@ -127,37 +126,32 @@ class JSONFileDataObject(
         is_new: (bool, int, None) = None,
     ):
         """
-        Object initialization.
+Object initialization.
 
-        self ......... (JSONFileDataObject instance,
-                       required) The instance to execute
-                       against
-        oid .......... (UUID|str, optional, defaults to
-                       None)
-        created ...... (datetime|str|float|int, optional,
-                       defaults to None)
-        modified ..... (datetime|str|float|int, optional,
-                       defaults to None)
-        is_active .... (bool|int, optional, defaults to
-                       None)
-        is_deleted ... (bool|int, optional, defaults to
-                       None)
-        is_dirty ..... (bool|int, optional, defaults to
-                       None)
-        is_new ....... (bool|int, optional, defaults to
-                       None)
-        """
-        # - When used by a subclass, require that subclass
-        #   to define a valid file-system path in its
-        #   _file_store_dir class-attribute - that's where
-        #   the JSON files will live
-        if self.__class__._file_store_dir == None:
+self .............. (JSONFileDataObject instance,
+                    required) The instance to execute
+                    against
+oid ............... (UUID|str, optional, defaults to None)
+created ........... (datetime|str|float|int, optional,
+                    defaults to None)
+modified .......... (datetime|str|float|int, optional,
+                    defaults to None)
+is_active ......... (bool|int, optional, defaults to None)
+is_deleted ........ (bool|int, optional, defaults to None)
+is_dirty .......... (bool|int, optional, defaults to None)
+is_new ............ (bool|int, optional, defaults to None)
+"""
+        # - When used by a subclass, require that
+        #   subclass to define a valid file-system path
+        #   in its _file_store_dir class-attribute:
+        #   that's where the JSON files will live
+        if self.__class__._file_store_dir == None: E501
             raise AttributeError(
                 '%s has not defined a file-system '
                 'location to store JSON data of its '
                 'instances\' data. Please set '
-                '%s._file_store_dir to a valid '
-                'file-system path' %
+                '%s._file_store_dir to a valid file-'
+                'system path' %
                 (
                     self.__class__.__name__,
                     self.__class__.__name__
@@ -203,7 +197,8 @@ class JSONFileDataObject(
                         (
                             self.__class__._file_store_dir,
                             os.sep
-                        ), 'w'
+                        ),
+                        'w'
                     )
                     test_file.write('test-file.txt')
                     test_file.close()
@@ -219,14 +214,16 @@ class JSONFileDataObject(
                             self.__class__._file_store_dir
                         )
                     )
-                # - ...that files can be read there...
+                # - ... that files can be read from
+                #   there...
                 try:
                     test_file = open(
                         '%s%stest-file.txt' %
                         (
                             self.__class__._file_store_dir,
                             os.sep
-                        ), 'r'
+                        ),
+                        'r'
                     )
                     test_file.read()
                     test_file.close()
@@ -271,6 +268,11 @@ class JSONFileDataObject(
             self, oid, created, modified,
             is_active, is_deleted, is_dirty, is_new
         )
+        # - Set default instance property-values
+        #   using _del_... methods
+        # - Set instance property-values from arguments
+        #   using _set_... methods
+        # - Perform any other initialization needed
 
     ###################################
     # Object deletion                 #
@@ -286,9 +288,9 @@ class JSONFileDataObject(
 
     def _create(self) -> None:
         """
-        Creates a new state-data record for the instance
-        in the back-end data-store
-        """
+Creates a new state-data record for the instance in the
+back-end data-store
+"""
         # - Since all data-transactions for these objects
         #   involve a file-write, we're just going to
         #   define this method in order to meet the
@@ -304,9 +306,9 @@ class JSONFileDataObject(
 
     def _update(self) -> None:
         """
-        Updates an existing state-data record for the
-        instance in the back-end data-store
-        """
+Updates an existing state-data record for the instance in
+the back-end data-store
+"""
         # - Since all data-transactions for these objects
         #   involve a file-write, we're just going to
         #   define this method in order to meet the
@@ -323,10 +325,10 @@ class JSONFileDataObject(
     # NOTE: This can be used to illustrate unittest.skip
     def save(self):
         """
-        Saves the instance's state-data to the back-end
-        data-store by creating it if the instance is new,
-        or updating it if the instance is dirty
-        """
+Saves the instance's state-data to the back-end data-
+store by creating it if the instance is new, or updating
+it if the instance is dirty
+"""
         if self.is_new or self.is_dirty:
             # - Make sure objects are loaded:
             self.__class__._load_objects(self.__class__)
@@ -350,7 +352,9 @@ class JSONFileDataObject(
                 self._set_is_dirty(False)
                 self._set_is_new(False)
                 # - Update it in the loaded objects
-                self.__class__._loaded_objects[self.oid] = self
+                self.__class__._loaded_objects[
+                    self.oid
+                ] = self
             except PermissionError:
                 # - Raise a more informative error
                 raise PermissionError(
@@ -375,26 +379,24 @@ class JSONFileDataObject(
     # Class methods                   #
     ###################################
 
+    @classmethod
     def _load_objects(cls, force_load=False):
         """
-        Class-level helper-method that loads all of the
-        objects in the local file-system data-store into
-        memory so that they can be used more quickly
-        afterwards.
+Class-level helper-method that loads all of the objects
+in the local file-system data-store into memory so that
+they can be used more quickly afterwards.
 
-        Expected to be called by the get class-method to
-        load objects for local retrieval, and other places
-        as needed.
+Expected to be called by the get class-method to load
+objects for local retrieval, and other places as needed.
 
-        cls .......... (class, required) The class that
-                       the method is bound to
-        force_load ... (bool, optional, defaults to False)
-                       If True, forces the process to re-
-                       load data from scratch, otherwise
-                       skips the load process if data
-                       already exists.
-        """
-        if cls._loaded_objects == None or force_load:
+cls .......... (class, required) The class that the
+               method is bound to
+force_load ... (bool, optional, defaults to False) If
+               True, forces the process to re-load data
+               from scratch, otherwise skips the load
+               process if data already exists.
+"""
+        if cls._loaded_objects == None or force_load: E501
             if not os.path.exists(cls._file_store_dir):
                 # - If the path-specification exists, try
                 #   to assure that the *path* exists, and
@@ -483,10 +485,12 @@ class JSONFileDataObject(
                             'and try again' %
                             (cls.__name__, item_file)
                         )
-                    # - If data-structure or -content is
-                    #   a problem, raise an error with
+                    # - If data-structure or -content
+                    #   is a problem, raise an error with
                     #   helpful information
-                    except (TypeError, ValueError) as error:
+                    except (
+                        TypeError, ValueError
+                    ) as error:
                         raise error.__class__(
                             '%s could not load object-'
                             'data from the data-store '
@@ -505,10 +509,10 @@ class JSONFileDataObject(
     @classmethod
     def delete(cls, *oids):
         """
-        Performs an ACTUAL record deletion from the back-
-        end data-store of all records whose unique
-        identifiers have been provided
-        """
+Performs an ACTUAL record deletion from the back-end
+data-store of all records whose unique identifiers have
+been provided
+"""
         # - First, ensure that objects are loaded
         cls._load_objects(cls)
         # - For each oid specified, try to remove the
@@ -543,7 +547,11 @@ class JSONFileDataObject(
                 'try again' %
                 (
                     cls.__name__, len(failed_deletions),
-                    ('files' if len(failed_deletions) > 1 else 'file'),
+                    (
+                        'files'
+                        if len(failed_deletions) > 1
+                        else 'file'
+                    ),
                     ', '.join(failed_deletions)
                 )
             )
@@ -551,17 +559,19 @@ class JSONFileDataObject(
     @classmethod
     def get(cls, *oids, **criteria):
         """
-        Finds and returns all instances of the class from
-        the back-end data-store whose oids are provided
-        and/or that match the supplied criteria
-        """
+Finds and returns all instances of the class from the
+back-end data-store whose oids are provided and/or that
+match the supplied criteria
+"""
         # - First, ensure that objects are loaded
         cls._load_objects(cls)
         # - If oids have been specified, then the initial
         #   results are all items in the in-memory store
         #   whose oids are in the supplied oids-list
         if oids:
-            oids = tuple([str(o) for o in oids])
+            oids = tuple(
+                [str(o) for o in oids]
+            )
             # - If no criteria were supplied, then oids
             #   are all we need to match against:
             if not criteria:
@@ -579,8 +589,9 @@ class JSONFileDataObject(
                     if str(o.oid) in oids
                     and o.matches(**criteria)
                 ]
-            # - In either case, we have a list of matching
-            #   items, which may be empty, so return it:
+            # - In either case, we have a list of
+            #   matching items, which may be empty, so
+            #   return it:
             return results
         # - If oids were NOT specified, then the results
         #   are all objects in memory that match the
@@ -595,26 +606,6 @@ class JSONFileDataObject(
         #   available:
         else:
             return list(cls._loaded_objects.values())
-
-    ###################################
-    # Static methods                  #
-    ###################################
-
-#######################################
-# Concrete classes                    #
-#######################################
-
-#######################################
-# Initialization needed after member  #
-#   definition is complete            #
-#######################################
-
-#######################################
-# Imports needed after member         #
-#   definition (to resolve circular   #
-#   dependencies - avoid if at all    #
-#   possible                          #
-#######################################
 
 #######################################
 # Code to execute if the module is    #

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """
-Provides classes and functionality for data-storage
-configuration and implementation in the Central Office
-application.
+TODO: Document the module.
 """
 
 #######################################
@@ -36,10 +34,13 @@ __status__ = 'Development'
 
 import abc
 import json
-import pymongo
 
 from datetime import datetime
 from uuid import UUID
+
+from pymongo.collection import Collection
+from pymongo import MongoClient
+from pymongo.database import Database
 
 #######################################
 # Third-party imports needed          #
@@ -293,39 +294,34 @@ database, user, and password values.
 
     def __init__(
         self,
-        host=None,
-        port=None,
-        database=None,
-        user=None,
-        password=None
+        host=None, port=None,
+        database=None, user=None, password=None
     ):
         """
-        Object initialization.
+Object initialization.
 
-        self ....... (DatastoreConfig instance, required)
-                     The instance to execute against
-        host ....... (str, optional, defaults to None)
-                     the host-name (FQDN, machine
-                     network-name or IP address) where
-                     the database that the instance will
-                     use to persist state-data resides
-        port ....... (int [0..65535], optional, defaults
-                     to None) the TCP/IP port on the host
-                     that the database connection will
-                     use
-        database ... (str, optional, defaults to None)
-                     The name of the database that the
-                     instance will use to persist state-
-                     data
-        user ....... (str, optional, defaults to None)
-                     The user-name used to connect to the
-                     database that the instance will use
-                     to persist state-data
-        password ... (str, optional, defaults to None)
-                     The password used to connect to the
-                     database that the instance will use
-                     to persist state-data
-        """
+self .......... (DatastoreConfig instance, required) The
+                instance to execute against
+host .......... (str, optional, defaults to None) the
+                host-name (FQDN, machine network-name or
+                IP address) where the database that the
+                instance will use to persist state-data
+                resides
+port .......... (int [0..65535], optional, defaults to
+                None) the TCP/IP port on the host that
+                the database connection will use
+database ...... (str, optional, defaults to None) the
+                name of the database that the instance
+                will use to persist state-data
+user .......... (str, optional, defaults to None) the
+                user-name used to connect to the database
+                that the instance will use to persist
+                state-data
+password ...... (str, optional, defaults to None) the
+                password used to connect to the database
+                that the instance will use to persist
+                state-data
+"""
         # - Call parent initializers if needed
         # - Set default instance property-values
         #   using _del_... methods
@@ -374,8 +370,8 @@ database, user, and password values.
             fp.close()
         except (IOError, PermissionError) as error:
             raise error.__class__(
-                '%s could not read the config-file at %s '
-                'due to an error (%s): %s' %
+                '%s could not read the config-file '
+                'at %s due to an error (%s): %s' %
                 (
                     cls.__name__, config_file,
                     error.__class__.__name__, error
@@ -407,9 +403,8 @@ database, user, and password values.
         else:
             raise RuntimeError(
                 '%s did not recognize the format of the '
-                'config-file at %s' % (
-                    cls.__name__, config_file
-                )
+                'config-file at %s'
+                % (cls.__name__, config_file)
             )
 
     ###################################
@@ -429,11 +424,10 @@ class HMSMongoDataObject(
     BaseDataObject, metaclass=abc.ABCMeta
 ):
     """
-    Provides baseline functionality, interface
-    requirements, and type-identity for objects that can
-    persist their state-data to a MongoDB-based back-end
-    data-store.
-    """
+Provides baseline functionality, interface requirements,
+and type-identity for objects that can persist their
+state-data to a MongoDB-based back-end data-store.
+"""
     ###################################
     # Class attributes/constants      #
     ###################################
@@ -441,7 +435,7 @@ class HMSMongoDataObject(
     # - Keeps track of the global configuration for
     #   data-access
     _configuration = None
-    # - Keeps track of the keys allowed for object-
+    # - Keeps track of the keys allowed for object
     #   creation from retrieved data
     _data_dict_keys = None
     # - Allows the default mongo-collection name (the
@@ -455,14 +449,12 @@ class HMSMongoDataObject(
     # Property-getter methods         #
     ###################################
 
-    def _get_collection(
-        self
-    ) -> pymongo.collection.Collection:
+    def _get_collection(self) -> Collection:
         try:
             return self.__class__._collection
         except AttributeError:
-            # - If the class specifies a collection
-            #   name, then use that as the collection...
+            # - If the class specifies a collection-name,
+            #   then use that as the collection...
             if self.__class__._mongo_collection:
                 self.__class__._collection = self.database[
                     self.__class__._mongo_collection
@@ -477,7 +469,7 @@ class HMSMongoDataObject(
     def _get_configuration(self) -> DatastoreConfig:
         return HMSMongoDataObject._configuration
 
-    def _get_connection(self) -> pymongo.MongoClient:
+    def _get_connection(self) -> MongoClient:
         try:
             return self.__class__._connection
         except AttributeError:
@@ -496,12 +488,12 @@ class HMSMongoDataObject(
                         self.configuration.port
                     )
             # - Create the connection
-            self.__class__._connection = pymongo.MongoClient(
+            self.__class__._connection = MongoClient(
                 *conn_config
             )
             return self.__class__._connection
 
-    def _get_database(self) -> pymongo.database.Database:
+    def _get_database(self) -> Database:
         try:
             return self.__class__._database
         except AttributeError:
@@ -588,43 +580,39 @@ class HMSMongoDataObject(
         is_new: (bool, int, None) = None,
     ):
         """
-        Object initialization.
+Object initialization.
 
-        self ......... (HMSMongoDataObject instance,
-                       required) The instance to execute
-                       against
-        oid .......... (UUID|str, optional, defaults to
-                       None) The unique identifier of the
-                       object's state-data record in the
-                       back-end data-store
-        created ...... (datetime|str|float|int, optional,
-                       defaults to None) The date/time
-                       that the object was created
-        modified ..... (datetime|str|float|int, optional,
-                       defaults to None) The date/time
-                       that the object was last modified
-        is_active .... (bool|int, optional, defaults to
-                       None) A flag indicating that the
-                       object is active
-        is_deleted ... (bool|int, optional, defaults to
-                       None) A flag indicating that the
-                       object should be considered
-                       deleted (and may be in the near
-                       future)
-        is_dirty ..... (bool|int, optional, defaults to
-                       None) A flag indicating that the
-                       object's data needs to be updated
-                       in the back-end data-store
-        is_new ....... (bool|int, optional, defaults to
-                       None) A flag indicating that the
-                       object's data needs to be created
-                       in the back-end data-store
-        """
+self .......... (HMSMongoDataObject instance, required)
+                The instance to execute against
+oid ........... (UUID|str, optional, defaults to None) The
+                unique identifier of the object's state-
+                data record in the back-end data-store
+created ....... (datetime|str|float|int, optional,
+                defaults to None) The date/time that the
+                object was created
+modified ...... (datetime|str|float|int, optional,
+                defaults to None) The date/time that the
+                object was last modified
+is_active ..... (bool|int, optional, defaults to None) A
+                flag indicating that the object is active
+is_deleted .... (bool|int, optional, defaults to None) A
+                flag indicating that the object should be
+                considered deleted (and may be in the near
+                future)
+is_dirty ...... (bool|int, optional, defaults to None) A
+                flag indicating that the object's data
+                needs to be updated in the back-end data-
+                store
+is_new ........ (bool|int, optional, defaults to None) A
+                flag indicating that the object's data
+                needs to be created in the back-end
+                data-store
+"""
         # - Call parent initializers if needed
         BaseDataObject.__init__(
             self,
-            oid, created, modified, is_active, is_deleted,
-            is_dirty, is_new
+            oid, created, modified, is_active,
+            is_deleted, is_dirty, is_new
         )
         # - Perform any other initialization needed
 
@@ -642,9 +630,9 @@ class HMSMongoDataObject(
 
     def _create(self) -> None:
         """
-        Creates a new state-data record for the instance
-        in the back-end data-store
-        """
+Creates a new state-data record for the instance in the
+back-end data-store
+"""
         # - Since all data-transactions for these objects
         #   involve a file-write, we're just going to
         #   define this method in order to meet the
@@ -660,9 +648,9 @@ class HMSMongoDataObject(
 
     def _update(self) -> None:
         """
-        Updates an existing state-data record for the
-        instance in the back-end data-store
-        """
+Updates an existing state-data record for the instance in
+the back-end data-store
+"""
         # - Since all data-transactions for these objects
         #   involve a file-write, we're just going to
         #   define this method in order to meet the
@@ -677,24 +665,22 @@ class HMSMongoDataObject(
         )
 
     def save(self):
-        # TODO: For the time being, we're going to
-        #       assume that save operations don't need to
-        #       care about whether the object's data is
-        #       new or dirty, that we wouldn't be
-        #       calling save unless we already knew that
-        #       to be the case. If that changes, we'll
-        #       want to check is_dirty and is_new, as
-        #       shown below, *and* make sure that they
-        #       get modified accordingly.
-        if self._is_new or self._is_dirty:
-            # - Make sure to update the modified
-            #   time-stamp!
-            self.modified = datetime.now()
-            data_dict = self.to_data_dict()
-            data_dict['_id'] = self.oid
-            self.collection.insert_one(data_dict)
-            self._set_is_dirty(False)
-            self._set_is_new(False)
+        # TODO: For the time being, we're going to assume
+        #       that save operations don't need to care
+        #       about whether the object's data is new or
+        #       dirty, that we wouldn't be calling save
+        #       unless we already knew that to be the
+        #       case. If that changes, we'll want to
+        #       check is_dirty and is_new, as shown
+        #       below, *and* make sure that they get
+        #       modified accordingly.
+        # - Make sure to update the modified time-stamp!
+        self.modified = datetime.now()
+        data_dict = self.to_data_dict()
+        data_dict['_id'] = self.oid
+        self.collection.insert_one(data_dict)
+        self._set_is_dirty(False)
+        self._set_is_new(False)
 
     ###################################
     # Overrides of built-in methods   #
@@ -707,15 +693,15 @@ class HMSMongoDataObject(
     @classmethod
     def configure(cls, configuration: (DatastoreConfig)):
         """
-        Sets configuration values across all classes
-        derived from HMSMongoDataObject.
-        """
+Sets configuration values across all classes derived from
+HMSMongoDataObject.
+"""
         if cls != HMSMongoDataObject:
             raise RuntimeError(
                 '%s.configure will alter *all* MongoDB '
-                'configuration, not just the '
-                'configuration for %s. Please use '
-                'HMSMongoDataObject.configure instead.' %
+                'configuration, not just the configura'
+                'tion for %s. Please use HMSMongoData'
+                'Object.configure instead.' %
                 (cls.__name__, cls.__name__)
             )
         if not isinstance(configuration, DatastoreConfig):
@@ -733,10 +719,10 @@ class HMSMongoDataObject(
     @classmethod
     def delete(cls, *oids):
         """
-        Performs an ACTUAL record deletion from the back-
-        end data-store of all records whose unique
-        identifiers have been provided
-        """
+Performs an ACTUAL record deletion from the back-end data-
+store of all records whose unique identifiers have been
+provided
+"""
         # - First, we need the collection that we're
         #   working with:
         collection = cls.get_mongo_collection()
@@ -754,11 +740,11 @@ class HMSMongoDataObject(
             init_args = argspec.args
             try:
                 init_args.remove('self')
-            except:
+            except Exception:
                 pass
             try:
                 init_args.remove('cls')
-            except:
+            except Exception:
                 pass
             print(argspec)
             if argspec.varargs:
@@ -775,7 +761,8 @@ class HMSMongoDataObject(
                 'present in %s.__init__ (%s)' %
                 (
                     cls.__name__, cls.__name__,
-                    cls.__name__, cls.__name__,
+                    cls.__name__,
+                    cls.__name__,
                     "'" + "', '".join(init_args) + "'"
                 )
             )
@@ -789,8 +776,8 @@ class HMSMongoDataObject(
                 and key in cls._data_dict_keys
             ]
         )
-        # - Then create and return an instance of
-        #   the class
+        # - Then create and return an instance of the
+        #   class
         return cls(**data_dict)
 
     @classmethod
@@ -835,8 +822,8 @@ class HMSMongoDataObject(
                 item for item in collection.find()
             ]
         # - At this point, we have data_dict values that
-        #   should be able to create instances, so
-        #   create them.
+        #   should be able to create instances, so create
+        #   them.
         results = [
             cls.from_data_dict(data_dict)
             for data_dict in data_dicts
@@ -853,14 +840,12 @@ class HMSMongoDataObject(
         return results
 
     @classmethod
-    def get_mongo_collection(
-        cls
-    ) -> pymongo.collection.Collection:
+    def get_mongo_collection(cls) -> Collection:
         """
-        Helper class-method that retrieves the relevant
-        MongoDB collection for data-access to state-data
-        records for the class.
-        """
+Helper class-method that retrieves the relevant MongoDB
+collection for data-access to state-data records for the
+class.
+"""
         # - If the collection has already been created,
         #   then return it, otherwise create it then
         #   return it
@@ -870,11 +855,11 @@ class HMSMongoDataObject(
             pass
         if not cls._configuration:
             raise RuntimeError(
-                '%s must be configured before the use of'
-                '%s.get will work. Call '
-                'HMSMongoDataObject.configure with a '
-                'DatastoreConfig object to resolve this '
-                'issue' % (cls.__name__, cls.__name__)
+                '%s must be configured before the use of '
+                '%s.get will work. Call HMSMongoData'
+                'Object.configure with a DatastoreConfig '
+                'object to resolve this issue'
+                % (cls.__name__, cls.__name__)
             )
         # - With configuration established, we can create
         #   the connection, database and collection
@@ -889,13 +874,9 @@ class HMSMongoDataObject(
             #   a host, though, so host has to be defined
             #   first...
             if cls._configuration.port:
-                conn_config.append(
-                    cls.configuration.port
-                )
+                conn_config.append(cls.configuration.port)
         # - Create the connection
-        cls._connection = pymongo.MongoClient(
-            *conn_config
-        )
+        cls._connection = MongoClient(*conn_config)
         # - Create the database
         cls._database = cls._connection[
             cls._configuration.database

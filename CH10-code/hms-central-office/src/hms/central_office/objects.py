@@ -45,7 +45,7 @@ from uuid import UUID
 from hms.core.business_objects import Address, \
     BaseArtisan, BaseProduct, HasProducts
 from hms.core.data_objects import BaseDataObject
-from hms.core.data_storage import HMSMongoDataObject
+from data_storage import HMSMongoDataObject
 
 #######################################
 # Local imports needed                #

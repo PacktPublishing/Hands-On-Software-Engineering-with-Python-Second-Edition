@@ -63,8 +63,8 @@ EMAIL_CHECK = re.compile(
     r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)'
 )
 URL_CHECK = re.compile(
-    r'(^https?: //[A-Za-z0-9][-_A-Za-z0-9]*\.'
-    r'[A-Za-z0-9][-_A-Za-z0-9\.]*$)'
+    r'(^https?: //[A-Za-z0-9][-_A-Za-z0-9]*\.[A-Za-z0-9]'
+    r'[-_A-Za-z0-9\.]*$)'
 )
 
 #######################################
@@ -85,8 +85,8 @@ URL_CHECK = re.compile(
 
 class Address:
     """
-Represents a physical mailing-address/location
-"""
+    Represents a physical mailing-address/location
+    """
     ###################################
     # Class attributes/constants      #
     ###################################
@@ -130,9 +130,9 @@ Represents a physical mailing-address/location
         self, value: (str, None)
     ) -> None:
         if value != None:
-            # - Type-check: If the value isn't None, then
-            #   it has to be a non-empty, single-line
-            #   string without tabs
+            # - Type-check: If the value isn't None,
+            #   then it has to be a non-empty, single-
+            #   line string without tabs
             if type(value) != str:
                 raise TypeError(
                     '%s.building_address expects a '
@@ -145,7 +145,7 @@ Represents a physical mailing-address/location
                         type(value).__name__
                     )
                 )
-            # - Value-check: no whitespace except " "
+            # - Value-check: no whitespace other than " "
             bad_chars = ('\n', '\r', '\t')
             is_valid = True
             for bad_char in bad_chars:
@@ -153,7 +153,7 @@ Represents a physical mailing-address/location
                     is_valid = False
                     break
             # - If it's empty or otherwise not valid,
-            #   raise error
+            #   raise an error
             if not value.strip() or not is_valid:
                 raise ValueError(
                     '%s.building_address expects a '
@@ -175,8 +175,8 @@ Represents a physical mailing-address/location
         # - Type-check: This is a required str value
         if type(value) != str:
             raise TypeError(
-                '%s.city expects a single-line, non-'
-                'empty str value, with no whitespace '
+                '%s.city expects a single-line, '
+                'non-empty str value, with no whitespace '
                 'other than spaces, but was passed '
                 '"%s" (%s)' %
                 (
@@ -184,7 +184,7 @@ Represents a physical mailing-address/location
                     type(value).__name__
                 )
             )
-        # - Value-check: no whitespace except " "
+        # - Value-check: no whitespace other than " "
         bad_chars = ('\n', '\r', '\t')
         is_valid = True
         for bad_char in bad_chars:
@@ -192,11 +192,11 @@ Represents a physical mailing-address/location
                 is_valid = False
                 break
         # - If it's empty or otherwise not valid,
-            #   raise error
+        #   raise an error
         if not value.strip() or not is_valid:
             raise ValueError(
-                '%s.city expects a single-line, non-'
-                'empty str value, with no whitespace '
+                '%s.city expects a single-line, '
+                'non-empty str value, with no whitespace '
                 'other than spaces, but was passed '
                 '"%s" (%s)' %
                 (
@@ -209,9 +209,9 @@ Represents a physical mailing-address/location
 
     def _set_country(self, value: (str, None)) -> None:
         if value != None:
-            # - Type-check: If the value isn't None, then
-            #   it has to be a non-empty, single-line
-            #   string without tabs
+            # - Type-check: If the value isn't None,
+            #   then it has to be a non-empty,
+            #   single-line string without tabs
             if type(value) != str:
                 raise TypeError(
                     '%s.country expects a single-line, '
@@ -223,7 +223,7 @@ Represents a physical mailing-address/location
                         type(value).__name__
                     )
                 )
-            # - Value-check: no whitespace except " "
+            # - Value-check: no whitespace other than " "
             bad_chars = ('\n', '\r', '\t')
             is_valid = True
             for bad_char in bad_chars:
@@ -231,7 +231,7 @@ Represents a physical mailing-address/location
                     is_valid = False
                     break
             # - If it's empty or otherwise not valid,
-            #   raise error
+            #   raise an error
             if not value.strip() or not is_valid:
                 raise ValueError(
                     '%s.country expects a single-line, '
@@ -244,27 +244,27 @@ Represents a physical mailing-address/location
                     )
                 )
             # - If this point is reached without error,
-            #   then the string-value is valid, so we can
-            #   just exit the if
+            #   then the string-value is valid, so we
+            #   can just exit the if
         self._country = value
 
     def _set_region(self, value: (str, None)) -> None:
         if value != None:
-            # - Type-check: If the value isn't None, then
-            #   it has to be a non-empty, single-line
-            #   string without tabs
+            # - Type-check: If the value isn't None,
+            #   then it has to be a non-empty, single-
+            #   line string without tabs
             if type(value) != str:
                 raise TypeError(
                     '%s.region expects a single-line, '
                     'non-empty str value, with no white'
-                    'space other than spaces or None, '
-                    'but was passed "%s" (%s)' %
+                    'space other than spaces or None, but'
+                    'was passed "%s" (%s)' %
                     (
                         self.__class__.__name__, value,
                         type(value).__name__
                     )
                 )
-            # - Value-check: no whitespace except " "
+            # - Value-check: no whitespace other than " "
             bad_chars = ('\n', '\r', '\t')
             is_valid = True
             for bad_char in bad_chars:
@@ -272,7 +272,7 @@ Represents a physical mailing-address/location
                     is_valid = False
                     break
             # - If it's empty or otherwise not valid,
-            #   raise error
+            #   raise an error
             if not value.strip() or not is_valid:
                 raise ValueError(
                     '%s.region expects a single-line, '
@@ -293,9 +293,9 @@ Represents a physical mailing-address/location
         self, value: (str, None)
     ) -> None:
         if value != None:
-            # - Type-check: If the value isn't None, then
-            #   it has to be a non-empty, single-line
-            #   string without tabs
+            # - Type-check: If the value isn't None,
+            #   then it has to be a non-empty, single-
+            #   line string without tabs
             if type(value) != str:
                 raise TypeError(
                     '%s.postal_code expects a single-'
@@ -307,7 +307,7 @@ Represents a physical mailing-address/location
                         type(value).__name__
                     )
                 )
-            # - Value-check: no whitespace except " "
+            # - Value-check: no whitespace other than " "
             bad_chars = ('\n', '\r', '\t')
             is_valid = True
             for bad_char in bad_chars:
@@ -315,7 +315,7 @@ Represents a physical mailing-address/location
                     is_valid = False
                     break
             # - If it's empty or otherwise not valid,
-            #   raise error
+            #   raise an error
             if not value.strip() or not is_valid:
                 raise ValueError(
                     '%s.postal_code expects a single-'
@@ -345,7 +345,7 @@ Represents a physical mailing-address/location
                     type(value).__name__
                 )
             )
-        # - Value-check: no whitespace except " "
+        # - Value-check: no whitespace other than " "
         bad_chars = ('\n', '\r', '\t')
         is_valid = True
         for bad_char in bad_chars:
@@ -353,7 +353,7 @@ Represents a physical mailing-address/location
                 is_valid = False
                 break
         # - If it's empty or otherwise not valid,
-            #   raise error
+        #   raise an error
         if not value.strip() or not is_valid:
             raise ValueError(
                 '%s.street_address expects a single-'
@@ -417,15 +417,16 @@ Represents a physical mailing-address/location
     )
     postal_code = property(
         _get_postal_code,
-        _set_postal_code, _del_postal_code,
+        _set_postal_code,
+        _del_postal_code,
         'Gets, sets or deletes the postal_code '
         '(str|None) of the instance'
     )
     street_address = property(
         _get_street_address, _set_street_address,
         _del_street_address,
-        'Gets, sets or deletes the street_address (str) '
-        'of the instance'
+        'Gets, sets or deletes the street_address '
+        '(str) of the instance'
     )
 
     ###################################
@@ -434,38 +435,45 @@ Represents a physical mailing-address/location
 
     def __init__(
         self,
-        street_address: (str,), city: (str,),
+        street_address: (str,),
+        city: (str,),
         building_address: (str, None) = None,
         region: (str, None) = None,
         postal_code: (str, None) = None,
         country: (str, None) = None
     ):
         """
-Object initialization.
+        Object initialization.
 
-self .............. (Address instance, required) The
-                    instance to execute against
-street_address .... (str, required) The base street-
-                    address of the location the instance
-                    represents
-city .............. (str, required) The city portion of
-                    the street-address that the instance
-                    represents
-building_address .. (str, optional, defaults to None)
-                    The second line of the street address
-                    the instance represents, if applicable
-region ............ (str, optional, defaults to None)
-                    The region (state, territory, etc.)
-                    portion of the street-address that
-                    the instance represents
-postal_code ....... (str, optional, defaults to None)
-                    The postal-code portion of the
-                    street-address that the instance
-                    represents
-country ........... (str, optional, defaults to None)
-                    The country portion of the street-
-                    address that the instance represents
-"""
+        self .............. (Address instance, required)
+                            The instance to execute
+                            against
+        street_address .... (str, required) The base
+                            street-address of the
+                            location the instance
+                            represents
+        city .............. (str, required) The city
+                            portion of the street-
+                            address that the instance
+                            represents
+        building_address .. (str, optional, defaults to
+                            None) The second line of the
+                            street address the instance
+                            represents, if applicable
+        region ............ (str, optional, defaults to
+                            None) The region (state,
+                            territory, etc.) portion of
+                            the street-address that the
+                            instance represents
+        postal_code ....... (str, optional, defaults to
+                            None) The postal-code portion
+                            of the street-address that
+                            the instance represents
+        country ........... (str, optional, defaults to
+                            None) The country portion of
+                            the street-address that the
+                            instance represents
+        """
         # - Call parent initializers if needed
         # - Set default instance property-values
         #   using _del_... methods
@@ -524,7 +532,8 @@ country ........... (str, optional, defaults to None)
         cls,
         street_address: (str,),
         building_address: (str, None),
-        city: (str,), region: (str, None),
+        city: (str,),
+        region: (str, None),
         postal_code: (str, None),
         country: (str, None)
     ):
@@ -546,9 +555,10 @@ country ........... (str, optional, defaults to None)
 # dependencies in method-annotations in BaseArtisan
 class BaseProduct(metaclass=abc.ABCMeta):
     """
-Provides baseline functionality, interface requirements,
-and type-identity for objects that can represent a Product
-"""
+    Provides baseline functionality, interface
+    requirements, and type-identity for objects that can
+    represent a Product in the context of the HMS system.
+    """
     ###################################
     # Class attributes/constants      #
     ###################################
@@ -593,8 +603,8 @@ and type-identity for objects that can represent a Product
             raise ValueError(
                 '%s.available expects either a boolean '
                 'value (True|False) or a direct int-'
-                'value equivalent (1|0), but was passed '
-                '"%s" (%s)' %
+                'value equivalent (1|0), but was '
+                'passed "%s" (%s)' %
                 (
                     self.__class__.__name__,
                     value, type(value).__name__
@@ -607,53 +617,53 @@ and type-identity for objects that can represent a Product
 
     def _set_description(self, value: str) -> None:
         if value != None:
-            # - Type-check: If the value isn't None, then
-            #   it has to be a non-empty, single-line
-            #   string without tabs
+            # - Type-check: If the value isn't None,
+            #   then it has to be a non-empty, single-
+            #   line string without tabs
             if type(value) != str:
                 raise TypeError(
                     '%s.description expects a single-'
-                    'line, non-empty str value, or None, '
-                    'but was passed "%s" (%s)' %
-                    (
-                        self.__class__.__name__, value,
-                        type(value).__name__
-                    )
-                )
-            # - If it's empty or otherwise not valid,
-            #   raise error
-            if not value.strip():
-                raise ValueError(
-                    '%s.description expects a single-'
-                    'line, non-empty str value, or None, '
-                    'but was passed "%s" (%s)' %
-                    (
-                        self.__class__.__name__, value,
-                        type(value).__name__
-                    )
-                )
-            # - If this point is reached without error,
-            #   then the string-value is valid, so we can
-            #   just exit the if
-        self._description = value
-
-    def _set_dimensions(self, value: str) -> None:
-        if value != None:
-            # - Type-check: If the value isn't None, then
-            #   it has to be a non-empty, single-line
-            #   string without tabs
-            if type(value) != str:
-                raise TypeError(
-                    '%s.dimensions expects a single-'
-                    'line, non-empty str value, with no '
-                    'whitespace other than spaces or '
+                    'line, non-empty str value, or '
                     'None, but was passed "%s" (%s)' %
                     (
                         self.__class__.__name__, value,
                         type(value).__name__
                     )
                 )
-            # - Value-check: no whitespace except " "
+            # - If it's empty or otherwise not valid,
+            #   raise an error
+            if not value.strip():
+                raise ValueError(
+                    '%s.description expects a single-'
+                    'line, non-empty str value, or '
+                    'None, but was passed "%s" (%s)' %
+                    (
+                        self.__class__.__name__, value,
+                        type(value).__name__
+                    )
+                )
+            # - If this point is reached without error,
+            #   then the string-value is valid, so we
+            #   can just exit the if
+        self._description = value
+
+    def _set_dimensions(self, value: str) -> None:
+        if value != None:
+            # - Type-check: If the value isn't None,
+            #   then it has to be a non-empty, single-
+            #   line string without tabs
+            if type(value) != str:
+                raise TypeError(
+                    '%s.dimensions expects a single-'
+                    'line, non-empty str value, with '
+                    'no whitespace other than spaces or '
+                    'None, but was passed "%s" (%s)' %
+                    (
+                        self.__class__.__name__, value,
+                        type(value).__name__
+                    )
+                )
+            # - Value-check: no whitespace other than " "
             bad_chars = ('\n', '\r', '\t')
             is_valid = True
             for bad_char in bad_chars:
@@ -661,12 +671,12 @@ and type-identity for objects that can represent a Product
                     is_valid = False
                     break
             # - If it's empty or otherwise not valid,
-            #   raise error
+            #   raise an error
             if not value.strip() or not is_valid:
                 raise ValueError(
                     '%s.dimensions expects a single-'
-                    'line, non-empty str value, with no '
-                    'whitespace other than spaces or '
+                    'line, non-empty str value, with '
+                    'no whitespace other than spaces or '
                     'None, but was passed "%s" (%s)' %
                     (
                         self.__class__.__name__, value,
@@ -674,8 +684,8 @@ and type-identity for objects that can represent a Product
                     )
                 )
             # - If this point is reached without error,
-            #   then the string-value is valid, so we can
-            #   just exit the if
+            #   then the string-value is valid, so we
+            #   can just exit the if
         self._dimensions = value
 
     def _set_metadata(self, value: (dict,)):
@@ -694,15 +704,16 @@ and type-identity for objects that can represent a Product
         # - First, we want to clear out any existing
         #   metadata values...
         self._del_metadata()
-        if value:  # value could be an empty dict: {}
+        if value:  # Checking because value could be {}
             # - Then we populate the clean internal
             #   attribute with metadata:
             for name in value:
                 try:
                     # - Since set_metadata will do all
-                    #   the type- and value-checking we
-                    #   need, we'll just call that for
-                    #   each item handed off to us here...
+                    #   the type- and value-checking
+                    #   we need, we'll just call that
+                    #   for each item handed off to us
+                    #   here...
                     self.set_metadata(name, value[name])
                 except Exception:
                     # - If an error was raised, then we
@@ -712,10 +723,10 @@ and type-identity for objects that can represent a Product
             if badvalues:
                 # - Oops... Something's not right...
                 raise ValueError(
-                    '%s.metadata expects a dictionary of '
-                    'metadata keys (strings) and values, '
-                    'but was passed a dict with values '
-                    'that aren\'t allowed: %s' %
+                    '%s.metadata expects a dictionary '
+                    'of metadata keys (strings) and '
+                    'values, but was passed a dict with '
+                    'values that aren\'t allowed: %s' %
                     (
                         self.__class__.__name__,
                         str(badvalues)
@@ -740,7 +751,7 @@ and type-identity for objects that can represent a Product
                     type(value).__name__
                 )
             )
-        # - Value-check: no whitespace except " "
+        # - Value-check: no whitespace other than " "
         bad_chars = ('\n', '\r', '\t')
         is_valid = True
         for bad_char in bad_chars:
@@ -748,7 +759,7 @@ and type-identity for objects that can represent a Product
                 is_valid = False
                 break
         # - If it's empty or otherwise not valid,
-        #   raise error
+        #   raise an error
         if not value.strip() or not is_valid:
             raise ValueError(
                 '%s.name expects a single-line, non-'
@@ -821,7 +832,7 @@ and type-identity for objects that can represent a Product
                         type(value).__name__
                     )
                 )
-            # - Value-check: no whitespace except " "
+            # - Value-check: no whitespace other than " "
             bad_chars = ('\n', '\r', '\t')
             is_valid = True
             for bad_char in bad_chars:
@@ -829,7 +840,7 @@ and type-identity for objects that can represent a Product
                     is_valid = False
                     break
             # - If it's empty or otherwise not valid,
-            #   raise error
+            #   raise an error
             if not value.strip() or not is_valid:
                 raise ValueError(
                     '%s.summary expects a single-line, '
@@ -842,8 +853,8 @@ and type-identity for objects that can represent a Product
                     )
                 )
             # - If this point is reached without error,
-            #   then the string-value is valid, so we can
-            #   just exit the if
+            #   then the string-value is valid, so we
+            #   can just exit the if
         self._summary = value
 
     ###################################
@@ -874,9 +885,6 @@ and type-identity for objects that can represent a Product
     def _del_summary(self) -> None:
         self._summary = None
 
-#     def _del_property_name(self) -> None:
-#         self._property_name = None
-
     ###################################
     # Instance property definitions   #
     ###################################
@@ -890,15 +898,16 @@ and type-identity for objects that can represent a Product
     )
     description = property(
         _get_description,
-        _set_description, _del_description,
+        _set_description,
+        _del_description,
         'Gets, sets or deletes the description (str) '
         'associated with the Product that the instance '
         'represents'
     )
     dimensions = property(
         _get_dimensions, _set_dimensions, _del_dimensions,
-        'Gets, sets or deletes the dimensions (str) '
-        'associated with the Product that the instance '
+        'Gets, sets or deletes the company name (str) '
+        'associated with the Artisan that the instance '
         'represents'
     )
     metadata = property(
@@ -920,7 +929,8 @@ and type-identity for objects that can represent a Product
     )
     store_available = property(
         _get_store_available,
-        _set_store_available, _del_store_available,
+        _set_store_available,
+        _del_store_available,
         'Gets sets or deletes the flag that indicates '
         'whether the central office considers the '
         'product that the instance represents available '
@@ -929,8 +939,8 @@ and type-identity for objects that can represent a Product
     summary = property(
         _get_summary, _set_summary, _del_summary,
         'Gets, sets or deletes the summary (str) '
-        'associated with the Product that the '
-        'instance represents'
+        'associated with the Product that the instance '
+        'represents'
     )
 
     ###################################
@@ -939,7 +949,9 @@ and type-identity for objects that can represent a Product
 
     def __init__(
         self,
-        name: (str,), summary: (str,), available: (bool,),
+        name: (str,),
+        summary: (str,),
+        available: (bool,),
         store_available: (bool,),
         # - Optional arguments:
         description: (str, None) = None,
@@ -948,31 +960,39 @@ and type-identity for objects that can represent a Product
         shipping_weight: (int,) = 0,
     ):
         """
-Object initialization.
+        Object initialization.
 
-self .............. (BaseProduct instance, required)
-                    The instance to execute against
-name .............. (str, required) The name of the
-                    product
-summary ........... (str, required) A one-line summary
-                    of the product
-available ......... (bool, required) Flag indicating
-                    whether the product is considered
-                    available by the artisan who makes it
-store_available ... (bool, required) Flag indicating
-                    whether the product is considered
-                    available on the web-store by the
-                    central office
-description ....... (str, optional, defaults to None) A
-                    detailed description of the product
-dimensions ........ (str, optional, defaults to None) A
-                    measurement-description of the product
-metadata .......... (dict, optional, defaults to {}) A
-                    collection of metadata keys and
-                    values describing the product
-shipping_weight ... (int, optional, defaults to 0) The
-                    shipping-weight of the product
-"""
+        self .............. (BaseProduct instance,
+                            required) The instance to
+                            execute against
+        name .............. (str, required) The name of
+                            the product
+        summary ........... (str, required) A one-line
+                            summary of the product
+        available ......... (bool, required) Flag
+                            indicating whether the
+                            product is considered
+                            available by the artisan who
+                            makes it
+        store_available ... (bool, required) Flag
+                            indicating whether the
+                            product is considered
+                            available on the web-store
+                            by the central office
+        description ....... (str, optional, defaults to
+                            None) A detailed description
+                            of the product
+        dimensions ........ (str, optional, defaults to
+                            None) A measurement-descrip-
+                            tion of the product
+        metadata .......... (dict, optional, defaults
+                            to {}) A collection of
+                            metadata keys and values
+                            describing the product
+        shipping_weight ... (int, optional, defaults to
+                            0) The shipping-weight of
+                            the product
+        """
         # TODO: We'll need to figure out what UNITS the
         #       shipping-weight is stored in...
         # - Call parent initializers if needed
@@ -1012,27 +1032,30 @@ shipping_weight ... (int, optional, defaults to 0) The
 
     def set_metadata(self, key: (str,), value: (str,)):
         """
-Sets the value of a specified metadata-key associated
-with the product that the instance represents.
+        Sets the value of a specified metadata-key
+        associated with the product that the instance
+        represents.
 
-self .............. (BaseProduct instance, required)
-                    The instance to execute against
-key ............... (str, required) The metadata key to
-                    associate a value with
-value ............. (str, required) The value to
-                    associate with the metadata key
-"""
+        self .... (BaseProduct instance, required) The
+                  instance to execute against
+        key ..... (str, required) The metadata key to
+                  associate a value with
+        value ... (str, required) The value to associate
+                  with the metadata key
+        """
         if type(key) != str:
             raise TypeError(
-                '%s.metadata expects a single-line, non-'
-                'empty str key, with no whitespace other '
-                'than spaces, but was passed "%s" (%s)' %
+                '%s.metadata expects a single-line, '
+                'non-empty str key, with no whitespace '
+                'other than spaces, but was passed '
+                '"%s" (%s)' %
                 (
                     self.__class__.__name__, key,
                     type(key).__name__
                 )
             )
-        # - Value-check of key: no whitespace except " "
+        # - Value-check of key: no whitespace other
+        #   than " "
         bad_chars = ('\n', '\r', '\t')
         is_valid = True
         for bad_char in bad_chars:
@@ -1040,12 +1063,13 @@ value ............. (str, required) The value to
                 is_valid = False
                 break
         # - If it's empty or otherwise not valid,
-        #   raise error
+        #   raise an error
         if not key.strip() or not is_valid:
             raise ValueError(
-                '%s.metadata expects a single-line, non-'
-                'empty str key, with no whitespace other '
-                'than spaces, but was passed "%s" (%s)' %
+                '%s.metadata expects a single-line, '
+                'non-empty str key, with no whitespace '
+                'other than spaces, but was passed '
+                '"%s" (%s)' %
                 (
                     self.__class__.__name__, key,
                     type(key).__name__
@@ -1053,8 +1077,8 @@ value ............. (str, required) The value to
             )
         if type(value) != str:
             raise TypeError(
-                '%s.metadata expects a single-line, non-'
-                'empty str value, with no whitespace '
+                '%s.metadata expects a single-line, '
+                'non-empty str value, with no whitespace '
                 'other than spaces, but was passed '
                 '"%s" (%s)' %
                 (
@@ -1062,7 +1086,8 @@ value ............. (str, required) The value to
                     type(value).__name__
                 )
             )
-        # - Value-check of value: no whitespace except " "
+        # - Value-check of value: no whitespace other
+        #   than " "
         bad_chars = ('\n', '\r', '\t')
         is_valid = True
         for bad_char in bad_chars:
@@ -1070,12 +1095,12 @@ value ............. (str, required) The value to
                 is_valid = False
                 break
         # - If it's empty or otherwise not valid,
-        #   raise error
+        #   raise an error
         if not value.strip() or not is_valid:
             raise ValueError(
-                '%s.metadata expects a single-line, non-'
-                'empty str value, with no whitespace '
-                'other than spaces, but was passed '
+                '%s.metadata expects a single-line, '
+                'non-empty str value, with no white'
+                'space other than spaces, but was passed '
                 '"%s" (%s)' %
                 (
                     self.__class__.__name__, value,
@@ -1086,15 +1111,15 @@ value ............. (str, required) The value to
 
     def remove_metadata(self, key):
         """
-Removes the specified metadata associated with the
-product that the instance represents, identified by
-the key
+        Removes the specified metadata associated with
+        the product that the instance represents,
+        identified by the key
 
-self .. (BaseProduct instance, required) The instance
-        to execute against
-key ... (str, required) The key that identifies the
-        metadata value to remove
-"""
+        self ... (BaseProduct instance, required) The
+                 instance to execute against
+        key .... (str, required) The key that identifies
+                 the metadata value to remove
+        """
         try:
             del self._metadata[key]
         except KeyError:
@@ -1115,11 +1140,11 @@ key ... (str, required) The key that identifies the
 
 class HasProducts(metaclass=abc.ABCMeta):
     """
-Provides baseline functionality, interface requirements,
-and type-identity for objects that can have a common
-products property whose membership is stored and
-handled in the same way.
-"""
+    Provides baseline functionality, interface
+    requirements, and type-identity for objects that can
+    have a common products property whose membership is
+    stored and handled in the same way.
+    """
     ###################################
     # Class attributes/constants      #
     ###################################
@@ -1135,11 +1160,13 @@ handled in the same way.
     # Property-setter methods         #
     ###################################
 
-    def _set_products(self, value: (list, tuple)) -> None:
-        # - Check first that the value is an iterable a
+    def _set_products(
+        self, value: (list, tuple)
+    ) -> None:
+        # - Check first that the value is an iterable -
         #   list or tuple, it doesn't really matter
-        #   which, just so long as it's a sequence-
-        #   type collection of some kind.
+        #   which, just so long as it's a sequence-type
+        #   collection of some kind.
         if type(value) not in (list, tuple):
             raise TypeError(
                 '%s.products expects a list or tuple of '
@@ -1164,7 +1191,8 @@ handled in the same way.
             else:
                 bad_items.append(item)
         # - If there are any bad items, then do NOT
-        #   commit the changes -- raise an error instead!
+        #   commit the changes -- raise an error
+        #   instead!
         if bad_items:
             raise TypeError(
                 '%s.products expects a list or tuple of '
@@ -1203,13 +1231,14 @@ handled in the same way.
 
     def __init__(self, *products):
         """
-Object initialization.
+        Object initialization.
 
-self ...... (BaseOrder instance, required) The instance
-            to execute against
-products .. (list or tuple of BaseProduct instances)
-            The products that were ordered
-"""
+        self ....... (BaseOrder instance, required) The
+                     instance to execute against
+        products ... (list or tuple of BaseProduct
+                     instances) The products that were
+                     ordered
+        """
         # - Call parent initializers if needed
         # - Set default instance property-values
         #   using _del_... methods
@@ -1233,30 +1262,32 @@ products .. (list or tuple of BaseProduct instances)
         self, product: BaseProduct
     ) -> BaseProduct:
         """
-Adds a product to the instance's collection of products.
+        Adds a product to the instance's collection of
+        products.
 
-Returns the product added.
+        Returns the product added.
 
-self ...... (HasProducts instance, required) The instance
-            to execute against
-product ... (BaseProduct, required) The product to add to
-            the instance's collection of products
+        self ....... (HasProducts instance, required)
+                     The instance to execute against
+        product ...  (BaseProduct, required) The product
+                     to add to the instance's collection
+                     of products
 
-Raises TypeError
-    if the product specified is not a BaseProduct-
-    derived instance
+        Raises TypeError if the product specified is not
+            a BaseProduct-derived instance
 
-May be implemented in derived classes by simply calling
-    return HasProducts.add_product(self, product)
-"""
-        # - Make sure the product passed in is a
-        #   BaseProduct
+        May be implemented in derived classes by simply
+            calling
+            HasProducts.add_product(self, product)
+        """
+        # - Make sure the product passed in is
+        #   a BaseProduct
         if not isinstance(product, BaseProduct):
             raise TypeError(
                 '%s.add_product expects an instance of '
-                'BaseProduct to be passed in its product '
-                'argument, but "%s" (%s) was passed '
-                'instead' %
+                'BaseProduct to be passed in its '
+                'product argument, but "%s" (%s) was '
+                'passed instead' %
                 (
                     self.__class__.__name__, product,
                     type(product).__name__
@@ -1270,39 +1301,38 @@ May be implemented in derived classes by simply calling
     @abc.abstractmethod
     def remove_product(
         self, product: BaseProduct
-    ) -> None:
+    ) -> BaseProduct:
         """
-Removes a product from the instance's collection of
-products.
+        Removes a product from the instance's collection
+        of products.
 
-Returns the product removed.
+        Returns the product removed.
 
-self ...... (HasProducts instance, required) The instance
-            to execute against
-product ... (BaseProduct, required) The product to remove
-            from the instance's collection of products
+        self ....... (HasProducts instance, required) The
+                     instance to execute against
+        product .... (BaseProduct, required) The product
+                     to remove from the instance's
+                     collection of products
 
-Raises TypeError
-    if the product specified is not a BaseProduct-
-    derived instance
-Raises ValueError
-    if the product specified is not amember of the
-    instance's products collection
+        Raises TypeError if the product specified is not
+            a BaseProduct-derived instance
+        Raises ValueError if the product specified is not
+            a member of the instance's products collection
 
-May be implemented in derived classes by simply calling
-    return HasProducts.remove_product(self, product)
-"""
+        May be implemented in derived classes by simply
+        calling HasProducts.remove_product(self, product)
+        """
         # - Make sure the product passed in is a
         #   BaseProduct. Technically this may not be
         #   necessary, since type is enforced in
-        #   add_product, but it does no harm to
-        #   re-check here...
+        #   add_product, but it does no harm to re-check
+        #   here...
         if not isinstance(product, BaseProduct):
             raise TypeError(
                 '%s.add_product expects an instance of '
-                'BaseProduct to be passed in its product '
-                'argument, but "%s" (%s) was passed '
-                'instead' %
+                'BaseProduct to be passed in its '
+                'product argument, but "%s" (%s) was '
+                'passed instead' %
                 (
                     self.__class__.__name__, product,
                     type(product).__name__
@@ -1314,8 +1344,9 @@ May be implemented in derived classes by simply calling
         except ValueError:
             raise ValueError(
                 '%s.remove_product could not remove %s '
-                'from its products collection because it '
-                'was not a member of that collection' %
+                'from its products collection because '
+                'it was not a member of that '
+                'collection' %
                 (self.__class__.__name__, product)
             )
 
@@ -1334,10 +1365,10 @@ May be implemented in derived classes by simply calling
 
 class BaseArtisan(HasProducts, metaclass=abc.ABCMeta):
     """
-Provides baseline functionality, interface requirements,
-and type-identity for objects that can represent an
-Artisan in the context of the HMS system.
-"""
+    Provides baseline functionality, interface
+    requirements, and type-identity for objects that can
+    represent an Artisan in the context of the HMS system.
+    """
     ###################################
     # Class attributes/constants      #
     ###################################
@@ -1368,10 +1399,10 @@ Artisan in the context of the HMS system.
     def _set_address(self, value: Address) -> None:
         if not isinstance(value, Address):
             raise TypeError(
-                '%s.address expects an Address object or '
-                'an object derived from Address, but '
-                'was passed "%s" (%s) instead, which '
-                'is not.' %
+                '%s.address expects an Address object '
+                'or an object derived from Address, but '
+                'was passed "%s" (%s) instead, which is '
+                'not.' %
                 (
                     self.__class__.__name__,
                     value, type(value).__name__
@@ -1395,7 +1426,7 @@ Artisan in the context of the HMS system.
                         type(value).__name__
                     )
                 )
-            # - Value-check: no whitespace except " "
+            # - Value-check: no whitespace other than " "
             bad_chars = ('\n', '\r', '\t')
             is_valid = True
             for bad_char in bad_chars:
@@ -1403,7 +1434,7 @@ Artisan in the context of the HMS system.
                     is_valid = False
                     break
             # - If it's empty or otherwise not valid,
-            #   raise error
+            #   raise an error
             if not value.strip() or not is_valid:
                 raise ValueError(
                     '%s.company_name expects a single-'
@@ -1432,10 +1463,10 @@ Artisan in the context of the HMS system.
                     type(value).__name__
                 )
             )
-        # - Since we know it's a string, we can start by
-        #   parsing value with email.utils.parseaddr, and
-        #   using the second item of that result to check
-        #   for well-formed-ness
+        # - Since we know it's a string, we can start
+        #   by parsing value with email.utils.parseaddr,
+        #   and using the second item of that result to
+        #   check for well-formed-ness
         check_value = parseaddr(value)[1]
         # - If value is not empty, then there was
         #   *something* that was recognized as being an
@@ -1475,7 +1506,7 @@ Artisan in the context of the HMS system.
                     type(value).__name__
                 )
             )
-        # - Value-check: no whitespace except " "
+        # - Value-check: no whitespace other than " "
         bad_chars = ('\n', '\r', '\t')
         is_valid = True
         for bad_char in bad_chars:
@@ -1483,7 +1514,7 @@ Artisan in the context of the HMS system.
                 is_valid = False
                 break
         # - If it's empty or otherwise not valid,
-        #   raise error
+        #   raise an error
         if not value.strip() or not is_valid:
             raise ValueError(
                 '%s.contact_name expects a single-line, '
@@ -1499,7 +1530,6 @@ Artisan in the context of the HMS system.
         self._contact_name = value
 
     def _set_website(self, value: (str, None)) -> None:
-        # - Type-check: This is an optional str value
         if value != None:
             if type(value) != str:
                 raise TypeError(
@@ -1550,26 +1580,29 @@ Artisan in the context of the HMS system.
     address = property(
         _get_address, _set_address, _del_address,
         'Gets, sets or deletes the physical address '
-        '(Address) associated with the Artisan that '
-        'the instance represents'
+        '(Address) associated with the Artisan that the '
+        'instance represents'
     )
     company_name = property(
         _get_company_name,
-        _set_company_name, _del_company_name,
+        _set_company_name,
+        _del_company_name,
         'Gets, sets or deletes the company name (str) '
         'associated with the Artisan that the instance '
         'represents'
     )
     contact_email = property(
         _get_contact_email,
-        _set_contact_email, _del_contact_email,
+        _set_contact_email,
+        _del_contact_email,
         'Gets, sets or deletes the email address (str) '
         'of the named contact associated with the '
         'Artisan that the instance represents'
     )
     contact_name = property(
         _get_contact_name,
-        _set_contact_name, _del_contact_name,
+        _set_contact_name,
+        _del_contact_name,
         'Gets, sets or deletes the name of the contact '
         '(str) associated with the Artisan that the '
         'instance represents'
@@ -1587,32 +1620,38 @@ Artisan in the context of the HMS system.
 
     def __init__(
         self,
-        contact_name: str, contact_email: str,
-        address: Address, company_name: str = None,
-        website: (str,) = None,
+        contact_name: str,
+        contact_email: str,
+        address: Address,
+        company_name: (str, None) = None,
+        website: (str, None) = None,
         *products
     ):
         """
-Object initialization.
+        Object initialization.
 
-self .......... (BaseArtisan instance, required) The
-                instance to execute against
-contact_name .. (str, required) The name of the primary
-                contact for the Artisan that the instance
-                represents
-contact_email . (str [email address], required) The email
-                address of the primary contact for the
-                Artisan that the instance represents
-address ....... (Address, required) The mailing/shipping
-                address for the Artisan that the instance
-                represents
-company_name .. (str, optional, defaults to None) The
-                company-name for the Artisan that the
-                instance represents
-products ...... (BaseProduct collection) The products
-                associated with the Artisan that the
-                instance represents
-"""
+        self ............ (BaseArtisan instance,
+                          required) The instance to
+                          execute against
+        contact_name .... (str, required) The name of the
+                          primary contact for the Artisan
+                          that the instance represents
+        contact_email ... (str [email address], required)
+                          The email address of the
+                          primary contact for the Artisan
+                          that the instance represents
+        address ......... (Address, required) The mailing/
+                          shipping address for the Artisan
+                          that the instance represents
+        company_name .... (str, optional, defaults to
+                          None) The company-name for the
+                          Artisan that the instance
+                          represents
+        products ........ (BaseProduct collection) The
+                          products associated with the
+                          Artisan that the instance
+                          represents
+        """
         # - Call parent initializers if needed
         HasProducts.__init__(self, *products)
         # - Set default instance property-values
@@ -1660,9 +1699,10 @@ products ...... (BaseProduct collection) The products
 
 class BaseCustomer(metaclass=abc.ABCMeta):
     """
-Provides baseline functionality, interface requirements,
-and type-identity for objects that represent a Customer
-"""
+    Provides baseline functionality, interface
+    requirements, and type-identity for objects that can
+    represent a Customer in the context of the HMS system.
+    """
     ###################################
     # Class attributes/constants      #
     ###################################
@@ -1724,15 +1764,15 @@ and type-identity for objects that represent a Customer
             if type(value) != str:
                 raise TypeError(
                     '%s.name expects a single-line, non-'
-                    'empty str value, with no white'
-                    'space other than spaces or None, '
-                    'but was passed "%s" (%s)' %
+                    'empty str value, with no whitespace '
+                    'other than spaces or None, but was '
+                    'passed "%s" (%s)' %
                     (
                         self.__class__.__name__, value,
                         type(value).__name__
                     )
                 )
-            # - Value-check: no whitespace except " "
+            # - Value-check: no whitespace other than " "
             bad_chars = ('\n', '\r', '\t')
             is_valid = True
             for bad_char in bad_chars:
@@ -1740,7 +1780,7 @@ and type-identity for objects that represent a Customer
                     is_valid = False
                     break
             # - If it's empty or otherwise not valid,
-            #   raise error
+            #   raise an error
             if not value.strip() or not is_valid:
                 raise ValueError(
                     '%s.name expects a single-line, non-'
@@ -1782,8 +1822,8 @@ and type-identity for objects that represent a Customer
     )
     name = property(
         _get_name, _set_name, _del_name,
-        'Gets, sets or deletes the billing-address of '
-        'the customer that the instance represents'
+        'Gets, sets or deletes the name of the customer '
+        'that the instance represents'
     )
     shipping_address = property(
         _get_shipping_address, _set_shipping_address,
@@ -1798,24 +1838,28 @@ and type-identity for objects that represent a Customer
 
     def __init__(
         self,
-        name: (str,), billing_address: (Address,),
+        name: (str,),
+        billing_address: (Address,),
         shipping_address: (Address, None) = None
     ):
         """
-Object initialization.
+        Object initialization.
 
-self .............. (BaseCustomer instance, required)
-                    The instance to execute against
-name .............. (str, required) The name of the
-                    customer.
-billing_address ... (Address, required) The billing
-                    address of the customer
-shipping_address .. (Address, optional, defaults to None)
-                    The shipping address of the customer.
-"""
-        # - Prevent a direct instantiation of this
-        #   class - it's intended to be abstract, even
-        #   though it has no explicitly-abstract members:
+        self ............... (BaseCustomer instance,
+                             required)The instance to
+                             execute against
+        name ............... (str, required) The name
+                             of the customer.
+        billing_address .... (Address, required) The
+                             billing address of the
+                             customer
+        shipping_address ... (Address, optional, defaults
+                             to None) The shipping
+                             address of the customer.
+        """
+        # - Prevent a direct instantiation of this class:
+        #   it's intended to be abstract, even though it
+        #   has no explicitly-abstract members:
         if self.__class__ == BaseCustomer:
             raise NotImplementedError(
                 'BaseCustomer is intended to be an '
@@ -1864,10 +1908,11 @@ shipping_address .. (Address, optional, defaults to None)
 
 class BaseOrder(HasProducts, metaclass=abc.ABCMeta):
     """
-Provides baseline functionality, interface requirements,
-and type-identity for objects that represent a customer's
-order of one-to-many products
-"""
+    Provides baseline functionality, interface
+    requirements, and type-identity for objects that
+    represent a customer's Order of one-to-many products
+    in the context of the HMS system.
+    """
     ###################################
     # Class attributes/constants      #
     ###################################
@@ -1918,18 +1963,21 @@ order of one-to-many products
     ###################################
 
     def __init__(
-        self, customer: (BaseCustomer,), *products
+        self,
+        customer: (BaseCustomer,),
+        *products
     ):
         """
-Object initialization.
+        Object initialization.
 
-self ...... (BaseOrder instance, required) The instance
-            to execute against
-customer .. (BaseCustomer, required) The customer that
-            placed the order
-products .. (list or tuple of BaseProduct instances)
-            The products that were ordered
-"""
+        self ....... (BaseOrder instance, required) The
+                     instance to execute against
+        customer ... (BaseCustomer, required) The
+                     customer that placed the order
+        products ... (list or tuple of BaseProduct
+                     instances) The products that were
+                     ordered
+        """
         # - Call parent initializers if needed
         HasProducts.__init__(self, *products)
         # - Set default instance property-values

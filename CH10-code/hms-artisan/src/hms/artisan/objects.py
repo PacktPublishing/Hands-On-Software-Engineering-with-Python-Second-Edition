@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-Provides classes and functionality that represent various
-business-objects as they exist in the context of the
-Artisan Application
+Provides classes and functionality that represent
+various business-objects as they exist in the context
+of the Artisan Application
 """
 
 #######################################
@@ -42,10 +42,10 @@ from uuid import UUID
 # Third-party imports needed          #
 #######################################
 
-from hms_core.business_objects import Address, \
+from hms.core.business_objects import Address, \
     BaseArtisan, BaseProduct, HasProducts
-from hms_core.data_objects import BaseDataObject
-from hms_artisan.data_storage import JSONFileDataObject
+from hms.core.data_objects import BaseDataObject
+from hms.artisan.data_storage import JSONFileDataObject
 
 #######################################
 # Local imports needed                #
@@ -81,17 +81,17 @@ from hms_artisan.data_storage import JSONFileDataObject
 #######################################
 
 
-class Artisan(BaseArtisan, JSONFileDataObject, object):
+class Artisan(BaseArtisan, JSONFileDataObject):
     """
-Represents an Artisan in the context of the Artisan
-Application
-"""
+    Represents an Artisan in the context of the Artisan
+    Application
+    """
     ###################################
     # Class attributes/constants      #
     ###################################
 
-    # TODO: Work out the configuration-based file-system
-    #       path for this attribute
+    # TODO: Work out the configuration-based file-
+    #       system path for this attribute
     _file_store_dir = '/tmp/hms_data'
 
     ###################################
@@ -194,8 +194,8 @@ Application
         'Artisan that the instance represents'
     )
     contact_name = property(
-        BaseArtisan._get_contact_name,
-        _set_contact_name, _del_contact_name,
+        BaseArtisan._get_contact_name, _set_contact_name,
+        _del_contact_name,
         'Gets, sets or deletes the name of the contact '
         '(str) associated with the Artisan that the '
         'instance represents'
@@ -216,10 +216,12 @@ Application
     def __init__(
         self,
         # - Required arguments from BaseArtisan
-        contact_name: str, contact_email: str,
+        contact_name: str,
+        contact_email: str,
         address: Address,
         # - Optional arguments from BaseArtisan
-        company_name: str = None, website: (str,) = None,
+        company_name: str = None,
+        website: (str,) = None,
         # - Optional arguments from
         #   BaseDataObject/JSONFileDataObject
         oid: (UUID, str, None) = None,
@@ -251,7 +253,7 @@ company_name ...... (str, optional, defaults to None) The
                     company-name for the Artisan that the
                     instance represents
 website ........... (str, optional, defaults to None) The
-                    the URL of the website associated with
+                    URL of the website associated with
                     the Artisan that the instance
                     represents
 oid ............... (UUID|str, optional, defaults to None)
@@ -276,10 +278,6 @@ products .......... (BaseProduct collection) The products
             self, oid, created, modified, is_active,
             is_deleted, is_dirty, is_new
         )
-        # - Set default instance property-values
-        #   using _del_... methods
-        # - Set instance property-values from arguments
-        #   using _set_... methods
         # - Perform any other initialization needed
         self._set_is_dirty(False)
 
@@ -355,9 +353,9 @@ products .......... (BaseProduct collection) The products
         cls, objects: (list, tuple), sort_by: (str,)
     ) -> (list,):
         """
-Returns a list of the original objects supplied, sorted
-by the criteria provided
-"""
+        Returns a list of the original objects supplied,
+        sorted by the criteria provided
+        """
         raise NotImplementedError()
 
     ###################################
@@ -367,9 +365,9 @@ by the criteria provided
 
 class Order(Address, JSONFileDataObject, object):
     """
-Represents an Order in the context of the Artisan
-Application
-"""
+    Represents an Order in the context of the
+    Artisan Application
+    """
     ###################################
     # Class attributes/constants      #
     ###################################
@@ -415,8 +413,8 @@ Application
         if type(value) != dict:
             raise TypeError(
                 '%s.items expects a dict of UUID keys '
-                'and int-values, but was passed '
-                '"%s" (%s)' %
+                'and int-values, but was passed "%s" '
+                '(%s)' %
                 (
                     self.__class__.__name__,
                     value, type(value).__name__
@@ -450,7 +448,7 @@ Application
                 is_valid = False
                 break
         # - If it's empty or otherwise not valid,
-        #   raise error
+        #   raise an error
         if not value.strip() or not is_valid:
             raise ValueError(
                 '%s.name expects a single-line, non-'
@@ -462,9 +460,7 @@ Application
                     type(value).__name__
                 )
             )
-        # - If this point is reached without error, then
-        #   the string-value is valid, so we can just
-        #   exit the if
+        # - Otherwise it's valid
         self._name = value
         self._set_is_dirty(True)
 
@@ -544,8 +540,8 @@ Application
     )
     country = property(
         Address._get_country, _set_country, _del_country,
-        'Gets, sets or deletes the country (str|None) of '
-        'the instance'
+        'Gets, sets or deletes the country (str|None) '
+        'of the instance'
     )
     items = property(
         _get_items, None, None,
@@ -569,8 +565,8 @@ Application
         '(str|None) of the instance'
     )
     street_address = property(
-        Address._get_street_address,
-        _set_street_address, _del_street_address,
+        Address._get_street_address, _set_street_address,
+        _del_street_address,
         'Gets, sets or deletes the street_address (str) '
         'of the instance'
     )
@@ -583,7 +579,8 @@ Application
         self,
         name: (str,),
         # - Required arguments from Address
-        street_address: (str,), city: (str,),
+        street_address: (str,),
+        city: (str,),
         # - Local optional arguments
         items: (dict,) = {},
         # - Optional arguments from Address
@@ -595,27 +592,28 @@ Application
         #   BaseDataObject/JSONFileDataObject
         oid: (UUID, str, None) = None,
         created: (datetime, str, float, int, None) = None,
-        modified: (datetime, str, float, int, None) = None,
+        modified: (datetime, str, float, int, None) = None,  # noqa E501
         is_active: (bool, int, None) = None,
         is_deleted: (bool, int, None) = None,
         is_dirty: (bool, int, None) = None,
         is_new: (bool, int, None) = None,
     ):
-        """Object initialization.
+        """
+Object initialization.
 
 self .............. (Order instance, required) The
                     instance to execute against
 name .............. (str, required) The name of the
                     addressee
-street_address .... (str, required) The base street-
+street_address .... (str, required) The base street
                     address of the location the instance
                     represents
 city .............. (str, required) The city portion of
                     the street-address that the instance
                     represents
 items ............. (dict, optional, defaults to {}) The
-                    dict of oids-to-quantities of
-                    products in the order
+                    dict of oids-to-quantities of products
+                    in the order
 building_address .. (str, optional, defaults to None) The
                     second line of the street address the
                     instance represents, if applicable
@@ -626,9 +624,9 @@ region ............ (str, optional, defaults to None) The
 postal_code ....... (str, optional, defaults to None) The
                     postal-code portion of the street-
                     address that the instance represents
-country ........... (str, optional, defaults to None) The
-                    country portion of the street-address
-                    that the instance represents
+country ........... (str, optional, defaults to None)
+                    The country portion of the street
+                    address that the instance represents
 oid ............... (UUID|str, optional, defaults to None)
 created ........... (datetime|str|float|int, optional,
                     defaults to None)
@@ -739,7 +737,7 @@ is_new ............ (bool|int, optional, defaults to None)
             'region': self.region,
             'postal_code': self.postal_code,
             'country': self.country,
-            # - Generate a string: int dict from the
+            # - Generate a string:int dict from the
             #   UUID: int dict
             'items': dict(
                 [
@@ -785,9 +783,9 @@ is_new ............ (bool|int, optional, defaults to None)
         cls, objects: (list, tuple), sort_by: (str,)
     ) -> (list,):
         """
-Returns a list of the original objects supplied, sorted
-by the criteria provided
-"""
+        Returns a list of the original objects supplied,
+        sorted by the criteria provided
+        """
         raise NotImplementedError()
 
     @classmethod
@@ -800,9 +798,8 @@ by the criteria provided
     ):
         return cls(
             name=name, street_address=street_address,
-            building_address=building_address,
-            city=city, region=region,
-            postal_code=postal_code,
+            city=city, building_address=building_address,
+            region=region, postal_code=postal_code,
             country=country
         )
 
@@ -810,12 +807,14 @@ by the criteria provided
     # Static methods                  #
     ###################################
 
+# - from_data_dict, matches, sort, to_data_dict
 
-class Product(BaseProduct, JSONFileDataObject, object):
+
+class Product(BaseProduct, JSONFileDataObject):
     """
-Represents a Product in the context of the Artisan
-Application
-"""
+    Represents a Product in the context of the Artisan
+    Application
+    """
     ###################################
     # Class attributes/constants      #
     ###################################
@@ -923,6 +922,9 @@ Application
         self._set_is_dirty(True)
         return result
 
+#     def _del_property_name(self) -> None:
+#         self._property_name = None
+
     ###################################
     # Instance property definitions   #
     ###################################
@@ -989,7 +991,9 @@ Application
     def __init__(
         self,
         # - Required arguments from BaseProduct
-        name: (str,), summary: (str,), available: (bool,),
+        name: (str,),
+        summary: (str,),
+        available: (bool,),
         store_available: (bool,),
         # - Optional arguments from BaseProduct
         description: (str, None) = None,
@@ -1006,7 +1010,8 @@ Application
         is_dirty: (bool, int, None) = None,
         is_new: (bool, int, None) = None,
     ):
-        """Object initialization.
+        """
+Object initialization.
 
 self .............. (Product instance, required) The
                     instance to execute against
@@ -1021,14 +1026,13 @@ store_available ... (bool, required) Flag indicating
                     whether the product is considered
                     available on the web-store by the
                     central office
-description ....... (str, optional, defaults to None)
-                    A detailed description of the product
-dimensions ........ (str, optional, defaults to None)
-                    A measurement-description of the
-                    product
-metadata .......... (dict, optional, defaults to {})
-                    A collection of metadata keys and
-                    values describing the product
+description ....... (str, optional, defaults to None) A
+                    detailed description of the product
+dimensions ........ (str, optional, defaults to None) A
+                    measurement-description of the product
+metadata .......... (dict, optional, defaults to {}) A
+                    collection of metadata keys and values
+                    describing the product
 shipping_weight ... (int, optional, defaults to 0) The
                     shipping-weight of the product
 oid ............... (UUID|str, optional, defaults to None)
@@ -1054,10 +1058,7 @@ products .......... (BaseProduct collection) The products
             self, oid, created, modified, is_active,
             is_deleted, is_dirty, is_new
         )
-        # - Set default instance property-values using
-        #   _del_... methods
-        # - Set instance property-values from arguments
-        #   using _set_... methods
+
         # - Perform any other initialization needed
         self._set_is_dirty(False)
 
@@ -1118,7 +1119,9 @@ products .......... (BaseProduct collection) The products
 
     @classmethod
     def sort(
-        cls, objects: (list, tuple), sort_by: (str,)
+        cls,
+        objects: (list, tuple),
+        sort_by: (str,)
     ) -> (list,):
         """
         Returns a list of the original objects supplied,

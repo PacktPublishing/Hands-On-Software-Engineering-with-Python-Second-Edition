@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Provides classes and functionality that represent
-business objects in the context of teh central office
+business objects in the context of the central office
 applications and services, with state-data persistence
 to and from a MongoDB database.
 """
@@ -42,10 +42,11 @@ from uuid import UUID
 # Third-party imports needed          #
 #######################################
 
-from hms_core.business_objects import Address, \
+from hms.core.business_objects import Address, \
     BaseArtisan, BaseProduct, HasProducts
-from hms_core.data_objects import BaseDataObject
-from hms_core.data_storage import HMSMongoDataObject
+from hms.core.data_objects import BaseDataObject
+from hms.core.data_storage import DatastoreConfig, \
+    HMSMongoDataObject
 
 #######################################
 # Local imports needed                #
@@ -180,35 +181,40 @@ applications and services
 
     address = property(
         BaseArtisan._get_address,
-        _set_address, _del_address,
+        _set_address,
+        _del_address,
         'Gets, sets or deletes the physical address '
-        '(Address) associated with the Artisan that the '
-        'instance represents'
+        '(Address) associated with the Artisan that '
+        'the instance represents'
     )
     company_name = property(
         BaseArtisan._get_company_name,
-        _set_company_name, _del_company_name,
+        _set_company_name,
+        _del_company_name,
         'Gets, sets or deletes the company name (str) '
         'associated with the Artisan that the instance '
         'represents'
     )
     contact_email = property(
         BaseArtisan._get_contact_email,
-        _set_contact_email, _del_contact_email,
+        _set_contact_email,
+        _del_contact_email,
         'Gets, sets or deletes the email address (str) '
         'of the named contact associated with the '
         'Artisan that the instance represents'
     )
     contact_name = property(
         BaseArtisan._get_contact_name,
-        _set_contact_name, _del_contact_name,
+        _set_contact_name,
+        _del_contact_name,
         'Gets, sets or deletes the name of the contact '
         '(str) associated with the Artisan that the '
         'instance represents'
     )
     website = property(
         BaseArtisan._get_website,
-        _set_website, _del_website,
+        _set_website,
+        _del_website,
         'Gets, sets or deletes the URL of the website '
         '(str) associated with the Artisan that the '
         'instance represents'
@@ -221,8 +227,10 @@ applications and services
     # TODO: Add and document arguments if/as needed
     def __init__(
         self,
-        contact_name: str, contact_email: str,
-        address: Address, company_name: str = None,
+        contact_name: str,
+        contact_email: str,
+        address: Address,
+        company_name: str = None,
         website: (str,) = None,
         # - Arguments from HMSMongoDataObject
         oid: (UUID, str, None) = None,
@@ -235,59 +243,72 @@ applications and services
         *products
     ):
         """
-Object initialization.
+        Object initialization.
 
-self .......... (Artisan instance, required) The instance
-                to execute against
-contact_name .. (str, required) The name of the primary
-                contact for the Artisan that the instance
-                represents
-contact_email . (str [email address], required) The email
-                address of the primary contact for the
-                Artisan that the instance represents
-address ....... (Address, required) The mailing/shipping
-                address for the Artisan that the instance
-                represents
-company_name .. (str, optional, defaults to None) The
-                company-name for the Artisan that the
-                nstance represents
-oid ........... (UUID|str, optional, defaults to None)
-                The unique identifier of the object's
-                state-data record in the back-end
-                data-store
-created ....... (datetime|str|float|int, optional,
-                defaults to None) The date/time that the
-                object was created
-modified ...... (datetime|str|float|int, optional,
-                defaults to None) The date/time that the
-                object was last modified
-is_active ..... (bool|int, optional, defaults to None)
-                A flag indicating that the object is
-                active
-is_deleted .... (bool|int, optional, defaults to None)
-                A flag indicating that the object should
-                be considered deleted (and may be in the
-                near future)
-is_dirty ...... (bool|int, optional, defaults to None) A
-                flag indicating that the object's data
-                needs to be updated in the back-end data-
-                store
-is_new ........ (bool|int, optional, defaults to None) A
-                flag indicating that the object's data
-                needs to be created in the back-end data-
-                store
-products ...... (BaseProduct collection) The products
-                associated with the Artisan that the
-                instance represents
-"""
+        self ............ (Artisan instance, required)
+                          The instance to execute against
+        contact_name .... (str, required) The name of the
+                          primary contact for the Artisan
+                          that the instance represents
+        contact_email ... (str [email address], required)
+                          The email address of the
+                          primary contact for the Artisan
+                          that the instance represents
+        address ......... (Address, required) The
+                          mailing/shipping address for
+                          the Artisan that the instance
+                          represents
+        company_name .... (str, optional, defaults to
+                          None) The company-name for the
+                          Artisan that the instance
+                          represents
+        oid ............. (UUID|str, optional, defaults
+                          to None) The unique identifier
+                          of the object's state-data
+                          record in the back-end data-
+                          store
+        created ......... (datetime|str|float|int,
+                          optional, defaults to None) The
+                          date/time that the object was
+                          created
+        modified ........ (datetime|str|float|int,
+                          optional, defaults to None) The
+                          date/time that the object was
+                          last modified
+        is_active ....... (bool|int, optional, defaults
+                          to None) A flag indicating
+                          that the object is active
+        is_deleted ...... (bool|int, optional, defaults
+                          to None) A flag indicating that
+                          the object should be considered
+                          deleted (and may be in the near
+                          future)
+        is_dirty ........ (bool|int, optional, defaults
+                          to None) A flag indicating that
+                          the object's data needs to be
+                          updated in the back-end data-
+                          store
+        is_new .......... (bool|int, optional, defaults
+                          to None) A flag indicating that
+                          the object's data needs to be
+                          created in the back-end data-
+                          store
+        products ........ (BaseProduct collection) The
+                          products associated with the
+                          Artisan that the instance
+                          represents
+        """
         # - Call parent initializers if needed
         BaseArtisan.__init__(
-            self, contact_name, contact_email, address,
-            company_name, website
+            self,
+            contact_name, contact_email,
+            address, company_name, website
         )
         HMSMongoDataObject.__init__(
-            self, oid, created, modified,
-            is_active, is_deleted, is_dirty, is_new
+            self,
+            oid, created, modified,
+            is_active, is_deleted,
+            is_dirty, is_new
         )
         if products:
             BaseArtisan._set_products(*products)
@@ -356,9 +377,10 @@ products ...... (BaseProduct collection) The products
             data_dict['address'] = Address.from_dict(
                 data_dict['address']
             )
-        # NOTE: Changes made here, for whatever reason
-        #       might arise, may also need to be made
-        #       in HMSMongoDataObject.from_data_dict:
+        # ##### NOTE: Changes made here, for whatever
+        #       reason might arise, may also need to
+        #       be made in
+        #       HMSMongoDataObject.from_data_dict --
         #       it's the same process!
         # - Assure that we have the collection of keys
         #   that are allowed for the class!
@@ -388,10 +410,11 @@ products ...... (BaseProduct collection) The products
                 'to a list or tuple of argument-names '
                 'present in %s.__init__ (%s)' %
                 (
-                    cls.__name__, cls.__name__,
                     cls.__name__,
                     cls.__name__,
-                    "'" + "', '".join(init_args) + "'"
+                    cls.__name__,
+                    cls.__name__, "'"
+                    + "', '".join(init_args) + "'"
                 )
             )
         # - Remove any keys that aren't listed in the
@@ -403,7 +426,8 @@ products ...... (BaseProduct collection) The products
                 if key in cls._data_dict_keys
             ]
         )
-        # - Then create and return an instance
+        # - Then create and return an instance of
+        #   the class
         return cls(**data_dict)
 
     @classmethod
@@ -419,18 +443,18 @@ products ...... (BaseProduct collection) The products
 
 class Product(BaseProduct, HMSMongoDataObject):
     """
-Represents a Product in the context of the central office
-applications and services
-"""
+    Represents a Product in the context of the central
+    office applications and services
+    """
     ###################################
     # Class attributes/constants      #
     ###################################
 
     _data_dict_keys = [
-        'name', 'summary', 'available', 'store_available',
-        'description', 'dimensions', 'metadata',
-        'shipping_weight', 'oid', 'created', 'modified',
-        'is_active', 'is_deleted'
+        'name', 'summary', 'available',
+        'store_available', 'description', 'dimensions',
+        'metadata', 'shipping_weight', 'oid', 'created',
+        'modified', 'is_active', 'is_deleted'
     ]
 
     ###################################
@@ -529,16 +553,14 @@ applications and services
         self._set_is_dirty(True)
         return result
 
-#     def _del_property_name(self) -> None:
-#         self._property_name = None
-
     ###################################
     # Instance property definitions   #
     ###################################
 
     available = property(
         BaseProduct._get_available,
-        _set_available, _del_available,
+        _set_available,
+        _del_available,
         'Gets sets or deletes the flag that indicates '
         'whether the artisan owner of the product that '
         'the instance represents is considered by them '
@@ -546,14 +568,16 @@ applications and services
     )
     description = property(
         BaseProduct._get_description,
-        _set_description, _del_description,
+        _set_description,
+        _del_description,
         'Gets, sets or deletes the description (str) '
         'associated with the Product that the instance '
         'represents'
     )
     dimensions = property(
         BaseProduct._get_dimensions,
-        _set_dimensions, _del_dimensions,
+        _set_dimensions,
+        _del_dimensions,
         'Gets, sets or deletes the company name (str) '
         'associated with the Artisan that the instance '
         'represents'
@@ -565,19 +589,22 @@ applications and services
     )
     name = property(
         BaseProduct._get_name, _set_name, _del_name,
-        'Gets, sets or deletes the name (str) associated '
-        'with the Product that the instance represents'
+        'Gets, sets or deletes the name (str) '
+        'associated with the Product that the instance '
+        'represents'
     )
     shipping_weight = property(
         BaseProduct._get_shipping_weight,
-        _set_shipping_weight, _del_shipping_weight,
+        _set_shipping_weight,
+        _del_shipping_weight,
         'Gets, sets or deletes the shipping_weight (int) '
         'associated with the Product that the instance '
         'represents'
     )
     store_available = property(
         BaseProduct._get_store_available,
-        _set_store_available, _del_store_available,
+        _set_store_available,
+        _del_store_available,
         'Gets sets or deletes the flag that indicates '
         'whether the central office considers the '
         'product that the instance represents available '
@@ -585,7 +612,8 @@ applications and services
     )
     summary = property(
         BaseProduct._get_summary,
-        _set_summary, _del_summary,
+        _set_summary,
+        _del_summary,
         'Gets, sets or deletes the summary (str) '
         'associated with the Product that the instance '
         'represents'
@@ -598,7 +626,9 @@ applications and services
     def __init__(
         self,
         # - Arguments from HMSMongoDataObject
-        name: (str,), summary: (str,), available: (bool,),
+        name: (str,),
+        summary: (str,),
+        available: (bool,),
         store_available: (bool,),
         # - Optional arguments:
         description: (str, None) = None,
@@ -615,72 +645,83 @@ applications and services
         is_new: (bool, int, None) = None,
     ):
         """
-Object initialization.
+        Object initialization.
 
-self .............. (Product instance, required) The
-                    instance to execute against
-name .............. (str, required) The name of the
-                    product
-summary ........... (str, required) A one-line summary of
-                    the product
-available ......... (bool, required) Flag indicating
-                    whether the product is considered
-                    available by the artisan who makes it
-store_available ... (bool, required) Flag indicating
-                    whether the product is considered
-                    available on the web-store by the
-                    central office
-description ....... (str, optional, defaults to None)
-                    A detailed description of the product
-dimensions ........ (str, optional, defaults to None)
-                    A measurement-description of the
-                    product
-metadata .......... (dict, optional, defaults to {})
-                    A collection of metadata keys and
-                    values describing the product
-shipping_weight ... (int, optional, defaults to 0) The
-                    shipping- weight of the product
-oid ............... (UUID|str, optional, defaults to None)
-                    The unique identifier of the object's
-                    state-data record in the back-end
-                    data-store
-created ........... (datetime|str|float|int, optional,
-                    defaults to None) The date/time that
-                    the object was created
-modified .......... (datetime|str|float|int, optional,
-                    defaults to None) The date/time that
-                    the object was last modified
-is_active ......... (bool|int, optional, defaults to None)
-                    A flag indicating that the object is
-                    active
-is_deleted ........ (bool|int, optional, defaults to None)
-                    A flag indicating that the object
-                    should be considered deleted (and may
-                    be in the near future)
-is_dirty .......... (bool|int, optional, defaults to None)
-                    A flag indicating that the object's
-                    data needs to be updated in the back-
-                    end data-store
-is_new ............ (bool|int, optional, defaults to None)
-                    A flag indicating that the object's
-                    data needs to be created in the back-
-                    end data-store
-"""
+        self .............. (Product instance, required)
+                            The instance to execute
+                            against
+        name .............. (str, required) The name of
+                            the product
+        summary ........... (str, required) A one-line
+                            summary of the product
+        available ......... (bool, required) Flag
+                            indicating whether the
+                            product is considered
+                            available by the artisan who
+                            makes it
+        store_available ... (bool, required) Flag
+                            indicating whether the
+                            product is considered
+                            available on the web-store by
+                            the central office
+        description ....... (str, optional, defaults to
+                            None) A detailed description
+                            of the product
+        dimensions ........ (str, optional, defaults to
+                            None) A measurement-descrip-
+                            tion of the product
+        metadata .......... (dict, optional, defaults to
+                            {}) A collection of metadata
+                            keys and values describing
+                            the product
+        shipping_weight ... (int, optional, defaults to
+                            0) The shipping-weight of the
+                            product
+        oid ............... (UUID|str, optional, defaults
+                            to None) The unique
+                            identifier of the object's
+                            state-data record in the
+                            back-end data-store
+        created ........... (datetime|str|float|int,
+                            optional, defaults to None)
+                            The date/time that the object
+                            was created
+        modified .......... (datetime|str|float|int,
+                            optional, defaults to None)
+                            The date/time that the object
+                            was last modified
+        is_active ......... (bool|int, optional, defaults
+                            to None) A flag indicating
+                            that the object is active
+        is_deleted ........ (bool|int, optional, defaults
+                            to None) A flag indicating
+                            that the object should be
+                            considered deleted (and may
+                            be in the near future)
+        is_dirty .......... (bool|int, optional, defaults
+                            to None) A flag indicating
+                            that the object's data needs
+                            to be updated in the back-end
+                            data-store
+        is_new ............ (bool|int, optional, defaults
+                            to None) A flag indicating
+                            that the object's data needs
+                            to be created in the back-end
+                            data-store
+        """
         # - Call parent initializers if needed
         BaseProduct.__init__(
-            self, name, summary, available,
-            store_available, description,
-            dimensions, metadata, shipping_weight
+            self, name, summary,
+            available, store_available,
+            description, dimensions,
+            metadata, shipping_weight
         )
         HMSMongoDataObject.__init__(
-            self, oid, created, modified,
-            is_active, is_deleted, is_dirty, is_new
+            self,
+            oid, created, modified,
+            is_active, is_deleted,
+            is_dirty, is_new
         )
-        # - Set default instance property-values
-        #   using _del_... methods
-        # - Set instance property-values from arguments
-        #   using _set_... methods
-        # - Perform any other initialization needed
 
     ###################################
     # Object deletion                 #
@@ -758,3 +799,9 @@ is_new ............ (bool|int, optional, defaults to None)
 
 if __name__ == '__main__':
     pass
+
+    config = DatastoreConfig(
+        database='delete_me_later',
+    )
+
+    HMSMongoDataObject.configure(config)

@@ -1,0 +1,43 @@
+How this was generated:
+
+pipenv install "pyyaml==5.3.1"
+
+Run the security-scans.py script with this vulnerability
+in the 
+
++==============================================================================+
+
+ REPORT 
+
+  Safety v2.3.2 is scanning for Vulnerabilities...
+  Scanning dependencies in your files:
+
+  -> /tmp/hms-core-R_hGdNKU58fde4tp_requirements.txt
+
+  Found and scanned 1 package
+  Timestamp 2024-08-24 17:30:03
+  1 vulnerability found
+  0 vulnerabilities ignored
+
++==============================================================================+
+ VULNERABILITIES FOUND 
++==============================================================================+
+
+-> Vulnerability found in pyyaml version 5.3.1
+   Vulnerability ID: 39611
+   Affected spec: <5.4
+   ADVISORY: Pyyaml version 5.4 includes a fix for CVE-2020-14343: A
+   vulnerability was discovered in the PyYAML library in versions before 5.4,...
+   CVE-2020-14343
+   For more information, please visit
+   https://data.safetycli.com/v/39611/742
+
+ Scan was completed. 1 vulnerability was found. 
+
++==============================================================================+
+   REMEDIATIONS
+
+  1 vulnerability was found in 1 package. For detailed remediation & fix 
+  recommendations, upgrade to a commercial license. 
+
++==============================================================================+

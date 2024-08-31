@@ -1,0 +1,11 @@
+# post-merge
+
+# This hook script must be executable, locally, and will
+# not behave as intended until local Git configuration is
+# altered, as described in the README.md file.
+
+# Update local package dependencies
+pipenv update
+
+# Check for security issues with any package dependencies.
+pipenv run python hook-scripts/security-scans.py

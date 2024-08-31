@@ -29,4 +29,4 @@ command = ['pipenv', 'check'] + [
 ]
 
 print(f'Running {" ".join(command)}')
-sys.exit(run(' '.join(command), shell=True))
+sys.exit(run(' '.join(command), shell=True).returncode)

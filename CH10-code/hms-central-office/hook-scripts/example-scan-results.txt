@@ -3,7 +3,7 @@ How this was generated:
 pipenv install "pyyaml==5.3.1"
 
 Run the security-scans.py script with this vulnerability
-in the 
+in the IGNORE_ITEMS collection.
 
 +==============================================================================+
 

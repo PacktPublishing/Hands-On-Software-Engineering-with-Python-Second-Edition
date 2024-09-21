@@ -8,6 +8,8 @@ name = "pypi"
 [dev-packages]
 flake8 = "*"
 pytest = "*"
+pytest-subtests = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.11"

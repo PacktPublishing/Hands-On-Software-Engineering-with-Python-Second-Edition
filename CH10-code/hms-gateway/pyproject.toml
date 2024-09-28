@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hms-gateway"
+version = "0.0.1"
+authors = [
+  { name="Example Author", email="author@example.com" },
+]
+description = "The Gateway package for Hand Made Stuff (HMS)"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[project.urls]
+Homepage = "https://github.com/PacktPublishing/Hands-On-Software-Engineering-with-Python-Second-Edition/tree/main/CH10-code/hms-gateway"

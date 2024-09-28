@@ -17,3 +17,7 @@ python_full_version = "3.11.7"
 
 [central_office]
 pymongo = "*"
+
+[build_publish]
+build = "*"
+twine = "*"

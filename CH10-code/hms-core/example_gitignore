@@ -1,0 +1,11 @@
+# These items shoudl be added to the real .gitignore file
+
+# NEVER store the user's .env file; Assume that "local"
+# secrets like credentials will eventually need to be
+# stored there!
+.env
+
+# Build-artifacts
+build
+dist
+src/*.egg_info

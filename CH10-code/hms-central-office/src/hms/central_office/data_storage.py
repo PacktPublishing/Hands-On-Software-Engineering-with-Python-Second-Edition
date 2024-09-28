@@ -45,7 +45,7 @@ from uuid import UUID
 # Third-party imports needed          #
 #######################################
 
-from hms_core.data_objects import BaseDataObject
+from hms.core.data_objects import BaseDataObject
 
 #######################################
 # Local imports needed                #

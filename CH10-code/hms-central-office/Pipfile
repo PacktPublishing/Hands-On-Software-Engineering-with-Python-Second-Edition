@@ -4,19 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+pymongo = "*"
 
 [dev-packages]
 flake8 = "*"
 pytest = "*"
-pytest-subtests = "*"
 coverage = "*"
 
 [requires]
 python_version = "3.11"
 python_full_version = "3.11.7"
-
-[central_office]
-pymongo = "*"
 
 [build_publish]
 build = "*"

@@ -1,0 +1,15 @@
+# pre-push
+
+# This hook script must be executable, locally, and will
+# not behave as intended until local Git configuration is
+# altered, as described in the README.md file
+
+# Check for security issues with any package dependencies.
+pipenv run python hook-scripts/security-scans.py
+
+# Run the project's unit-test suite
+pipenv run pytest tests/unit
+
+# Lint the project's source and test code
+pipenv run flake8 src
+pipenv run flake8 tests

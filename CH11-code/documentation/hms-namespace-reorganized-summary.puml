@@ -1,0 +1,112 @@
+@startuml
+
+' title The summary namespace diagram for the Hand Made Stuff codebase as of the start of Chapter 10
+
+' This can be rendered, then saved as a PNG or SVG image/document by copying this text,
+' going to https://www.plantuml.com/plantuml/uml, and pasting it into the large text box
+' at the top of that page.
+' Just below that text-box are PNG and SVG links that can be saved as the relevant file-type
+
+'left to right direction
+
+!theme mars
+
+skinparam monochrome true
+skinparam componentStyle rectangle
+skinparam linetype ortho
+'skinparam nodesep 30
+'skinparam ranksep 30
+
+allow_mixing
+
+hide empty members
+
+namespace hms <<Rectangle>> {
+
+    package artisan <<Folder>> {
+
+        namespace objects <<Rectangle>> {
+
+            class Artisan
+
+            Artisan --|> hms.core.business_objects.BaseArtisan
+            Artisan --|> hms.artisan.data_storage.JSONFileDataObject
+
+            class Order
+
+            Order --|> hms.artisan.data_storage.JSONFileDataObject
+            Order ..> hms.core.business_objects.Address : duplicates\nstructure of
+
+            class Product
+
+        }
+
+        namespace data_storage <<Rectangle>> {
+
+            class JSONFileDataObject
+
+            JSONFileDataObject --|> hms.core.data_objects.BaseDataObject
+        }
+
+    }
+
+    package central_office <<Folder>> {
+
+        namespace data_storage <<Rectangle>> {
+
+            class DatastoreConfig
+
+            class HMSMongoDataObject
+
+            HMSMongoDataObject --o DatastoreConfig
+
+        }
+
+    }
+
+    package core <<Folder>> {
+
+        namespace business_objects <<Rectangle>> {
+
+            class Address
+
+            abstract class BaseArtisan
+
+            BaseArtisan --o Address
+
+            abstract class BaseCustomer
+
+            BaseCustomer --o Address
+
+            abstract class BaseOrder
+
+            BaseOrder --|> HasProducts
+
+            abstract class BaseProduct
+
+            abstract class HasProducts
+
+        }
+
+        namespace data_objects <<Rectangle>> {
+
+            abstract class BaseDataObject
+
+        }
+    }
+
+    package gateway <<Folder>> {
+        note as no_gateway
+            The ""gateway"" code is
+            expected to be retired.
+        end note
+    }
+
+    note as no_inits
+        The ""_ _init_ _"" methods
+        are omitted for space
+    end note
+
+}
+
+@enduml

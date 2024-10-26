@@ -1,0 +1,109 @@
+{
+    "schemas": {
+        "Address": {
+            "description": "Represents a physical address, where mail could be sent.",
+            "properties": {
+                "street_address": {
+                    "title": "Street Address",
+                    "type": "string"
+                },
+                "building_address": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Building Address"
+                },
+                "city": {
+                    "title": "City",
+                    "type": "string"
+                },
+                "region": {
+                    "title": "Region",
+                    "type": "string"
+                },
+                "postal_code": {
+                    "title": "Postal Code",
+                    "type": "string"
+                },
+                "country": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Country"
+                }
+            },
+            "required": [
+                "street_address",
+                "city",
+                "region",
+                "postal_code"
+            ],
+            "title": "Address",
+            "type": "object"
+        },
+        "BaseArtisan": {
+            "description": "Provides baseline functionality, interface requirements, and type identity for objects that can represent an Artisan in the system.",
+            "properties": {
+                "honorific": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Honorific"
+                },
+                "given_name": {
+                    "title": "Given Name",
+                    "type": "string"
+                },
+                "family_name": {
+                    "title": "Family Name",
+                    "type": "string"
+                },
+                "suffix": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Suffix"
+                },
+                "address": {
+                    "$ref": "#/schemas/Address"
+                },
+                "email_address": {
+                    "title": "Email Address",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "given_name",
+                "family_name",
+                "address",
+                "email_address"
+            ],
+            "title": "BaseArtisan",
+            "type": "object"
+        }
+    }
+}

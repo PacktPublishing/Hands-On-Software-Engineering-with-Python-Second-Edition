@@ -9,6 +9,7 @@ name = "pypi"
 flake8 = "*"
 pytest = "*"
 coverage = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.11"
@@ -17,3 +18,12 @@ python_full_version = "3.11.7"
 [build_publish]
 build = "*"
 twine = "*"
+
+[json-schema]
+fastjsonschema = "*"
+
+[class-based]
+typeguard = "*"
+
+[pydantic-based]
+pydantic = ">1<3"

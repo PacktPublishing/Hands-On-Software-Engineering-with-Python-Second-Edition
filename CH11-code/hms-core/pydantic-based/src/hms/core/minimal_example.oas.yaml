@@ -1,0 +1,73 @@
+openapi: 3.0.3
+info:
+  title: Example components schemas from minimal_example.py
+components:
+  schemas:
+    Address:
+      description: Represents a physical address, where mail could be sent.
+      properties:
+        building_address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Building Address
+        city:
+          title: City
+          type: string
+        country:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Country
+        postal_code:
+          title: Postal Code
+          type: string
+        region:
+          title: Region
+          type: string
+        street_address:
+          title: Street Address
+          type: string
+      required:
+      - street_address
+      - city
+      - region
+      - postal_code
+      title: Address
+      type: object
+    BaseArtisan:
+      description: Provides baseline functionality, interface requirements, and type
+        identity for objects that can represent an Artisan in the system.
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        email_address:
+          title: Email Address
+          type: string
+        family_name:
+          title: Family Name
+          type: string
+        given_name:
+          title: Given Name
+          type: string
+        honorific:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Honorific
+        suffix:
+          anyOf:
+          - type: string
+          - type: 'null'
+          default: null
+          title: Suffix
+      required:
+      - given_name
+      - family_name
+      - address
+      - email_address
+      title: BaseArtisan
+      type: object

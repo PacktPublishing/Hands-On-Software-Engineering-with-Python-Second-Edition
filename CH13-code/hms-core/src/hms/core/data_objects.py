@@ -151,10 +151,4 @@ class BaseDataObject(metaclass=abc.ABCMeta):
 # Code to run if the module is executed directly
 if __name__ == '__main__':
 
-    with get_env_database_connector() as db:
-        with db.cursor() as cursor:
-            cursor.execute('SHOW TABLES;')
-            print(
-                'SHOW TABLES results: '
-                f'{cursor.fetchall()}'
-            )
+    pass

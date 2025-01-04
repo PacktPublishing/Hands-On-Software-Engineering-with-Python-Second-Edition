@@ -9,8 +9,8 @@ CREATE TABLE BaseBusinessObject (
     COMMENT 'The UTC date/time that the record was originally created.',
     modified DATETIME ON UPDATE CURRENT_TIMESTAMP NULL
     COMMENT 'The UTC date/time that the record was last modified.',
-    object_data json NOT NULL
-    COMMENT 'The JSON representation of the state-data for the object.',
+    -- IMPORTANT: This PK constraint will need to be
+    -- renamed in derived table definitions!
     CONSTRAINT BaseBusinessObject_PK PRIMARY KEY (oid)
 )
 ENGINE=InnoDB

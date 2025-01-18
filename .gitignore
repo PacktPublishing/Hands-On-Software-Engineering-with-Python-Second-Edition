@@ -104,3 +104,6 @@ scratch-space/
 CH08-code/unit-test-examples.geany
 
 *.geany
+
+# Ignore database backups
+*.backup

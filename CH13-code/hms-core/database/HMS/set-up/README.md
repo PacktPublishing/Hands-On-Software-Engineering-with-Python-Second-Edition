@@ -2,7 +2,7 @@
 
 The SQL scripts in this directory need to be executed with sufficient permissions to create the database, the application user, and to grant permissions to your developer user-name. The `root` account that was created with your MySQL installation will have those permissions, and these scripts have been tested using that account.
 
-Any of these commands that start with `mysql -u root -p` will prompt you for a **root** password.
+Any of these commands that start with `mysql -u root -p` will prompt you for a password; use the **root** password.
 
 1. Create the database with
 

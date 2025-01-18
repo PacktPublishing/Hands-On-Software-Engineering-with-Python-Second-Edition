@@ -22,5 +22,4 @@
 Using the `root` credentials for your MySQL installation, create a local database.
 - See the [set-up README file](HMS/set-up/README.md) for details on this process.
 - The set-up will also grant permissions for your local account to act as a database administrator for the local database.
-* Grant all of the *Developer Permissions* noted below — these will be used during development to allow you, the developer, to work with the database as needed.
 

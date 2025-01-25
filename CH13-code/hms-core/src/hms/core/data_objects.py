@@ -12,7 +12,7 @@ import os
 
 from datetime import datetime
 from functools import cache
-from typing import Any
+from typing import Any, Self
 from uuid import UUID, uuid4
 
 # Third-Party Imports

@@ -13,8 +13,8 @@ properties:
     default: false
     description: Flag indicating whether the object is "active."
     examples:
-    - true
     - false
+    - true
     title: Is Active
     type: boolean
   is_deleted:
@@ -22,8 +22,8 @@ properties:
     description: Flag indicating whether the object is "deleted" (pending an **actual**
       deletion later, perhaps).
     examples:
-    - true
     - false
+    - true
     title: Is Deleted
     type: boolean
   modified:

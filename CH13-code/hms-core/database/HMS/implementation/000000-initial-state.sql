@@ -8,4 +8,3 @@
   */
 
 SHOW TABLES;
-

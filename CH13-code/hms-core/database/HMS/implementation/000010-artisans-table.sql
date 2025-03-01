@@ -1,4 +1,4 @@
-CREATE TABLE BaseBusinessObject (
+CREATE TABLE Artisan (
     oid CHAR(36) NOT NULL PRIMARY KEY
     COMMENT 'The unique identifier of the record; a UUID value (for example b279fda6-eafc-40e5-b8c7-415ed864acf7).',
     is_active TINYINT(1) DEFAULT 0 NOT NULL
@@ -15,5 +15,5 @@ CREATE TABLE BaseBusinessObject (
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci
-COMMENT='A reference table, showing common fields and their definitions for other tables that will store business object state-data.'
+COMMENT='Tracks Artisans in the system'
 ;

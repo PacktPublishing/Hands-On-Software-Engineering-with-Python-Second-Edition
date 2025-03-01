@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 
 [dev-packages]
-flake8 = "*"
+flake8 = "<8"
 pyyaml = "<7"
 
 [requires]
@@ -16,3 +16,5 @@ python_full_version = "3.11.7"
 [hms-core]
 mysql-connector-python = "<10"
 pydantic = "<3"
+email-validator = "<3"
+typeguard = "<5"

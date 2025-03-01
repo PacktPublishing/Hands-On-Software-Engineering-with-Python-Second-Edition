@@ -287,7 +287,7 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         title='Is Active',
         description='Flag indicating whether the object '
         'is "active."',
-        examples=[True, False],
+        examples=[False, True],
         default=False
     )
     is_deleted: bool = Field(
@@ -295,7 +295,7 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         description='Flag indicating whether the object '
         'is "deleted" (pending an **actual** deletion '
         'later, perhaps).',
-        examples=[True, False],
+        examples=[False, True],
         default=False,
     )
     created: datetime = Field(
@@ -317,6 +317,12 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         """
         Saves the instance's state data to the back end
         data store.
+
+        Parameters:
+        -----------
+        db_source_name : Optional str
+            The name of an alternative table to execute
+            the query against during the save.
         """
         field_data = {
             key: value for key, value
@@ -387,8 +393,6 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         **criteria: Any
     ) -> list[Self]:
         """
-        Requires that derived classes implement this
-        class-method.
         Queries the database for a collection of <cls>
         business objects, returning a list of those that
         were retrieved.
@@ -412,7 +416,7 @@ class BaseDataObject(metaclass=abc.ABCMeta):
             the query, or (less ideally) to be used to
             filter results in code.
             May also be passed names to indicate a sort-
-            order, of the form "sort_{field}_{asc|desc}"
+            order, of the form "sort_{field}"
             May also be passed names to indicate criteria
             and operations against any of the fields in
             the class' CRITERIA_FIELDS attribute, suffixed

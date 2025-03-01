@@ -16,7 +16,7 @@ from pydantic import (
     # Model-related items
     BaseModel, Field,
     # Specific formats used in models
-    EmailStr, NameEmail,
+    EmailStr, NameEmail, HttpUrl,
     # Errors
     PydanticUserError
 )
@@ -188,6 +188,277 @@ class Address(BaseModel):
     )
 
 
+class ProductImage(BaseModel, BaseDataObject):
+    """
+    Represents an image for a Product in the context of the HMS systems, with data access functionality and operability.
+    """  # noqa E501
+
+    CRITERIA_FIELDS: ClassVar[list[str]] = \
+        BaseDataObject.CRITERIA_FIELDS + [
+            'product_oid', 'is_primary_image'
+        ]
+
+    # Relational links
+    product_oid: UUID = Field(
+        title='Product ID',
+        description='The unique identifier of the '
+        'Product that the ProductImage is associated '
+        'with',
+        examples=[
+            UUID('0'*32),
+            '073f2f01-64b6-441f-a053-b3aaa3cf5a1e',
+            UUID('f'*32),
+        ],
+        frozen=True,
+    )
+
+    # Image data
+    is_primary_image: bool = Field(
+        title='Primary Image Flag',
+        description='Flag indicating that this image is '
+        'the "primary" image for the product it relates '
+        'to, to be used in product lists, and as the '
+        '"main" image for product detail views.',
+        default=False,
+        examples=[
+            True,
+            False,
+        ]
+    )
+    image_url: HttpUrl = Field(
+        title='Image URL',
+        description='The required URL of the image',
+        examples=[
+            'https://cdn.hms.com/products/images/file.png',
+        ]
+    )
+    caption: Optional[str] | None = Field(
+        title='Image Caption',
+        description='The optional caption for the image.',
+        examples=[
+            'Some caption text, with <strong>limited'
+            '</strong> HTML allowed (styling only).',
+            None,
+        ]
+    )
+    alt_text: str = Field(
+        title='Image Alt Text',
+        description='The required alt-text for the image.',
+        examples=[
+            'A description of the image for users with '
+            'visual impairments. Plain text only.',
+        ]
+    )
+    width: int = Field(
+        title='Image Width (pixels)',
+        description='The width of the image, in pixels, '
+        'as originally uploaded',
+        examples=[
+            1800,
+            1200
+        ]
+    )
+    height: int = Field(
+        title='Image Height (pixels)',
+        description='The height of the image, in pixels, '
+        'as originally uploaded',
+        examples=[
+            1200,
+            1800
+        ]
+    )
+
+
+class Product(BaseModel, BaseDataObject):
+    """
+    Represents a Product in the context of the HMS systems, with data access functionality and operability.
+    """  # noqa E501
+
+    CRITERIA_FIELDS: ClassVar[list[str]] = \
+        BaseDataObject.CRITERIA_FIELDS + ['artisan_oid']
+
+    # Relational links
+    artisan_oid: UUID = Field(
+        title='Artisan ID',
+        description='The unique identifier of the '
+        'Artisan that the Product is associated with',
+        examples=[
+            UUID('0'*32),
+            '073f2f01-64b6-441f-a053-b3aaa3cf5a1e',
+            UUID('f'*32),
+        ],
+        frozen=True,
+    )
+
+    # Object data
+    name: str = Field(
+        title='Product Name',
+        description='The required name of the Product.',
+        examples=[
+            'Billiard Table',
+            'Dining Table',
+            'Heirloom Quilt',
+            'Dragon Scarf',
+        ]
+    )
+    summary: str = Field(
+        title='Product Summary',
+        description='The required summary of the Product.',
+        examples=[
+            'Some summary text, with <strong>limited'
+            '</strong> HTML allowed (styling only).',
+        ]
+    )
+    description: str = Field(
+        title='Product Description',
+        description='The required description of the Product.',
+        examples=[
+            'Some description text, with <strong>limited'
+            '</strong> HTML allowed:\n<ul><li>Limited '
+            'headings (<code>&lt;h3&gt;</code> and '
+            '"higher");</li><li>Limited block-level '
+            'elements (paragraphs, lists);</li>'
+            '<li>Styling</li></ul>',
+        ]
+    )
+    product_images: Optional[list[ProductImage]] = Field(
+        title='Product Images',
+        description='The list of ProductImages '
+        'associated with the Product',
+        default_factory=list,
+        examples=[
+            [],
+            get_examples(ProductImage, max_items=2)
+        ]
+    )
+    # Commerce data
+    price: Decimal = Field(
+        title='Product Price',
+        description='The required price of the Product, '
+        'in dollars',
+        ge=Decimal(0),
+        examples=[
+            Decimal(12.34),
+            Decimal(123.45),
+            Decimal(0),
+        ]
+    )
+    shipping_weight: Decimal = Field(
+        title='Shipping Weight',
+        description='The required shipping weight of the '
+        'Product, in ounces',
+        ge=Decimal(0),
+        examples=[
+            Decimal(320),
+            Decimal(3.2),
+            Decimal(0),
+        ]
+    )
+    # Size data
+    height: Optional[Decimal] | None = Field(
+        title='Product Height',
+        description='The optional height of the '
+        'Product, in inches',
+        ge=Decimal(0),
+        default=None,
+        examples=[
+            None,
+            Decimal(12),
+            Decimal(1),
+            Decimal(0),
+        ]
+    )
+    length: Optional[Decimal] | None = Field(
+        title='Product Length',
+        description='The optional length of the '
+        'Product, in inches',
+        ge=Decimal(0),
+        default=None,
+        examples=[
+            None,
+            Decimal(12),
+            Decimal(1),
+            Decimal(0),
+        ]
+    )
+    width: Optional[Decimal] | None = Field(
+        title='Product Width',
+        description='The optional width of the '
+        'Product, in inches',
+        ge=Decimal(0),
+        default=None,
+        examples=[
+            None,
+            Decimal(12),
+            Decimal(1),
+            Decimal(0),
+        ]
+    )
+    size: Optional[str] | None = Field(
+        title='Product Size',
+        description='The optional size-name of the '
+        'Product.',
+        default=None,
+        examples=[
+            None,
+            'Small',
+            'Medium',
+            'Large'
+        ]
+    )
+
+    def save(
+        self, *,
+        db_source_name: str | None = None,
+        **metadata: str
+    ) -> None:
+        """
+        Saves the instance's state data to the back end
+        data store. OVERRIDES BaseDataObject.save to
+        provide the option to save metadata for the
+        Product at the same time.
+
+        Parameters:
+        -----------
+        db_source_name : Optional str
+            The name of an alternative table to execute
+            the query against during the save.
+        metadata : Optional str values
+            The metadata values associated with the
+            instance to save.
+
+        Note:
+        -----
+        If no metadata is supplied, existing metadata
+        for the Product will be left untouched.
+        """
+        BaseDataObject.save(self, db_source_name)
+        if metadata:
+            self.save_metadata(**metadata)
+
+    def save_metadata(self, **metadata: str) -> None:
+        """
+        Creates metadata records for the instance,
+        deleting and overwriting any existing ones
+        in the process.
+        """
+        connector = get_env_database_connector()
+        cursor = connector.cursor()
+        cursor.execute(
+            "DELETE FROM ProductMetadata "
+            "WHERE product_oid='%s';", 
+            (self.oid)
+        )
+        for key, value in metadata.items():
+            cursor.execute(
+                "INSERT INTO ProductMetadata "
+                "(product_oid, category_name, value) "
+                "VALUES ('%s', '%s', '%s')",
+                (self.oid, key, value)
+            )
+        connector.commit()
+
+
 class Artisan(BaseModel, BaseDataObject):
     """
     Represents an Artisan in the context of the HMS systems, with data access functionality and operability.
@@ -274,7 +545,7 @@ class Artisan(BaseModel, BaseDataObject):
         title='Business Mailing Address',
         description='The required mailing address for '
         'the Artisan.',
-        examples=get_examples(Address)[:2]
+        examples=get_examples(Address, max_items=2)
     )
     email_address: EmailStr | NameEmail = Field(
         title='Email Address',
@@ -286,6 +557,17 @@ class Artisan(BaseModel, BaseDataObject):
             'Company Contact <contact@company.com>',
             'john.smith@test.com',
             'contact@company.com',
+        ]
+    )
+    # Artisan Products collection
+    products: Optional[list[Product]] = Field(
+        title='Products',
+        description='The list of Products associated '
+        'with the Artisan',
+        default_factory=list,
+        examples=[
+            [],
+            get_examples(Product, max_items=2)
         ]
     )
 

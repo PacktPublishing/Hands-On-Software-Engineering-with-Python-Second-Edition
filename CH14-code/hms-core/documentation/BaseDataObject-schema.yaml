@@ -1,0 +1,50 @@
+description: The JSON schema definitions for the common fields provided by BaseDataObject,
+  for reference purposes. See also the base-business-object.sql file in database/examples
+  for the corresponding SQL implementation.
+properties:
+  created:
+    description: The date/time (UTC) when the object was created.
+    examples:
+    - '2025-01-04T14:52:39.842206'
+    format: date-time
+    title: Created Date
+    type: string
+  is_active:
+    default: false
+    description: Flag indicating whether the object is "active."
+    examples:
+    - false
+    - true
+    title: Is Active
+    type: boolean
+  is_deleted:
+    default: false
+    description: Flag indicating whether the object is "deleted" (pending an **actual**
+      deletion later, perhaps).
+    examples:
+    - false
+    - true
+    title: Is Deleted
+    type: boolean
+  modified:
+    anyOf:
+    - format: date-time
+      type: string
+    - type: 'null'
+    default: null
+    description: The (optional) date/time (UTC) when the object was last modified.
+    examples:
+    - null
+    - '2025-01-04T14:52:39.842206'
+    title: Last Modified Date
+  oid:
+    description: The unique identifier of the record for the instance's state data
+      in the back end data store
+    examples:
+    - 00000000-0000-0000-0000-000000000000
+    - 073f2f01-64b6-441f-a053-b3aaa3cf5a1e
+    - ffffffff-ffff-ffff-ffff-ffffffffffff
+    format: uuid
+    title: Object ID
+    type: string
+title: BaseDataObject-schema-members

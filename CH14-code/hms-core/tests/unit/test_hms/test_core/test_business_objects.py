@@ -1492,37 +1492,6 @@ class test_ProductImage(unittest.TestCase):
         )
 
 
-class test_get_examples(unittest.TestCase):
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_get_examples_bad_cls(self):
-        self.fail(
-            'test_get_examples_bad_cls has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_get_examples_bad_max_items(self):
-        self.fail(
-            'test_get_examples_bad_max_items has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_get_examples_bad_randomize(self):
-        self.fail(
-            'test_get_examples_bad_randomize has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_get_examples_happy_paths(self):
-        self.fail(
-            'test_get_examples_happy_paths has not been '
-            'implemented yet'
-        )
-
-
 # Code to run if the module is executed directly
 if __name__ == '__main__':
 

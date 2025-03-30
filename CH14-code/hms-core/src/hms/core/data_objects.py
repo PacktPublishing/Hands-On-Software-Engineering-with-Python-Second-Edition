@@ -8,20 +8,24 @@ from __future__ import annotations
 
 # Built-In Imports
 import abc
+import itertools
 import json
 import os
 
 from datetime import datetime
 from functools import cache
+from random import shuffle
 from typing import Any, ClassVar, Self
 from uuid import UUID, uuid4
 
 # Third-Party Imports
 import mysql.connector
 
-from pydantic import BaseModel, Field
+from mysql.connector.connection_cext import \
+    CMySQLConnection
 
-from mysql.connector.connection_cext import CMySQLConnection
+from pydantic import BaseModel, Field, PydanticUserError
+from typeguard import typechecked
 
 # Path Manipulations (avoid these!) and "Local" Imports
 
@@ -41,10 +45,11 @@ SQL_OPERATORS = {
 
 
 # Module Functions
+@typechecked
 def build_where_clause(
-    criteria: dict[str, None],
+    criteria: dict[str, Any],
     criteria_fields: list[str],
-) -> tuple[str, tuple[Any]]:
+) -> tuple[str, tuple[Any, ...]]:
     """
     Builds and returns a SQL `WHERE` clause based on
     the provided criteria.
@@ -108,8 +113,8 @@ def build_where_clause(
                             value, (list, tuple)
                         ), (
                             '"_in" criteria must be '
-                            'supplied as a list or tuple, '
-                            f'but {value} is a '
+                            'supplied as a list or '
+                            f'tuple, but {value} is a '
                             f'{type(value).__name__}.'
                         )
                         # Generate the placeholders for
@@ -137,16 +142,24 @@ def build_where_clause(
                 # for unsupported operations?
 
     # - Finalize the values and return them
-    where = 'WHERE ' + ' AND '.join(where)
-    parameters = tuple(parameters)
+    if where and parameters:
+        where = 'WHERE ' + ' AND '.join(where)
+        parameters = tuple(parameters)
+    else:
+        where = ''
+        parameters = tuple()
     return (where, parameters)
 
 
-def build_limit_clause(page_size: int, page_number: int) -> str:
+@typechecked
+def build_limit_clause(
+    page_size: int, page_number: int
+) -> str:
     """
-    Creates and returns a LIMIT {page_size} OFFSET {offset}
-    clause, intended to be used by the BaseDataObject.get
-    class method to facilitate pagination of records.
+    Creates and returns a LIMIT {page_size} OFFSET
+    {offset} clause, intended to be used by the
+    BaseDataObject.get class method to facilitate
+    pagination of records.
 
     Parameters:
     -----------
@@ -165,8 +178,9 @@ def build_limit_clause(page_size: int, page_number: int) -> str:
     return f'LIMIT {page_size} OFFSET {offset}'
 
 
+@typechecked
 def build_order_by_clause(
-    criteria: dict[str, None],
+    criteria: dict[str, Any],
     criteria_fields: list[str],
 ) -> str:
     """
@@ -195,8 +209,8 @@ def build_order_by_clause(
         and key[5:] in criteria_fields
     }
     sort_phrases = [
-        f'{key} {value if value.lower() == "desc" else ""}'.strip()
-        for key, value in sort_fields.items()
+        f'{key} {v if v.lower() == "desc" else ""}'
+        .strip() for key, v in sort_fields.items()
     ]
     if sort_phrases:
         return f'ORDER BY {", ".join(sort_phrases)}'
@@ -204,6 +218,7 @@ def build_order_by_clause(
 
 
 @cache
+@typechecked
 def get_env_database_connector() -> CMySQLConnection:
     """
     Creates, caches and returns a MySQL connector object,
@@ -242,6 +257,93 @@ def get_env_database_connector() -> CMySQLConnection:
         database=os.environ['MYSQL_DB'],
     )
     return connector
+
+
+@typechecked
+def get_examples(
+    cls,
+    *,
+    randomize: bool = False,
+    max_items: int | None = None
+) -> list[dict[str, Any]]:
+    """
+    Returns a list of example instances of data for the
+    supplied BaseModel class.
+
+    cls : BaseModel-derived class
+        The BaseModel class to generate examples for
+    randomize : bool
+        Whether to randomize those examples before
+        returning them. Randomizing will lead to different
+        examples for JSON schemas and OAS definitions
+        that derive from those every time they are
+        published, which may not be desired behavior.
+    max_items : int
+        The maximum number of examples to return
+
+    Note:
+    -----
+    This function uses itertools.product to generate a
+    Cartesian set of all possible example values. Model
+    classes with large numbers of fields and/or large
+    numbers of example values will take correspondigly
+    longer times to generate. It is recommended that no
+    more than 2-3 examples be generated without good
+    reason.
+    """
+    try:
+        assert issubclass(cls, BaseModel), (
+            f'{cls.__name__} is not a subclass of '
+            f'BaseModel ({getattr(cls, "__mro__")})'
+        )
+        fields = cls.model_fields
+        assert fields, (
+            'Could not retrieve fields from the '
+            f'{cls.__name__} class; does it have fields, '
+            'and do any child models associated with it '
+            'have fields?'
+        )
+        examples = {
+            field_name: getattr(field, 'examples', [])
+            for field_name, field in fields.items()
+        }
+        iterables = {
+            field_name: [
+                (field_name, example_value)
+                for example_value in example_values
+                if example_value
+            ]
+            for field_name, example_values
+            in examples.items()
+            if example_values
+        }
+        arguments = itertools.product(*iterables.values())
+        if max_items is not None and not randomize:
+            results = []
+            for arg_set in arguments:
+                if len(results) == max_items:
+                    break
+                item_args = dict(arg_set)
+                new_item = cls(**item_args).model_dump(
+                    mode='json'
+                )
+                results.append(new_item)
+        else:
+            results = [
+                cls(**dict(arg_set)).model_dump(
+                    mode='json'
+                )
+                for arg_set in arguments
+            ]
+            if randomize:
+                shuffle(results)
+            if max_items:
+                results = results[0:max_items]
+    except (PydanticUserError, AssertionError) as error:
+        raise TypeError(f'{error}') from error
+    if not isinstance(results, list):
+        results = [results]
+    return results
 
 # Module Metaclasses
 
@@ -313,7 +415,10 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         default=None,
     )
 
-    def save(self, *, db_source_name: str | None = None) -> None:
+    def save(
+        self, *,
+        db_source_name: str | None = None
+    ) -> None:
         """
         Saves the instance's state data to the back end
         data store.
@@ -329,7 +434,9 @@ class BaseDataObject(metaclass=abc.ABCMeta):
             in self.model_dump(mode='json').items()
             if key in self.CRITERIA_FIELDS
         }
-        field_data['object_state'] = self.model_dump_json()
+        field_data[
+            'object_state'
+        ] = self.model_dump_json()
         field_names = []
         field_placeholders = []
         field_values = []
@@ -453,7 +560,9 @@ class BaseDataObject(metaclass=abc.ABCMeta):
                 criteria['oid'] = str(oids[0])
             else:
                 # Multiple oids
-                criteria['oid_in'] = [str(o) for o in oids]
+                criteria['oid_in'] = [
+                    str(o) for o in oids
+                ]
         where, parameters = build_where_clause(
             criteria, cls.CRITERIA_FIELDS
         )
@@ -526,7 +635,9 @@ class BaseDataObject(metaclass=abc.ABCMeta):
                 criteria = {'oid': str(oids[0])}
             else:
                 # Multiple oids
-                criteria = {'oid_in': [str(o) for o in oids]}
+                criteria = {
+                    'oid_in': [str(o) for o in oids]
+                }
         where, parameters = build_where_clause(
             criteria, cls.CRITERIA_FIELDS
         )

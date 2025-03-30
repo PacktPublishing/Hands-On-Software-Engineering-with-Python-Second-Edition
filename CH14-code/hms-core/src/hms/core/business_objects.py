@@ -4,11 +4,8 @@
 from __future__ import annotations
 
 # Built-In Imports
-import itertools
-
 from decimal import Decimal
-from random import shuffle
-from typing import Any, ClassVar, Optional
+from typing import ClassVar, Optional
 from uuid import UUID
 
 # Third-Party Imports
@@ -16,100 +13,19 @@ from pydantic import (
     # Model-related items
     BaseModel, Field,
     # Specific formats used in models
-    EmailStr, NameEmail, HttpUrl,
-    # Errors
-    PydanticUserError
+    EmailStr, NameEmail, HttpUrl
 )
 
 # Path Manipulations (avoid these!) and "Local" Imports
-from hms.core.data_objects import BaseDataObject
+from hms.core.data_objects import \
+    BaseDataObject, \
+    get_examples, get_env_database_connector
 
 # Module "Constants" and Other Attributes
 
 # Module Custom Exceptions
 
-
 # Module Functions
-def get_examples(
-    cls: BaseModel,
-    *,
-    randomize: bool = False,
-    max_items: int | None = None
-) -> list[dict[str, Any]]:
-    """
-    Returns a list of example instances of data for the
-    supplied BaseModel class.
-
-    cls : BaseModel-derived class
-        The BaseModel class to generate examples for
-    randomize : bool
-        Whether to randomize those examples before
-        returning them. Randomizing will lead to different
-        examples for JSON schemas and OAS definitions
-        that derive from those every time they are
-        published, which may not be desired behavior.
-    max_items : int
-        The maximum number of examples to return
-
-    Note:
-    -----
-    This function uses itertools.product to generate a
-    Cartesian set of all possible example values. Model
-    classes with large numbers of fields and/or large
-    numbers of example values will take correspondigly
-    longer times to generate. It is recommended that no
-    more than 2-3 examples be generated without good
-    reason.
-    """
-    try:
-        assert issubclass(cls, BaseModel), (
-            f'{cls.__name__} is not a subclass of '
-            f'BaseModel ({getattr(cls, "__mro__")})'
-        )
-        fields = cls.model_fields
-        assert fields, (
-            'Could not retrieve fields from the '
-            f'{cls.__name__} class; does it have fields, '
-            'and do any child models associated with it '
-            'have fields?'
-        )
-        examples = {
-            field_name: getattr(field, 'examples', [])
-            for field_name, field in fields.items()
-        }
-        iterables = {
-            field_name: [
-                (field_name, example_value)
-                for example_value in example_values
-                if example_value
-            ]
-            for field_name, example_values
-            in examples.items()
-            if example_values
-        }
-        arguments = itertools.product(*iterables.values())
-        if max_items is not None and not randomize:
-            results = []
-            for arg_set in arguments:
-                if len(results) == max_items:
-                    break
-                item_args = dict(arg_set)
-                new_item = cls(**item_args).model_dump(mode='json')
-                results.append(new_item)
-        else:
-            results = [
-                cls(**dict(arg_set)).model_dump(mode='json')
-                for arg_set in arguments
-            ]
-            if randomize:
-                shuffle(results)
-            if max_items:
-                results = results[0:max_items]
-    except (PydanticUserError, AssertionError) as error:
-        raise TypeError(f'{error}') from error
-    if not isinstance(results, list):
-        results = [results]
-    return results
 
 # Module Metaclasses
 
@@ -131,9 +47,9 @@ class Address(BaseModel):
     )
     building_address: Optional[str] | None = Field(
         title='Building Address',
-        description='The optional building address part of '
-        'the address (the location within a building at '
-        'the street_address location).',
+        description='The optional building address part '
+        'of the address (the location within a building '
+        'at the street_address location).',
         default=None,
         examples=[
             'Suite 123',
@@ -229,7 +145,8 @@ class ProductImage(BaseModel, BaseDataObject):
         title='Image URL',
         description='The required URL of the image',
         examples=[
-            'https://cdn.hms.com/products/images/file.png',
+            'https://cdn.hms.com/products/images/'
+            'file.png',
         ]
     )
     caption: Optional[str] | None = Field(
@@ -243,7 +160,8 @@ class ProductImage(BaseModel, BaseDataObject):
     )
     alt_text: str = Field(
         title='Image Alt Text',
-        description='The required alt-text for the image.',
+        description='The required alt-text for the '
+        'image.',
         examples=[
             'A description of the image for users with '
             'visual impairments. Plain text only.',
@@ -303,7 +221,8 @@ class Product(BaseModel, BaseDataObject):
     )
     summary: str = Field(
         title='Product Summary',
-        description='The required summary of the Product.',
+        description='The required summary of the '
+        'Product.',
         examples=[
             'Some summary text, with <strong>limited'
             '</strong> HTML allowed (styling only).',
@@ -311,7 +230,8 @@ class Product(BaseModel, BaseDataObject):
     )
     description: str = Field(
         title='Product Description',
-        description='The required description of the Product.',
+        description='The required description of the '
+        'Product.',
         examples=[
             'Some description text, with <strong>limited'
             '</strong> HTML allowed:\n<ul><li>Limited '

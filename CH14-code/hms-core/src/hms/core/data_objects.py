@@ -153,7 +153,7 @@ def build_where_clause(
 
 @typechecked
 def build_limit_clause(
-    page_size: int, page_number: int
+    page_size: int, page_number: int = 0
 ) -> str:
     """
     Creates and returns a LIMIT {page_size} OFFSET
@@ -404,17 +404,24 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         title='Created Date',
         description='The date/time (UTC) when the object '
         'was created.',
-        examples=['2025-01-04T14:52:39.842206'],
+        examples=[
+            '2025-01-04T14:52:39.842206',
+            '2025-01-05T14:52:39.842206',
+        ],
         default_factory=datetime.utcnow, frozen=True,
     )
     modified: datetime | None = Field(
         title='Last Modified Date',
         description='The (optional) date/time (UTC) when '
         'the object was last modified.',
-        examples=[None, '2025-01-04T14:52:39.842206'],
+        examples=[
+            None,
+            '2025-01-04T14:52:39.842206'
+        ],
         default=None,
     )
 
+    @typechecked
     def save(
         self, *,
         db_source_name: str | None = None
@@ -468,6 +475,7 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         connector.commit()
 
     @classmethod
+    @typechecked
     def from_record(
         cls,
         data: dict[str, Any] | tuple[tuple[str, Any]]
@@ -491,9 +499,10 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         return cls(**data)
 
     @classmethod
+    @typechecked
     def get(
         cls,
-        *oids: list[UUID | str],
+        *oids: UUID | str,
         db_source_name: str | None = None,
         page_size: int | None = None,
         page_number: int | None = None,
@@ -551,18 +560,36 @@ class BaseDataObject(metaclass=abc.ABCMeta):
                 name_in=('John', 'Jane')
               or
                 name_in=['John', 'Jane']
+
+        Raises:
+        -------
+        ValueError:
+            If any oids value is not a UUID, or a string
+            representation of one.
         """
         # Build the WHERE clause from **criteria,
         # including any oids values specified
         if oids:
-            if len(oids) == 1:
-                # Single oid
-                criteria['oid'] = str(oids[0])
-            else:
-                # Multiple oids
-                criteria['oid_in'] = [
-                    str(o) for o in oids
-                ]
+            try:
+                if len(oids) == 1:
+                    # Single oid
+                    if isinstance(oids[0], str):
+                        criteria['oid'] = str(UUID(oids[0]))
+                    else:
+                        criteria['oid'] = str(oids[0])
+                else:
+                    # Multiple oids
+                    criteria['oid_in'] = [
+                        str(o) if isinstance(o, UUID)
+                        else str(UUID(o))
+                        for o in oids
+                    ]
+            except Exception as error:
+                raise ValueError(
+                    f'One or more oids in {oids} could '
+                    'not be converted to a UUID'
+                ) from error
+
         where, parameters = build_where_clause(
             criteria, cls.CRITERIA_FIELDS
         )
@@ -573,14 +600,19 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         )
 
         # Build the LIMIT clause, if one is called for
-        if page_size is not None \
-                and page_number is not None:
+        if page_size is not None:
             try:
                 limit = build_limit_clause(
-                    page_size, page_number
+                    page_size, page_number or 0
                 )
             except AssertionError as error:
                 raise ValueError(f'{error}') from error
+        elif page_number is not None:
+            # TODO: Refactor this to make it cleaner?
+            raise TypeError(
+                f'{cls.__name__}.get may not specify a '
+                'page_number without a page_size'
+            )
         else:
             limit = ''
 
@@ -594,6 +626,7 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         # Get a connector, create a cursor, execute the
         # query (with parameters if any are supplied)
         connector = get_env_database_connector()
+        final_sql = final_sql.strip()
         with connector.cursor(dictionary=True) as cursor:
             if parameters:
                 cursor.execute(final_sql, parameters)
@@ -609,9 +642,10 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         return results
 
     @classmethod
+    @typechecked
     def delete(
         cls,
-        *oids: list[UUID | str],
+        *oids: UUID | str,
         db_source_name: str | None = None,
     ) -> None:
         """

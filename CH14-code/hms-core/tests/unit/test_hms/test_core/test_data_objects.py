@@ -9,6 +9,7 @@ import unittest
 
 from typing import ClassVar
 from unittest.mock import patch, MagicMock
+from uuid import UUID
 
 # Third-Party Imports
 from mysql.connector.connection_cext import \
@@ -19,7 +20,7 @@ from goblinfish.testing.pact.modules import \
 from goblinfish.testing.pact.module_members import \
     ExaminesSourceClass, ExaminesSourceFunction
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from typeguard import TypeCheckError
 
@@ -281,64 +282,388 @@ class test_BaseDataObject(
         )
 
     # Test-methods for source methods
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_delete_happy_paths(self):
-        self.fail(
-            'test_delete_happy_paths has not been '
-            'implemented yet'
-        )
+    @patch.dict(
+        os.environ,
+        {
+            'MYSQL_HOST': 'some-database-host',
+            'MYSQL_PORT': '1234',
+            'MYSQL_DB': 'some-database-name',
+            'MYSQL_USER': 'some-user-name',
+            'MYSQL_PASS': 'super-secret-password-really',
+        }
+    )
+    @patch(
+        'hms.core.data_objects.get_env_database_connector'
+    )
+    def test_delete_happy_paths(self, mock_connect):
+        # Arrange
+        # - A class that implements BaseDataObject
+        #   and BaseModel
+        class ConcreteDataObject(
+            BaseDataObject, BaseModel
+        ):
+            DELETE_TEMPLATE: ClassVar = 'DELETE FROM ' \
+                '{TABLE_NAME} {WHERE}'
+            TABLE_NAME: ClassVar = 'no_such_table'
+            given_name: str = Field()
+            family_name: str = Field()
 
+        # Configure the database-related mocks and patches
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_connection
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+
+        # Test single oid
+        with self.subTest(msg='Test with single oid (str)'):
+            ConcreteDataObject.delete(
+                '00000000-0000-0000-0000-000000000001'
+            )
+            mock_cursor.execute.assert_called_once_with(
+                'DELETE FROM no_such_table '
+                'WHERE oid = %s',
+                ('00000000-0000-0000-0000-000000000001',)
+            )
+        with self.subTest(
+            msg='Test with single oid (UUID)'
+        ):
+            mock_cursor.reset_mock()
+            ConcreteDataObject.delete(
+                UUID(
+                    '00000000-0000-0000-0000-000000000001'
+                )
+            )
+            mock_cursor.execute.assert_called_once_with(
+                'DELETE FROM no_such_table '
+                'WHERE oid = %s',
+                ('00000000-0000-0000-0000-000000000001',)
+            )
+
+        # ~ with self.subTest(msg='Test with multiple oids'):
+
+    @unittest.skip(
+        'Test in integration; too many variables to '
+        'test here.'
+    )
     def test_get_bad_criteria(self):
         self.fail(
             'test_get_bad_criteria has not been '
             'implemented yet'
         )
 
-    def test_get_bad_db_source_name(self):
-        self.fail(
-            'test_get_bad_db_source_name has not been '
-            'implemented yet'
+    @patch.dict(
+        os.environ,
+        {
+            'MYSQL_HOST': 'some-database-host',
+            'MYSQL_PORT': '1234',
+            'MYSQL_DB': 'some-database-name',
+            'MYSQL_USER': 'some-user-name',
+            'MYSQL_PASS': 'super-secret-password-really',
+        }
+    )
+    @patch(
+        'hms.core.data_objects.get_env_database_connector'
+    )
+    def test_get_bad_db_source_name(self, mock_connect):
+        # Arrange
+        bad_source_names = (
+            1, 2.3, True,
+            dict(), list(), tuple(),
+            object()
         )
+        # - A class that implements BaseDataObject
+        #   and BaseModel
+        class ConcreteDataObject(
+            BaseDataObject, BaseModel
+        ):
+            WRITE_TEMPLATE: ClassVar = \
+                '/* This is some SQL */'
+        # Act/Assert
+        for source_name in bad_source_names:
+            with self.subTest(
+                msg=f'Testing with "{source_name}" '
+                f'({type(source_name).__name__}) for source_name'
+            ):
+                with self.assertRaises(
+                    TypeCheckError,
+                    msg=f'"{source_name}" '
+                    f'({type(source_name).__name__}) '
+                    'should raise a typeguard.'
+                    'TypeCheckError'
+                ):
+                    ConcreteDataObject.get(db_source_name=source_name)
 
-    def test_get_bad_oids(self):
-        self.fail(
-            'test_get_bad_oids has not been '
-            'implemented yet'
-        )
+    @patch.dict(
+        os.environ,
+        {
+            'MYSQL_HOST': 'some-database-host',
+            'MYSQL_PORT': '1234',
+            'MYSQL_DB': 'some-database-name',
+            'MYSQL_USER': 'some-user-name',
+            'MYSQL_PASS': 'super-secret-password-really',
+        }
+    )
+    @patch(
+        'hms.core.data_objects.get_env_database_connector'
+    )
+    def test_get_bad_oids(self, mock_connect):
 
-    def test_get_bad_page_number(self):
-        self.fail(
-            'test_get_bad_page_number has not been '
-            'implemented yet'
-        )
+        # Arrange
+        # - A class that implements BaseDataObject
+        #   and BaseModel
+        class ConcreteDataObject(
+            BaseDataObject, BaseModel
+        ):
+            GET_TEMPLATE: ClassVar = 'SELECT * ' \
+                'FROM {TABLE_NAME} ' \
+                '{WHERE}{ORDER_BY}{LIMIT}'
+            TABLE_NAME: ClassVar = 'no_such_table'
+            given_name: str = Field()
+            family_name: str = Field()
 
-    def test_get_bad_page_size(self):
-        self.fail(
-            'test_get_bad_page_size has not been '
-            'implemented yet'
-        )
+        # Configure the database-related mocks and patches
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_connection
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
 
-    def test_get_happy_paths(self):
-        self.fail(
-            'test_get_happy_paths has not been '
-            'implemented yet'
-        )
+        with self.assertRaises(ValueError):
+            ConcreteDataObject.get('oid')
+
+        with self.assertRaises(ValueError):
+            ConcreteDataObject.get('oid', 'oid')
+
+    @patch.dict(
+        os.environ,
+        {
+            'MYSQL_HOST': 'some-database-host',
+            'MYSQL_PORT': '1234',
+            'MYSQL_DB': 'some-database-name',
+            'MYSQL_USER': 'some-user-name',
+            'MYSQL_PASS': 'super-secret-password-really',
+        }
+    )
+    @patch(
+        'hms.core.data_objects.get_env_database_connector'
+    )
+    def test_get_bad_page_number(self, mock_connect):
+
+        # Arrange
+        # - A class that implements BaseDataObject
+        #   and BaseModel
+        class ConcreteDataObject(
+            BaseDataObject, BaseModel
+        ):
+            GET_TEMPLATE: ClassVar = 'SELECT * ' \
+                'FROM {TABLE_NAME} ' \
+                '{WHERE}{ORDER_BY}{LIMIT}'
+            TABLE_NAME: ClassVar = 'no_such_table'
+            given_name: str = Field()
+            family_name: str = Field()
+
+        # Configure the database-related mocks and patches
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_connection
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+
+        with self.assertRaises(ValueError):
+            ConcreteDataObject.get(
+                page_size=10, page_number=-1
+            )
+
+        with self.assertRaises(TypeCheckError):
+            ConcreteDataObject.get(
+                page_size=10, page_number='zero'
+            )
+
+    @patch.dict(
+        os.environ,
+        {
+            'MYSQL_HOST': 'some-database-host',
+            'MYSQL_PORT': '1234',
+            'MYSQL_DB': 'some-database-name',
+            'MYSQL_USER': 'some-user-name',
+            'MYSQL_PASS': 'super-secret-password-really',
+        }
+    )
+    @patch(
+        'hms.core.data_objects.get_env_database_connector'
+    )
+    def test_get_bad_page_size(self, mock_connect):
+        # Arrange
+        # - A class that implements BaseDataObject
+        #   and BaseModel
+        class ConcreteDataObject(
+            BaseDataObject, BaseModel
+        ):
+            GET_TEMPLATE: ClassVar = 'SELECT * ' \
+                'FROM {TABLE_NAME} ' \
+                '{WHERE}{ORDER_BY}{LIMIT}'
+            TABLE_NAME: ClassVar = 'no_such_table'
+            given_name: str = Field()
+            family_name: str = Field()
+
+        # Configure the database-related mocks and patches
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_connection
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+
+        with self.assertRaises(ValueError):
+            ConcreteDataObject.get(
+                page_size=-1, page_number=0
+            )
+
+        with self.assertRaises(TypeCheckError):
+            ConcreteDataObject.get(
+                page_size='one', page_number=0
+            )
+
+    @patch.dict(
+        os.environ,
+        {
+            'MYSQL_HOST': 'some-database-host',
+            'MYSQL_PORT': '1234',
+            'MYSQL_DB': 'some-database-name',
+            'MYSQL_USER': 'some-user-name',
+            'MYSQL_PASS': 'super-secret-password-really',
+        }
+    )
+    @patch(
+        'hms.core.data_objects.get_env_database_connector'
+    )
+    def test_get_happy_paths(self, mock_connect):
+        # Arrange
+        # - A class that implements BaseDataObject
+        #   and BaseModel
+        class ConcreteDataObject(
+            BaseDataObject, BaseModel
+        ):
+            GET_TEMPLATE: ClassVar = 'SELECT * ' \
+                'FROM {TABLE_NAME} ' \
+                '{WHERE}{ORDER_BY}{LIMIT}'
+            TABLE_NAME: ClassVar = 'no_such_table'
+            given_name: str = Field()
+            family_name: str = Field()
+
+        # Configure the database-related mocks and patches
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_connection
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+
+        # Test with criteria
+        with self.subTest(msg='Testing with criteria'):
+            ConcreteDataObject.get(
+                family_name_eq='Jones'
+            )
+            mock_cursor.execute.assert_called_with(
+                'SELECT * FROM no_such_table WHERE '
+                'family_name = %s',
+                ('Jones',)
+            )
+            ConcreteDataObject.get(
+                given_name_eq='John',
+            )
+            mock_cursor.execute.assert_called_with(
+                'SELECT * FROM no_such_table WHERE '
+                'given_name = %s',
+                ('John',)
+            )
+            ConcreteDataObject.get(
+                given_name_eq='John',
+                family_name_eq='Jones'
+            )
+            mock_cursor.execute.assert_called_with(
+                'SELECT * FROM no_such_table WHERE '
+                'given_name = %s AND family_name = %s',
+                ('John', 'Jones')
+            )
+        # TODO: Test with all the other operators in
+        #       data_objects.SQL_OPERATORS
+
+        # Test with db_source_name
+        with self.subTest(msg='Testing with criteria'):
+            ConcreteDataObject.get(
+                db_source_name='some_other_table',
+                family_name_eq='Jones'
+            )
+            mock_cursor.execute.assert_called_with(
+                'SELECT * FROM some_other_table WHERE '
+                'family_name = %s',
+                ('Jones',)
+            )
+
+        with self.subTest(msg='Testing with oids'):
+            ConcreteDataObject.get(
+                '00000000-0000-0000-0000-000000000000',
+                UUID('00000000-0000-0000-0000-000000000001'),
+            )
+            mock_cursor.execute.assert_called_with(
+                'SELECT * FROM no_such_table '
+                'WHERE oid IN (%s, %s)',
+                (
+                    '00000000-0000-0000-0000-000000000000',
+                    '00000000-0000-0000-0000-000000000001',
+                )
+            )
+            ConcreteDataObject.get(
+                '00000000-0000-0000-0000-000000000002'
+            )
+            mock_cursor.execute.assert_called_with(
+                'SELECT * FROM no_such_table '
+                'WHERE oid = %s',
+                ('00000000-0000-0000-0000-000000000002',)
+            )
+            ConcreteDataObject.get(
+                UUID('00000000-0000-0000-0000-000000000003')
+            )
+            mock_cursor.execute.assert_called_with(
+                'SELECT * FROM no_such_table '
+                'WHERE oid = %s',
+                ('00000000-0000-0000-0000-000000000003',)
+            )
+
+        with self.subTest(msg='Testing with page_number only'):
+            with self.assertRaises(TypeError):
+                ConcreteDataObject.get(page_number=1)
+
+        with self.subTest(msg='Testing with page_size only'):
+            ConcreteDataObject.get(page_size=10)
+            mock_cursor.execute.assert_called_with(
+                'SELECT * FROM no_such_table '
+                'LIMIT 10 OFFSET 0'
+            )
+
+        # Test with page_number and page_size
+        with self.subTest(msg='Testing with page_number and page_size'):
+            ConcreteDataObject.get(page_size=10, page_number=1)
+            mock_cursor.execute.assert_called_with(
+                'SELECT * FROM no_such_table '
+                'LIMIT 10 OFFSET 10'
+            )
 
     def test_from_record_bad_data(self):
-        self.fail(
-            'test_from_record_bad_data has not been '
-            'implemented yet'
+        bad_data = (
+            1, 2.3, 'four', True,
+            dict(), list(), tuple(), object()
         )
+        for data in bad_data:
+            with self.subTest(
+                msg=f'Testing with "{data}" '
+                f'({type(data).__name__}).'
+            ):
+                with self.assertRaises(TypeCheckError):
+                    BaseDataObject.from_record(data)
 
+    @unittest.skip(
+        'Test in integration; too many variables to '
+        'test here.'
+    )
     def test_from_record_happy_paths(self):
         self.fail(
             'test_from_record_happy_paths has not been '
-            'implemented yet'
-        )
-
-    def test_save_bad_db_source_name(self):
-        self.fail(
-            'test_save_bad_db_source_name has not been '
             'implemented yet'
         )
 
@@ -353,6 +678,49 @@ class test_BaseDataObject(
         }
     )
     @patch('mysql.connector.connect')
+    def test_save_bad_db_source_name(self, db_connection):
+        # Arrange
+        bad_source_names = (
+            1, 2.3, True,
+            dict(), list(), tuple(),
+            object()
+        )
+        # - A class that implements BaseDataObject
+        #   and BaseModel
+        class ConcreteDataObject(
+            BaseDataObject, BaseModel
+        ):
+            WRITE_TEMPLATE: ClassVar = \
+                '/* This is some SQL */'
+        inst = ConcreteDataObject()
+        # Act/Assert
+        for source_name in bad_source_names:
+            with self.subTest(
+                msg=f'Testing with "{source_name}" '
+                f'({type(source_name).__name__}) for source_name'
+            ):
+                with self.assertRaises(
+                    TypeCheckError,
+                    msg=f'"{source_name}" '
+                    f'({type(source_name).__name__}) '
+                    'should raise a typeguard.'
+                    'TypeCheckError'
+                ):
+                    inst.save(db_source_name=source_name)
+
+    @patch.dict(
+        os.environ,
+        {
+            'MYSQL_HOST': 'some-database-host',
+            'MYSQL_PORT': '1234',
+            'MYSQL_DB': 'some-database-name',
+            'MYSQL_USER': 'some-user-name',
+            'MYSQL_PASS': 'super-secret-password-really',
+        }
+    )
+    @patch(
+        'hms.core.data_objects.get_env_database_connector'
+    )
     def test_save_happy_paths(self, mock_connect):
         # Arrange
 
@@ -362,7 +730,6 @@ class test_BaseDataObject(
             BaseDataObject, BaseModel
         ):
             WRITE_TEMPLATE: ClassVar = '/* This is some SQL */'
-            pass
 
         # Gather up all the possible examples for
         # that class
@@ -373,17 +740,12 @@ class test_BaseDataObject(
         mock_cursor = MagicMock()
         mock_connect.return_value = mock_connection
         mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
-        mock_cursor.execute.return_value = None        
+        mock_cursor.execute.return_value = None
 
         for example in examples:
             with self.subTest(
                 msg=f'Testing {example} object save'
             ):
-                # Arrange (resetting mocks)
-                mock_cursor.reset_mock()
-                mock_connection.reset_mock()
-                mock_connection.cursor.return_value. \
-                    __enter__.reset_mock()
                 # Act
                 inst = ConcreteDataObject(**example)
                 inst.save()
@@ -412,10 +774,13 @@ class test_BaseDataObject(
                     )
                 )
                 mock_connection.commit.assert_called_once()
-
-        self.fail(
-            'test_save_happy_paths is not complete'
-        )
+                # Reset mocks and cache for other tests
+                mock_cursor.reset_mock()
+                mock_connection.reset_mock()
+                mock_connection.cursor.return_value. \
+                    __enter__.reset_mock()
+                mock_connect.reset_mock()
+                mock_connect.cache_clear()
 
 
 class test_build_limit_clause(
@@ -639,7 +1004,7 @@ class test_get_env_database_connector(
         # Act - initial connection retrieval
         connector = get_env_database_connector()
         # Assert
-        patch_connection.assert_called_with(
+        patch_connection.assert_called_once_with(
             host=os.environ['MYSQL_HOST'],
             port=os.environ['MYSQL_PORT'],
             user=os.environ['MYSQL_USER'],
@@ -647,11 +1012,11 @@ class test_get_env_database_connector(
             database=os.environ['MYSQL_DB'],
         )
         # CACHED connection retrieval: Arrange
-        patch_connection.reset_mock()
         # Act
         cached_connector = get_env_database_connector()
         # Assert
-        patch_connection.assert_not_called()
+        # Do not try to test the underlying cached
+        # call, it's mocked out of existance.
         self.assertTrue(
             connector is cached_connector,
             'Second and subsequent calls to get_env_'
@@ -736,5 +1101,6 @@ if __name__ == '__main__':
     # ~ unittest.main()
 
     import pytest
-    # ~ pytest.main([__file__, '-v'])
-    pytest.main([f'{__file__}::test_BaseDataObject', '-v'])  # noqa: E501
+    pytest.main([__file__, '-v'])
+    # ~ pytest.main([f'{__file__}::test_BaseDataObject', '-v'])  # noqa: E501
+    # ~ pytest.main([f'{__file__}::test_BaseDataObject::test_delete_happy_paths', '-v'])  # noqa: E501

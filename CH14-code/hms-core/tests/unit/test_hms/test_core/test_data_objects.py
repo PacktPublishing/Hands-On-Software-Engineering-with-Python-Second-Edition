@@ -3,10 +3,12 @@
 """
 
 # Built-In Imports
+import json
 import os
 import unittest
 
-from unittest.mock import patch
+from typing import ClassVar
+from unittest.mock import patch, MagicMock
 
 # Third-Party Imports
 from mysql.connector.connection_cext import \
@@ -286,74 +288,133 @@ class test_BaseDataObject(
             'implemented yet'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_get_happy_paths(self):
-        self.fail(
-            'test_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_from_record_bad_data(self):
-        self.fail(
-            'test_from_record_bad_data has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_from_record_happy_paths(self):
-        self.fail(
-            'test_from_record_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
     def test_get_bad_criteria(self):
         self.fail(
             'test_get_bad_criteria has not been '
             'implemented yet'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
     def test_get_bad_db_source_name(self):
         self.fail(
             'test_get_bad_db_source_name has not been '
             'implemented yet'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
     def test_get_bad_oids(self):
         self.fail(
             'test_get_bad_oids has not been '
             'implemented yet'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
     def test_get_bad_page_number(self):
         self.fail(
             'test_get_bad_page_number has not been '
             'implemented yet'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
     def test_get_bad_page_size(self):
         self.fail(
             'test_get_bad_page_size has not been '
             'implemented yet'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
+    def test_get_happy_paths(self):
+        self.fail(
+            'test_get_happy_paths has not been '
+            'implemented yet'
+        )
+
+    def test_from_record_bad_data(self):
+        self.fail(
+            'test_from_record_bad_data has not been '
+            'implemented yet'
+        )
+
+    def test_from_record_happy_paths(self):
+        self.fail(
+            'test_from_record_happy_paths has not been '
+            'implemented yet'
+        )
+
     def test_save_bad_db_source_name(self):
         self.fail(
             'test_save_bad_db_source_name has not been '
             'implemented yet'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_save_happy_paths(self):
+    @patch.dict(
+        os.environ,
+        {
+            'MYSQL_HOST': 'some-database-host',
+            'MYSQL_PORT': '1234',
+            'MYSQL_DB': 'some-database-name',
+            'MYSQL_USER': 'some-user-name',
+            'MYSQL_PASS': 'super-secret-password-really',
+        }
+    )
+    @patch('mysql.connector.connect')
+    def test_save_happy_paths(self, mock_connect):
+        # Arrange
+
+        # - A class that implements BaseDataObject
+        #   and BaseModel
+        class ConcreteDataObject(
+            BaseDataObject, BaseModel
+        ):
+            WRITE_TEMPLATE: ClassVar = '/* This is some SQL */'
+            pass
+
+        # Gather up all the possible examples for
+        # that class
+        examples = get_examples(ConcreteDataObject)
+
+        # Configure the database-related mocks and patches
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+        mock_connect.return_value = mock_connection
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+        mock_cursor.execute.return_value = None        
+
+        for example in examples:
+            with self.subTest(
+                msg=f'Testing {example} object save'
+            ):
+                # Arrange (resetting mocks)
+                mock_cursor.reset_mock()
+                mock_connection.reset_mock()
+                mock_connection.cursor.return_value. \
+                    __enter__.reset_mock()
+                # Act
+                inst = ConcreteDataObject(**example)
+                inst.save()
+                # Assert
+                mock_connect.assert_called_once()
+                mock_connection.cursor \
+                    .assert_called_once()
+                mock_cursor.execute \
+                        .assert_called_once_with(
+                    ConcreteDataObject.WRITE_TEMPLATE,
+                    (
+                        # The values for the INSERT SQL
+                        str(inst.oid),
+                        inst.is_active,
+                        inst.is_deleted,
+                        example['created'],
+                        example['modified'],
+                        inst.model_dump_json(),
+                        # The values for the UPDATE SQL
+                        str(inst.oid),
+                        inst.is_active,
+                        inst.is_deleted,
+                        example['created'],
+                        example['modified'],
+                        inst.model_dump_json(),
+                    )
+                )
+                mock_connection.commit.assert_called_once()
+
         self.fail(
-            'test_save_happy_paths has not been '
-            'implemented yet'
+            'test_save_happy_paths is not complete'
         )
 
 
@@ -672,8 +733,8 @@ class test_get_examples(
 # Code to run if the module is executed directly
 if __name__ == '__main__':
 
-    unittest.main()
+    # ~ unittest.main()
 
-    # ~ import pytest
+    import pytest
     # ~ pytest.main([__file__, '-v'])
-    # ~ pytest.main([f'{__file__}::test_get_examples', '-v'])  # noqa: E501
+    pytest.main([f'{__file__}::test_BaseDataObject', '-v'])  # noqa: E501

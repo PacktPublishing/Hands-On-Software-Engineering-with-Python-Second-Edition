@@ -8,6 +8,7 @@ import unittest
 # Third-Party Imports
 
 # Path Manipulations (avoid these!) and "Local" Imports
+from hms.core.data_objects import BaseDataObject
 
 # Import the test target
 from hms.core.business_objects import \
@@ -290,6 +291,69 @@ class test_Artisan(unittest.TestCase):
     """
     Tests the Artisan class.
     """
+
+    # Tests of the inherited fields
+    @unittest.skipIf(
+        Artisan.oid is BaseDataObject.oid,
+        'The oid field is inherited from BaseDataObject'
+    )
+    def test_oid(self):
+        self.fail(
+            'Artisan.oid was originally inherited from '
+            'BaseDataObject, but that has changed, and '
+            'it needs to be tested in relation to the '
+            'Artisan class'
+        )
+
+    @unittest.skipIf(
+        Artisan.is_active is BaseDataObject.is_active,
+        'The is_active field is inherited from BaseDataObject'
+    )
+    def test_is_active(self):
+        self.fail(
+            'Artisan.is_active was originally inherited '
+            'from BaseDataObject, but that has changed, '
+            'and it needs to be tested in relation to '
+            'the Artisan class'
+        )
+
+    @unittest.skipIf(
+        Artisan.is_deleted is BaseDataObject.is_deleted,
+        'The is_deleted field is inherited from BaseDataObject'
+    )
+    def test_is_deleted(self):
+        self.fail(
+            'Artisan.is_deleted was originally inherited '
+            'from BaseDataObject, but that has changed, '
+            'and it needs to be tested in relation to '
+            'the Artisan class'
+        )
+
+    @unittest.skipIf(
+        Artisan.created is BaseDataObject.created,
+        'The created field is inherited from '
+        'BaseDataObject'
+    )
+    def test_created(self):
+        self.fail(
+            'Artisan.created was originally inherited '
+            'from BaseDataObject, but that has changed, '
+            'and it needs to be tested in relation to '
+            'the Artisan class'
+        )
+
+    @unittest.skipIf(
+        Artisan.modified is BaseDataObject.modified,
+        'The modified field is inherited from '
+        'BaseDataObject'
+    )
+    def test_modified(self):
+        self.fail(
+            'Artisan.modified was originally inherited '
+            'from BaseDataObject, but that has changed, '
+            'and it needs to be tested in relation to '
+            'the Artisan class'
+        )
 
     @unittest.skip('Test stubbed but not yet implemented')
     def test_honorific_get_happy_paths(self):
@@ -692,6 +756,71 @@ class test_Product(unittest.TestCase):
     """
     Tests the Product class.
     """
+
+    # Tests of the inherited fields
+    @unittest.skipIf(
+        Product.oid is BaseDataObject.oid,
+        'The oid field is inherited from BaseDataObject'
+    )
+    def test_oid(self):
+        self.fail(
+            'Product.oid was originally inherited from '
+            'BaseDataObject, but that has changed, and '
+            'it needs to be tested in relation to the '
+            'Product class'
+        )
+
+    @unittest.skipIf(
+        Product.is_active is BaseDataObject.is_active,
+        'The is_active field is inherited from '
+        'BaseDataObject'
+    )
+    def test_is_active(self):
+        self.fail(
+            'Product.is_active was originally inherited '
+            'from BaseDataObject, but that has changed, '
+            'and it needs to be tested in relation to '
+            'the Product class'
+        )
+
+    @unittest.skipIf(
+        Product.is_deleted is BaseDataObject.is_deleted,
+        'The is_deleted field is inherited from '
+        'BaseDataObject'
+    )
+    def test_is_deleted(self):
+        self.fail(
+            'Product.is_deleted was originally inherited '
+            'from BaseDataObject, but that has changed, '
+            'and it needs to be tested in relation to '
+            'the Product class'
+        )
+
+    @unittest.skipIf(
+        Product.created is BaseDataObject.created,
+        'The created field is inherited from '
+        'BaseDataObject'
+    )
+    def test_created(self):
+        self.fail(
+            'Product.created was originally inherited '
+            'from BaseDataObject, but that has changed, '
+            'and it needs to be tested in relation to '
+            'the Product class'
+        )
+
+    @unittest.skipIf(
+        Product.modified is BaseDataObject.modified,
+        'The modified field is inherited from '
+        'BaseDataObject'
+    )
+    def test_modified(self):
+        self.fail(
+            'Product.modified was originally inherited '
+            'from BaseDataObject, but that has changed, '
+            'and it needs to be tested in relation to '
+            'the Product class'
+        )
 
     @unittest.skip('Test stubbed but not yet implemented')
     def test_artisan_oid_get_happy_paths(self):
@@ -1182,6 +1311,73 @@ class test_ProductImage(unittest.TestCase):
     """
     Tests the ProductImage class.
     """
+
+    # Tests of the inherited fields
+    @unittest.skipIf(
+        ProductImage.oid is BaseDataObject.oid,
+        'The oid field is inherited from BaseDataObject'
+    )
+    def test_oid(self):
+        self.fail(
+            'ProductImage.oid was originally inherited '
+            'from BaseDataObject, but that has changed, '
+            'and it needs to be tested in relation to '
+            'the ProductImage class'
+        )
+
+    @unittest.skipIf(
+        ProductImage.is_active
+        is BaseDataObject.is_active,
+        'The is_active field is inherited from '
+        'BaseDataObject'
+    )
+    def test_is_active(self):
+        self.fail(
+            'ProductImage.is_active was originally '
+            'inherited from BaseDataObject, but that '
+            'has changed, and it needs to be tested in '
+            'relation to the ProductImage class'
+        )
+
+    @unittest.skipIf(
+        ProductImage.is_deleted is
+        BaseDataObject.is_deleted,
+        'The is_deleted field is inherited from '
+        'BaseDataObject'
+    )
+    def test_is_deleted(self):
+        self.fail(
+            'ProductImage.is_deleted was originally '
+            'inherited from BaseDataObject, but that '
+            'has changed, and it needs to be tested in '
+            'relation to the ProductImage class'
+        )
+
+    @unittest.skipIf(
+        ProductImage.created is BaseDataObject.created,
+        'The created field is inherited from '
+        'BaseDataObject'
+    )
+    def test_created(self):
+        self.fail(
+            'ProductImage.created was originally '
+            'inherited from BaseDataObject, but that '
+            'has changed, and it needs to be tested in '
+            'relation to the ProductImage class'
+        )
+
+    @unittest.skipIf(
+        ProductImage.modified is BaseDataObject.modified,
+        'The modified field is inherited from '
+        'BaseDataObject'
+    )
+    def test_modified(self):
+        self.fail(
+            'ProductImage.modified was originally '
+            'inherited from BaseDataObject, but that '
+            'has changed, and it needs to be tested in '
+            'relation to the ProductImage class'
+        )
 
     @unittest.skip('Test stubbed but not yet implemented')
     def test_product_oid_get_happy_paths(self):

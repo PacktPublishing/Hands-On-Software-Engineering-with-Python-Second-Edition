@@ -6,8 +6,10 @@
 import unittest
 
 from datetime import datetime
+from uuid import UUID
 
 # Third-Party Imports
+from pydantic import ValidationError
 
 # Path Manipulations (avoid these!) and "Local" Imports
 from hms.core.data_objects import \
@@ -695,38 +697,55 @@ class test_Product(unittest.TestCase):
             'the Product class'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_artisan_oid_get_happy_paths(self):
+    def test_artisan_oid(self):
         """
-        Tests the get process of the artisan_oid field of
-        the Product class
+        Tests the artisan_oid field of the Product class
         """
-        self.fail(
-            'test_artisan_oid_get_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = Product.model_fields['artisan_oid'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'artisan_oid'
+        }
+        for artisan_oid in good_values:
+            with self.subTest(
+                msg=f'Testing creation with artisan_oid {artisan_oid} '
+                f'({type(artisan_oid).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                args['artisan_oid'] = artisan_oid
+                if isinstance(artisan_oid, str):
+                    expected = UUID(artisan_oid)
+                else:
+                    expected = artisan_oid
+                # Act
+                inst = Product(**args)
+                # Assert
+                self.assertEqual(
+                    inst.artisan_oid, expected,
+                    'Creating a ConcreteDataObject '
+                    f'with an artisan_oid value of "{artisan_oid}" '
+                    f'({type(artisan_oid).__name__}) should '
+                    'return that value in instance.artisan_oid, '
+                    f'but "{inst.artisan_oid}" '
+                    f'({type(artisan_oid).__name__}) was '
+                    'returned instead.'
+                )
+        with self.subTest(
+            msg='Testing that an artisan_oid cannot be changed '
+            'after it is set'
+        ):
+            with self.assertRaises(ValidationError):
+                inst.artisan_oid = UUID('0'*32)
+        with self.subTest(
+            msg='Testing that an artisan_oid cannot be deleted'
+        ):
+            with self.assertRaises(ValidationError):
+                del inst.artisan_oid
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_artisan_oid_set_happy_paths(self):
-        """
-        Tests the set process of the artisan_oid field of
-        the Product class
-        """
-        self.fail(
-            'test_artisan_oid_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_artisan_oid_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        artisan_oid field of the Product class
-        """
-        self.fail(
-            'test_artisan_oid_set_bad_value has not '
-            'been implemented yet'
-        )
 
 class test_ProductImage(unittest.TestCase):
     """
@@ -810,6 +829,6 @@ if __name__ == '__main__':
     # ~ unittest.main()
 
     import pytest
-    pytest.main([__file__, '-v'])
+    # ~ pytest.main([__file__, '-v'])
     # ~ pytest.main([f'{__file__}::test_Artisan', '-v'])
-    # ~ pytest.main([f'{__file__}::test_Artisan::test_honorific', '-vv'])
+    pytest.main([f'{__file__}::test_Product::test_artisan_oid', '-vv'])

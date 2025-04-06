@@ -5,15 +5,17 @@
 # Built-In Imports
 import unittest
 
+from datetime import datetime
+
 # Third-Party Imports
 
 # Path Manipulations (avoid these!) and "Local" Imports
-from hms.core.data_objects import BaseDataObject
+from hms.core.data_objects import \
+    BaseDataObject, get_examples
 
 # Import the test target
 from hms.core.business_objects import \
-    Address, Artisan, Product, ProductImage, \
-    get_examples
+    Address, Artisan, Product, ProductImage
 
 
 # Expected test-case classes
@@ -21,276 +23,231 @@ class test_Address(unittest.TestCase):
     """
     Tests the Address class.
     """
+    EXAMPLE_ARGS = get_examples(
+        Address, max_items=1
+    )[0]
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_street_address_get_happy_paths(self):
+    def test_street_address(self):
         """
-        Tests the get process of the street_address field
-        of the Address class
-        """
-        self.fail(
-            'test_street_address_get_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_street_address_set_happy_paths(self):
-        """
-        Tests the set process of the street_address field
-        of the Address class
-        """
-        self.fail(
-            'test_street_address_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_street_address_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        street_address field of the Address class
-        """
-        self.fail(
-            'test_street_address_set_bad_value has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_street_address_delete_happy_paths(self):
-        """
-        Tests the delete process of the street_address
-        field of the Address class
-        """
-        self.fail(
-            'test_street_address_delete_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_building_address_get_happy_paths(self):
-        """
-        Tests the get process of the building_address
-        field of the Address class
-        """
-        self.fail(
-            'test_building_address_get_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_building_address_set_happy_paths(self):
-        """
-        Tests the set process of the building_address
-        field of the Address class
-        """
-        self.fail(
-            'test_building_address_set_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_building_address_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        building_address field of the Address class
-        """
-        self.fail(
-            'test_building_address_set_bad_value has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_building_address_delete_happy_paths(self):
-        """
-        Tests the delete process of the building_address
-        field of the Address class
-        """
-        self.fail(
-            'test_building_address_delete_happy_paths '
-            'has not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_city_get_happy_paths(self):
-        """
-        Tests the get process of the city field of the
+        Tests the street_address field of the
         Address class
         """
-        self.fail(
-            'test_city_get_happy_paths has not been '
-            'implemented yet'
-        )
+        # Arrange
+        good_values = Address. \
+            model_fields['street_address'].examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'street_address'
+        }
+        for street_address in good_values:
+            with self.subTest(
+                msg=f'Testing creation with street_'
+                f'address {street_address} '
+                f'({type(street_address).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['street_address'] = \
+                    street_address
+                # Act
+                inst = Address(**args)
+                # Assert
+                self.assertEqual(
+                    inst.street_address, expected,
+                    'Creating an Address with a street_'
+                    f'address value of "{street_address}"'
+                    f' ({type(street_address).__name__}) '
+                    'should return that value in instance'
+                    f'.street_address, but '
+                    f'"{inst.street_address}" '
+                    f'({type(street_address).__name__}) '
+                    'was returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_city_set_happy_paths(self):
+    def test_building_address(self):
         """
-        Tests the set process of the city field of the
+        Tests the building_address field of the
         Address class
         """
-        self.fail(
-            'test_city_set_happy_paths has not been '
-            'implemented yet'
-        )
+        # Arrange
+        good_values = Address. \
+            model_fields['building_address'].examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'building_address'
+        }
+        for building_address in good_values:
+            with self.subTest(
+                msg=f'Testing creation with building_address '
+                f'{building_address} ({type(building_address).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['building_address'] = \
+                    building_address
+                # Act
+                inst = Address(**args)
+                # Assert
+                self.assertEqual(
+                    inst.building_address, expected,
+                    'Creating an Address with a building_'
+                    f'address value of "{building_address}" '
+                    f'({type(building_address).__name__}) '
+                    'should return that value in instance'
+                    f'.building_address, but "{inst.building_address}" '
+                    f'({type(building_address).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_city_set_bad_value(self):
+    def test_city(self):
         """
-        Tests the validation of the set process of the
-        city field of the Address class
+        Tests the city field of the Address class
         """
-        self.fail(
-            'test_city_set_bad_value has not been '
-            'implemented yet'
-        )
+        # Arrange
+        good_values = Address.model_fields['city'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'city'
+        }
+        for city in good_values:
+            with self.subTest(
+                msg=f'Testing creation with city '
+                f'{city} ({type(city).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['city'] = city
+                # Act
+                inst = Address(**args)
+                # Assert
+                self.assertEqual(
+                    inst.city, expected,
+                    'Creating an Address with '
+                    f'a city value of "{city}" '
+                    f'({type(city).__name__}) '
+                    'should return that value in instance'
+                    f'.city, but "{inst.city}" '
+                    f'({type(city).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_city_delete_happy_paths(self):
+    def test_region_name(self):
         """
-        Tests the delete process of the city field of the
-        Address class
+        Tests the region_name field of the Address class
         """
-        self.fail(
-            'test_city_delete_happy_paths has not been '
-            'implemented yet'
-        )
+        # Arrange
+        good_values = Address. \
+            model_fields['region_name'].examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'region_name'
+        }
+        for region_name in good_values:
+            with self.subTest(
+                msg=f'Testing creation with region_name '
+                f'{region_name} ({type(region_name).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['region_name'] = \
+                    region_name
+                # Act
+                inst = Address(**args)
+                # Assert
+                self.assertEqual(
+                    inst.region_name, expected,
+                    'Creating an Address with '
+                    f'a region_name value of "{region_name}" '
+                    f'({type(region_name).__name__}) '
+                    'should return that value in instance'
+                    f'.region_name, but "{inst.region_name}" '
+                    f'({type(region_name).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_region_name_get_happy_paths(self):
+    def test_postal_code(self):
         """
-        Tests the get process of the region_name field of
-        the Address class
+        Tests the postal_code field of the Address class
         """
-        self.fail(
-            'test_region_name_get_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = Address. \
+            model_fields['postal_code'].examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'postal_code'
+        }
+        for postal_code in good_values:
+            with self.subTest(
+                msg=f'Testing creation with postal_code '
+                f'{postal_code} ({type(postal_code).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['postal_code'] = \
+                    postal_code
+                # Act
+                inst = Address(**args)
+                # Assert
+                self.assertEqual(
+                    inst.postal_code, expected,
+                    'Creating an Address with '
+                    f'a postal_code value of "{postal_code}" '
+                    f'({type(postal_code).__name__}) '
+                    'should return that value in instance'
+                    f'.postal_code, but "{inst.postal_code}" '
+                    f'({type(postal_code).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_region_name_set_happy_paths(self):
+    def test_country(self):
         """
-        Tests the set process of the region_name field of
-        the Address class
+        Tests the country field of the BaseDataObject class
         """
-        self.fail(
-            'test_region_name_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_region_name_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        region_name field of the Address class
-        """
-        self.fail(
-            'test_region_name_set_bad_value has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_region_name_delete_happy_paths(self):
-        """
-        Tests the delete process of the region_name field
-        of the Address class
-        """
-        self.fail(
-            'test_region_name_delete_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_postal_code_get_happy_paths(self):
-        """
-        Tests the get process of the postal_code field of
-        the Address class
-        """
-        self.fail(
-            'test_postal_code_get_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_postal_code_set_happy_paths(self):
-        """
-        Tests the set process of the postal_code field of
-        the Address class
-        """
-        self.fail(
-            'test_postal_code_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_postal_code_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        postal_code field of the Address class
-        """
-        self.fail(
-            'test_postal_code_set_bad_value has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_postal_code_delete_happy_paths(self):
-        """
-        Tests the delete process of the postal_code field
-        of the Address class
-        """
-        self.fail(
-            'test_postal_code_delete_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_country_get_happy_paths(self):
-        """
-        Tests the get process of the country field of the
-        Address class
-        """
-        self.fail(
-            'test_country_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_country_set_happy_paths(self):
-        """
-        Tests the set process of the country field of the
-        Address class
-        """
-        self.fail(
-            'test_country_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_country_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        country field of the Address class
-        """
-        self.fail(
-            'test_country_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_country_delete_happy_paths(self):
-        """
-        Tests the delete process of the country field of
-        the Address class
-        """
-        self.fail(
-            'test_country_delete_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = Address. \
+            model_fields['country'].examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'country'
+        }
+        for country in good_values:
+            with self.subTest(
+                msg=f'Testing creation with country '
+                f'{country} ({type(country).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['country'] = country
+                # Act
+                inst = Address(**args)
+                # Assert
+                self.assertEqual(
+                    inst.country, expected,
+                    'Creating an Address with '
+                    f'a country value of "{country}" '
+                    f'({type(country).__name__}) '
+                    'should return that value in instance'
+                    f'.country, but "{inst.country}" '
+                    f'({type(country).__name__}) was '
+                    'returned instead.'
+                )
 
 
 class test_Artisan(unittest.TestCase):
     """
     Tests the Artisan class.
     """
+
+    EXAMPLE_ARGS = get_examples(
+        Artisan, max_items=1
+    )[0]
 
     # Tests of the inherited fields
     @unittest.skipIf(
@@ -355,407 +312,323 @@ class test_Artisan(unittest.TestCase):
             'the Artisan class'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_honorific_get_happy_paths(self):
+    def test_honorific(self):
         """
-        Tests the get process of the honorific field of
-        the Artisan class
+        Tests the honorific field of the Artisan class
         """
-        self.fail(
-            'test_honorific_get_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = Artisan.model_fields['honorific'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'honorific'
+        }
+        for honorific in good_values:
+            with self.subTest(
+                msg=f'Testing creation with honorific '
+                f'{honorific} ({type(honorific).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['honorific'] = honorific
+                # Act
+                inst = Artisan(**args)
+                # Assert
+                self.assertEqual(
+                    inst.honorific, expected,
+                    'Creating an Artisan with '
+                    f'a honorific value of "{honorific}" '
+                    f'({type(honorific).__name__}) '
+                    'should return that value in instance'
+                    f'.honorific, but "{inst.honorific}" '
+                    f'({type(honorific).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_honorific_set_happy_paths(self):
+    def test_given_name(self):
         """
-        Tests the set process of the honorific field of
-        the Artisan class
+        Tests the given_name field of the Artisan class
         """
-        self.fail(
-            'test_honorific_set_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = Artisan.model_fields['given_name'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'given_name'
+        }
+        for given_name in good_values:
+            with self.subTest(
+                msg=f'Testing creation with given_name '
+                f'{given_name} ({type(given_name).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['given_name'] = given_name
+                # Act
+                inst = Artisan(**args)
+                # Assert
+                self.assertEqual(
+                    inst.given_name, expected,
+                    'Creating an Artisan with '
+                    f'a given_name value of "{given_name}" '
+                    f'({type(given_name).__name__}) '
+                    'should return that value in instance'
+                    f'.given_name, but "{inst.given_name}" '
+                    f'({type(given_name).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_honorific_set_bad_value(self):
+    def test_middle_name(self):
         """
-        Tests the validation of the set process of the
-        honorific field of the Artisan class
+        Tests the middle_name field of the Artisan class
         """
-        self.fail(
-            'test_honorific_set_bad_value has not been '
-            'implemented yet'
-        )
+        # Arrange
+        good_values = Artisan.model_fields['middle_name'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'middle_name'
+        }
+        for middle_name in good_values:
+            with self.subTest(
+                msg=f'Testing creation with middle_name '
+                f'{middle_name} ({type(middle_name).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['middle_name'] = middle_name
+                # Act
+                inst = Artisan(**args)
+                # Assert
+                self.assertEqual(
+                    inst.middle_name, expected,
+                    'Creating an Artisan with '
+                    f'a middle_name value of "{middle_name}" '
+                    f'({type(middle_name).__name__}) '
+                    'should return that value in instance'
+                    f'.middle_name, but "{inst.middle_name}" '
+                    f'({type(middle_name).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_honorific_delete_happy_paths(self):
+    def test_family_name(self):
         """
-        Tests the delete process of the honorific field
-        of the Artisan class
+        Tests the family_name field of the Artisan class
         """
-        self.fail(
-            'test_honorific_delete_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = Artisan.model_fields['family_name'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'family_name'
+        }
+        for family_name in good_values:
+            with self.subTest(
+                msg=f'Testing creation with family_name '
+                f'{family_name} ({type(family_name).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['family_name'] = family_name
+                # Act
+                inst = Artisan(**args)
+                # Assert
+                self.assertEqual(
+                    inst.family_name, expected,
+                    'Creating an Artisan with '
+                    f'a family_name value of "{family_name}" '
+                    f'({type(family_name).__name__}) '
+                    'should return that value in instance'
+                    f'.family_name, but "{inst.family_name}" '
+                    f'({type(family_name).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_given_name_get_happy_paths(self):
+    def test_suffix(self):
         """
-        Tests the get process of the given_name field of
-        the Artisan class
+        Tests the suffix field of the Artisan class
         """
-        self.fail(
-            'test_given_name_get_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = Artisan.model_fields['suffix'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'suffix'
+        }
+        for suffix in good_values:
+            with self.subTest(
+                msg=f'Testing creation with suffix '
+                f'{suffix} ({type(suffix).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['suffix'] = suffix
+                # Act
+                inst = Artisan(**args)
+                # Assert
+                self.assertEqual(
+                    inst.suffix, expected,
+                    'Creating an Artisan with '
+                    f'a suffix value of "{suffix}" '
+                    f'({type(suffix).__name__}) '
+                    'should return that value in instance'
+                    f'.suffix, but "{inst.suffix}" '
+                    f'({type(suffix).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_given_name_set_happy_paths(self):
+    def test_company_name(self):
         """
-        Tests the set process of the given_name field of
-        the Artisan class
+        Tests the company_name field of the Artisan class
         """
-        self.fail(
-            'test_given_name_set_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = Artisan.model_fields['company_name'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'company_name'
+        }
+        for company_name in good_values:
+            with self.subTest(
+                msg=f'Testing creation with company_name '
+                f'{company_name} ({type(company_name).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['company_name'] = company_name
+                # Act
+                inst = Artisan(**args)
+                # Assert
+                self.assertEqual(
+                    inst.company_name, expected,
+                    'Creating an Artisan with '
+                    f'a company_name value of "{company_name}" '
+                    f'({type(company_name).__name__}) '
+                    'should return that value in instance'
+                    f'.company_name, but "{inst.company_name}" '
+                    f'({type(company_name).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_given_name_set_bad_value(self):
+    @unittest.skip('Needs more detailed attention')
+    def test_business_address(self):
         """
-        Tests the validation of the set process of the
-        given_name field of the Artisan class
+        Tests the business_address field of the Artisan class
         """
-        self.fail(
-            'test_given_name_set_bad_value has not been '
-            'implemented yet'
-        )
+        # Arrange
+        good_values = Artisan.model_fields['business_address'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'business_address'
+        }
+        for business_address in good_values:
+            with self.subTest(
+                msg=f'Testing creation with business_address '
+                f'{business_address} ({type(business_address).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['business_address'] = business_address
+                # Act
+                inst = Artisan(**args)
+                # Assert
+                self.assertEqual(
+                    inst.business_address, expected,
+                    'Creating an Artisan with '
+                    f'a business_address value of "{business_address}" '
+                    f'({type(business_address).__name__}) '
+                    'should return that value in instance'
+                    f'.business_address, but "{inst.business_address}" '
+                    f'({type(business_address).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_given_name_delete_happy_paths(self):
+    def test_email_address(self):
         """
-        Tests the delete process of the given_name field
-        of the Artisan class
+        Tests the email_address field of the Artisan class
         """
-        self.fail(
-            'test_given_name_delete_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = Artisan.model_fields['email_address'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'email_address'
+        }
+        for email_address in good_values:
+            with self.subTest(
+                msg=f'Testing creation with email_address '
+                f'{email_address} ({type(email_address).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['email_address'] = email_address
+                # Act
+                inst = Artisan(**args)
+                # Assert
+                self.assertEqual(
+                    inst.email_address, expected,
+                    'Creating an Artisan with '
+                    f'a email_address value of "{email_address}" '
+                    f'({type(email_address).__name__}) '
+                    'should return that value in instance'
+                    f'.email_address, but "{inst.email_address}" '
+                    f'({type(email_address).__name__}) was '
+                    'returned instead.'
+                )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_middle_name_get_happy_paths(self):
+    @unittest.skip('Needs more detailed attention')
+    def test_products(self):
         """
-        Tests the get process of the middle_name field of
-        the Artisan class
+        Tests the products field of the Artisan class
         """
-        self.fail(
-            'test_middle_name_get_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_middle_name_set_happy_paths(self):
-        """
-        Tests the set process of the middle_name field of
-        the Artisan class
-        """
-        self.fail(
-            'test_middle_name_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_middle_name_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        middle_name field of the Artisan class
-        """
-        self.fail(
-            'test_middle_name_set_bad_value has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_middle_name_delete_happy_paths(self):
-        """
-        Tests the delete process of the middle_name field
-        of the Artisan class
-        """
-        self.fail(
-            'test_middle_name_delete_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_family_name_get_happy_paths(self):
-        """
-        Tests the get process of the family_name field of
-        the Artisan class
-        """
-        self.fail(
-            'test_family_name_get_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_family_name_set_happy_paths(self):
-        """
-        Tests the set process of the family_name field of
-        the Artisan class
-        """
-        self.fail(
-            'test_family_name_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_family_name_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        family_name field of the Artisan class
-        """
-        self.fail(
-            'test_family_name_set_bad_value has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_family_name_delete_happy_paths(self):
-        """
-        Tests the delete process of the family_name field
-        of the Artisan class
-        """
-        self.fail(
-            'test_family_name_delete_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_suffix_get_happy_paths(self):
-        """
-        Tests the get process of the suffix field of the
-        Artisan class
-        """
-        self.fail(
-            'test_suffix_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_suffix_set_happy_paths(self):
-        """
-        Tests the set process of the suffix field of the
-        Artisan class
-        """
-        self.fail(
-            'test_suffix_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_suffix_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        suffix field of the Artisan class
-        """
-        self.fail(
-            'test_suffix_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_suffix_delete_happy_paths(self):
-        """
-        Tests the delete process of the suffix field of
-        the Artisan class
-        """
-        self.fail(
-            'test_suffix_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_company_name_get_happy_paths(self):
-        """
-        Tests the get process of the company_name field
-        of the Artisan class
-        """
-        self.fail(
-            'test_company_name_get_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_company_name_set_happy_paths(self):
-        """
-        Tests the set process of the company_name field
-        of the Artisan class
-        """
-        self.fail(
-            'test_company_name_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_company_name_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        company_name field of the Artisan class
-        """
-        self.fail(
-            'test_company_name_set_bad_value has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_company_name_delete_happy_paths(self):
-        """
-        Tests the delete process of the company_name
-        field of the Artisan class
-        """
-        self.fail(
-            'test_company_name_delete_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_business_address_get_happy_paths(self):
-        """
-        Tests the get process of the business_address
-        field of the Artisan class
-        """
-        self.fail(
-            'test_business_address_get_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_business_address_set_happy_paths(self):
-        """
-        Tests the set process of the business_address
-        field of the Artisan class
-        """
-        self.fail(
-            'test_business_address_set_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_business_address_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        business_address field of the Artisan class
-        """
-        self.fail(
-            'test_business_address_set_bad_value has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_business_address_delete_happy_paths(self):
-        """
-        Tests the delete process of the business_address
-        field of the Artisan class
-        """
-        self.fail(
-            'test_business_address_delete_happy_paths '
-            'has not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_email_address_get_happy_paths(self):
-        """
-        Tests the get process of the email_address field
-        of the Artisan class
-        """
-        self.fail(
-            'test_email_address_get_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_email_address_set_happy_paths(self):
-        """
-        Tests the set process of the email_address field
-        of the Artisan class
-        """
-        self.fail(
-            'test_email_address_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_email_address_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        email_address field of the Artisan class
-        """
-        self.fail(
-            'test_email_address_set_bad_value has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_email_address_delete_happy_paths(self):
-        """
-        Tests the delete process of the email_address
-        field of the Artisan class
-        """
-        self.fail(
-            'test_email_address_delete_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_products_get_happy_paths(self):
-        """
-        Tests the get process of the products field of
-        the Artisan class
-        """
-        self.fail(
-            'test_products_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_products_set_happy_paths(self):
-        """
-        Tests the set process of the products field of
-        the Artisan class
-        """
-        self.fail(
-            'test_products_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_products_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        products field of the Artisan class
-        """
-        self.fail(
-            'test_products_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_products_delete_happy_paths(self):
-        """
-        Tests the delete process of the products field of
-        the Artisan class
-        """
-        self.fail(
-            'test_products_delete_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = Artisan.model_fields['products'] \
+            .examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'products'
+        }
+        for products in good_values:
+            with self.subTest(
+                msg=f'Testing creation with products '
+                f'{products} ({type(products).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['products'] = products
+                # Act
+                inst = Artisan(**args)
+                # Assert
+                self.assertEqual(
+                    inst.products, expected,
+                    'Creating an Artisan with '
+                    f'a products value of "{products}" '
+                    f'({type(products).__name__}) '
+                    'should return that value in instance'
+                    f'.products, but "{inst.products}" '
+                    f'({type(products).__name__}) was '
+                    'returned instead.'
+                )
 
 
 class test_Product(unittest.TestCase):
     """
     Tests the Product class.
     """
+
+    EXAMPLE_ARGS = get_examples(
+        Product, max_items=1
+    )[0]
 
     # Tests of the inherited fields
     @unittest.skipIf(
@@ -855,462 +728,14 @@ class test_Product(unittest.TestCase):
             'been implemented yet'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_artisan_oid_delete_happy_paths(self):
-        """
-        Tests the delete process of the artisan_oid field
-        of the Product class
-        """
-        self.fail(
-            'test_artisan_oid_delete_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_name_get_happy_paths(self):
-        """
-        Tests the get process of the name field of the
-        Product class
-        """
-        self.fail(
-            'test_name_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_name_set_happy_paths(self):
-        """
-        Tests the set process of the name field of the
-        Product class
-        """
-        self.fail(
-            'test_name_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_name_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        name field of the Product class
-        """
-        self.fail(
-            'test_name_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_name_delete_happy_paths(self):
-        """
-        Tests the delete process of the name field of the
-        Product class
-        """
-        self.fail(
-            'test_name_delete_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_summary_get_happy_paths(self):
-        """
-        Tests the get process of the summary field of the
-        Product class
-        """
-        self.fail(
-            'test_summary_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_summary_set_happy_paths(self):
-        """
-        Tests the set process of the summary field of the
-        Product class
-        """
-        self.fail(
-            'test_summary_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_summary_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        summary field of the Product class
-        """
-        self.fail(
-            'test_summary_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_summary_delete_happy_paths(self):
-        """
-        Tests the delete process of the summary field of
-        the Product class
-        """
-        self.fail(
-            'test_summary_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_description_get_happy_paths(self):
-        """
-        Tests the get process of the description field of
-        the Product class
-        """
-        self.fail(
-            'test_description_get_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_description_set_happy_paths(self):
-        """
-        Tests the set process of the description field of
-        the Product class
-        """
-        self.fail(
-            'test_description_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_description_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        description field of the Product class
-        """
-        self.fail(
-            'test_description_set_bad_value has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_description_delete_happy_paths(self):
-        """
-        Tests the delete process of the description field
-        of the Product class
-        """
-        self.fail(
-            'test_description_delete_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_product_images_get_happy_paths(self):
-        """
-        Tests the get process of the product_images field
-        of the Product class
-        """
-        self.fail(
-            'test_product_images_get_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_product_images_set_happy_paths(self):
-        """
-        Tests the set process of the product_images field
-        of the Product class
-        """
-        self.fail(
-            'test_product_images_set_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_product_images_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        product_images field of the Product class
-        """
-        self.fail(
-            'test_product_images_set_bad_value has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_product_images_delete_happy_paths(self):
-        """
-        Tests the delete process of the product_images
-        field of the Product class
-        """
-        self.fail(
-            'test_product_images_delete_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_price_get_happy_paths(self):
-        """
-        Tests the get process of the price field of the
-        Product class
-        """
-        self.fail(
-            'test_price_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_price_set_happy_paths(self):
-        """
-        Tests the set process of the price field of the
-        Product class
-        """
-        self.fail(
-            'test_price_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_price_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        price field of the Product class
-        """
-        self.fail(
-            'test_price_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_price_delete_happy_paths(self):
-        """
-        Tests the delete process of the price field of
-        the Product class
-        """
-        self.fail(
-            'test_price_delete_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_shipping_weight_get_happy_paths(self):
-        """
-        Tests the get process of the shipping_weight
-        field of the Product class
-        """
-        self.fail(
-            'test_shipping_weight_get_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_shipping_weight_set_happy_paths(self):
-        """
-        Tests the set process of the shipping_weight
-        field of the Product class
-        """
-        self.fail(
-            'test_shipping_weight_set_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_shipping_weight_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        shipping_weight field of the Product class
-        """
-        self.fail(
-            'test_shipping_weight_set_bad_value has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_shipping_weight_delete_happy_paths(self):
-        """
-        Tests the delete process of the shipping_weight
-        field of the Product class
-        """
-        self.fail(
-            'test_shipping_weight_delete_happy_paths '
-            'has not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_height_get_happy_paths(self):
-        """
-        Tests the get process of the height field of the
-        Product class
-        """
-        self.fail(
-            'test_height_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_height_set_happy_paths(self):
-        """
-        Tests the set process of the height field of the
-        Product class
-        """
-        self.fail(
-            'test_height_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_height_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        height field of the Product class
-        """
-        self.fail(
-            'test_height_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_height_delete_happy_paths(self):
-        """
-        Tests the delete process of the height field of
-        the Product class
-        """
-        self.fail(
-            'test_height_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_length_get_happy_paths(self):
-        """
-        Tests the get process of the length field of the
-        Product class
-        """
-        self.fail(
-            'test_length_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_length_set_happy_paths(self):
-        """
-        Tests the set process of the length field of the
-        Product class
-        """
-        self.fail(
-            'test_length_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_length_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        length field of the Product class
-        """
-        self.fail(
-            'test_length_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_length_delete_happy_paths(self):
-        """
-        Tests the delete process of the length field of
-        the Product class
-        """
-        self.fail(
-            'test_length_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_width_get_happy_paths(self):
-        """
-        Tests the get process of the width field of the
-        Product class
-        """
-        self.fail(
-            'test_width_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_width_set_happy_paths(self):
-        """
-        Tests the set process of the width field of the
-        Product class
-        """
-        self.fail(
-            'test_width_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_width_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        width field of the Product class
-        """
-        self.fail(
-            'test_width_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_width_delete_happy_paths(self):
-        """
-        Tests the delete process of the width field of
-        the Product class
-        """
-        self.fail(
-            'test_width_delete_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_size_get_happy_paths(self):
-        """
-        Tests the get process of the size field of the
-        Product class
-        """
-        self.fail(
-            'test_size_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_size_set_happy_paths(self):
-        """
-        Tests the set process of the size field of the
-        Product class
-        """
-        self.fail(
-            'test_size_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_size_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        size field of the Product class
-        """
-        self.fail(
-            'test_size_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_size_delete_happy_paths(self):
-        """
-        Tests the delete process of the size field of the
-        Product class
-        """
-        self.fail(
-            'test_size_delete_happy_paths has not been '
-            'implemented yet'
-        )
-
-
 class test_ProductImage(unittest.TestCase):
     """
     Tests the ProductImage class.
     """
+
+    EXAMPLE_ARGS = get_examples(
+        ProductImage, max_items=1
+    )[0]
 
     # Tests of the inherited fields
     @unittest.skipIf(
@@ -1379,319 +804,12 @@ class test_ProductImage(unittest.TestCase):
             'relation to the ProductImage class'
         )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_product_oid_get_happy_paths(self):
-        """
-        Tests the get process of the product_oid field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_product_oid_get_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_product_oid_set_happy_paths(self):
-        """
-        Tests the set process of the product_oid field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_product_oid_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_product_oid_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        product_oid field of the ProductImage class
-        """
-        self.fail(
-            'test_product_oid_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_product_oid_delete_happy_paths(self):
-        """
-        Tests the delete process of the product_oid field
-        of the ProductImage class
-        """
-        self.fail(
-            'test_product_oid_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_primary_image_get_happy_paths(self):
-        """
-        Tests the get process of the is_primary_image
-        field of the ProductImage class
-        """
-        self.fail(
-            'test_is_primary_image_get_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_primary_image_set_happy_paths(self):
-        """
-        Tests the set process of the is_primary_image
-        field of the ProductImage class
-        """
-        self.fail(
-            'test_is_primary_image_set_happy_paths has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_primary_image_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        is_primary_image field of the ProductImage class
-        """
-        self.fail(
-            'test_is_primary_image_set_bad_value has '
-            'not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_primary_image_delete_happy_paths(self):
-        """
-        Tests the delete process of the is_primary_image
-        field of the ProductImage class
-        """
-        self.fail(
-            'test_is_primary_image_delete_happy_paths '
-            'has not been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_image_url_get_happy_paths(self):
-        """
-        Tests the get process of the image_url field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_image_url_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_image_url_set_happy_paths(self):
-        """
-        Tests the set process of the image_url field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_image_url_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_image_url_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        image_url field of the ProductImage class
-        """
-        self.fail(
-            'test_image_url_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_image_url_delete_happy_paths(self):
-        """
-        Tests the delete process of the image_url field
-        of the ProductImage class
-        """
-        self.fail(
-            'test_image_url_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_caption_get_happy_paths(self):
-        """
-        Tests the get process of the caption field of the
-        ProductImage class
-        """
-        self.fail(
-            'test_caption_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_caption_set_happy_paths(self):
-        """
-        Tests the set process of the caption field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_caption_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_caption_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        caption field of the ProductImage class
-        """
-        self.fail(
-            'test_caption_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_caption_delete_happy_paths(self):
-        """
-        Tests the delete process of the caption field
-        of the ProductImage class
-        """
-        self.fail(
-            'test_caption_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_alt_text_get_happy_paths(self):
-        """
-        Tests the get process of the alt_text field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_alt_text_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_alt_text_set_happy_paths(self):
-        """
-        Tests the set process of the alt_text field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_alt_text_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_alt_text_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        alt_text field of the ProductImage class
-        """
-        self.fail(
-            'test_alt_text_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_alt_text_delete_happy_paths(self):
-        """
-        Tests the delete process of the alt_text field
-        of the ProductImage class
-        """
-        self.fail(
-            'test_alt_text_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_width_get_happy_paths(self):
-        """
-        Tests the get process of the width field of the
-        ProductImage class
-        """
-        self.fail(
-            'test_width_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_width_set_happy_paths(self):
-        """
-        Tests the set process of the width field of the
-        ProductImage class
-        """
-        self.fail(
-            'test_width_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_width_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        width field of the ProductImage class
-        """
-        self.fail(
-            'test_width_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_width_delete_happy_paths(self):
-        """
-        Tests the delete process of the width field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_width_delete_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_height_get_happy_paths(self):
-        """
-        Tests the get process of the height field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_height_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_height_set_happy_paths(self):
-        """
-        Tests the set process of the height field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_height_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_height_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        height field of the ProductImage class
-        """
-        self.fail(
-            'test_height_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_height_delete_happy_paths(self):
-        """
-        Tests the delete process of the height field of
-        the ProductImage class
-        """
-        self.fail(
-            'test_height_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-
 # Code to run if the module is executed directly
 if __name__ == '__main__':
 
-    unittest.main()
+    # ~ unittest.main()
 
-    # ~ import pytest
-    # ~ pytest.main([__file__, '-v'])
+    import pytest
+    pytest.main([__file__, '-v'])
+    # ~ pytest.main([f'{__file__}::test_Artisan', '-v'])
+    # ~ pytest.main([f'{__file__}::test_Artisan::test_honorific', '-vv'])

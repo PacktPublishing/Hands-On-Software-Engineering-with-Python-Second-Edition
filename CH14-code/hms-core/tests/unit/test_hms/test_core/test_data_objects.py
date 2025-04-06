@@ -265,7 +265,7 @@ class test_BaseDataObject(
             with self.assertRaises(ValidationError):
                 inst.created = datetime.utcnow()
         with self.subTest(
-            msg='Testing that n created cannot be deleted'
+            msg='Testing that a created cannot be deleted'
         ):
             with self.assertRaises(ValidationError):
                 del inst.created

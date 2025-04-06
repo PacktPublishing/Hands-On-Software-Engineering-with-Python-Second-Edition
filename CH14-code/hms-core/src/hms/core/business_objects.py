@@ -473,8 +473,8 @@ class Artisan(BaseModel, BaseDataObject):
         'Artisan. May be either a simple email, or a '
         '"name" email (see examples).',
         examples=[
-            'John Smith <john.smith@test.com>',
-            'Company Contact <contact@company.com>',
+            # ~ 'John Smith <john.smith@test.com>',
+            # ~ 'Company Contact <contact@company.com>',
             'john.smith@test.com',
             'contact@company.com',
         ]

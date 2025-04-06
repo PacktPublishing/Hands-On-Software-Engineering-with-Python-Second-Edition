@@ -7,6 +7,7 @@ import json
 import os
 import unittest
 
+from datetime import datetime
 from typing import ClassVar
 from unittest.mock import patch, MagicMock
 from uuid import UUID
@@ -20,7 +21,7 @@ from goblinfish.testing.pact.modules import \
 from goblinfish.testing.pact.module_members import \
     ExaminesSourceClass, ExaminesSourceFunction
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from typeguard import TypeCheckError
 
@@ -60,226 +61,255 @@ class test_BaseDataObject(
     TARGET_MODULE = 'hms.core.data_objects'
     TARGET_CLASS = 'BaseDataObject'
 
+    class ConcreteDataObject(BaseDataObject, BaseModel):
+        pass
+
+    EXAMPLE_ARGS = get_examples(
+        ConcreteDataObject,
+        max_items=1
+    )[0]
+
     # Test-methods for source properties and fields
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_oid_get_happy_paths(self):
+    def test_oid(self):
         """
-        Tests the get process of the oid field of the
-        BaseDataObject class
+        Tests the oid field of the BaseDataObject class
         """
-        self.fail(
-            'test_oid_get_happy_paths has not been '
-            'implemented yet'
-        )
+        # Arrange
+        good_values = self.ConcreteDataObject.oid.examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'oid'
+        }
+        for oid in good_values:
+            with self.subTest(
+                msg=f'Testing creation with oid {oid} '
+                f'({type(oid).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                args['oid'] = oid
+                if isinstance(oid, str):
+                    expected = UUID(oid)
+                else:
+                    expected = oid
+                # Act
+                inst = self.ConcreteDataObject(**args)
+                # Assert
+                self.assertEqual(
+                    inst.oid, expected,
+                    'Creating a ConcreteDataObject '
+                    f'with an oid value of "{oid}" '
+                    f'({type(oid).__name__}) should '
+                    'return that value in instance.oid, '
+                    f'but "{inst.oid}" '
+                    f'({type(oid).__name__}) was '
+                    'returned instead.'
+                )
+        with self.subTest(msg='Testing default value'):
+            # Arrange
+            args = dict(base_args)
+            # Act
+            inst = self.ConcreteDataObject(**args)
+            # Assert
+            self.assertTrue(isinstance(inst.oid, UUID))
+        with self.subTest(
+            msg='Testing that an oid cannot be changed '
+            'after it is set'
+        ):
+            with self.assertRaises(ValidationError):
+                inst.oid = UUID('0'*32)
+        with self.subTest(
+            msg='Testing that an oid cannot be deleted'
+        ):
+            with self.assertRaises(ValidationError):
+                del inst.oid
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_oid_set_happy_paths(self):
+    def test_is_active(self):
         """
-        Tests the set process of the oid field of the
-        BaseDataObject class
+        Tests the is_active field of the BaseDataObject class
         """
-        self.fail(
-            'test_oid_set_happy_paths has not been '
-            'implemented yet'
-        )
+        # Arrange
+        good_values = self.ConcreteDataObject.is_active.examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'is_active'
+        }
+        for is_active in good_values:
+            with self.subTest(
+                msg='Testing creation with is_active '
+                f'{is_active} ({type(is_active).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['is_active'] = is_active
+                # Act
+                inst = self.ConcreteDataObject(**args)
+                # Assert
+                self.assertEqual(
+                    inst.is_active, expected,
+                    'Creating a ConcreteDataObject with '
+                    f'an is_active value of '
+                    f'"{is_active}" '
+                    f'({type(is_active).__name__}) '
+                    'should return that value in instance'
+                    f'.is_active, but "{inst.is_active}" '
+                    f'({type(is_active).__name__}) was '
+                    'returned instead.'
+                )
+        with self.subTest(msg='Testing default value'):
+            # Arrange
+            args = dict(base_args)
+            # Act
+            inst = self.ConcreteDataObject(**args)
+            # Assert
+            self.assertFalse(inst.is_active)
+            self.assertTrue(
+                isinstance(inst.is_active, bool)
+            )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_oid_set_bad_value(self):
+    def test_is_deleted(self):
         """
-        Tests the validation of the set process of the
-        oid field of the BaseDataObject class
+        Tests the is_deleted field of the BaseDataObject class
         """
-        self.fail(
-            'test_oid_set_bad_value has not been '
-            'implemented yet'
-        )
+        # Arrange
+        good_values = self.ConcreteDataObject.is_deleted.examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'is_deleted'
+        }
+        for is_deleted in good_values:
+            with self.subTest(
+                msg='Testing creation with is_deleted '
+                f'{is_deleted} '
+                f'({type(is_deleted).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['is_deleted'] = is_deleted
+                # Act
+                inst = self.ConcreteDataObject(**args)
+                # Assert
+                self.assertEqual(
+                    inst.is_deleted, expected,
+                    'Creating a ConcreteDataObject with '
+                    'an is_deleted value of '
+                    f'"{is_deleted}" '
+                    f'({type(is_deleted).__name__}) '
+                    'should return that value in instance'
+                    '.is_deleted, but '
+                    f'"{inst.is_deleted}" '
+                    f'({type(is_deleted).__name__}) was '
+                    'returned instead.'
+                )
+        with self.subTest(msg='Testing default value'):
+            # Arrange
+            args = dict(base_args)
+            # Act
+            inst = self.ConcreteDataObject(**args)
+            # Assert
+            self.assertFalse(inst.is_deleted)
+            self.assertTrue(
+                isinstance(inst.is_deleted, bool)
+            )
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_oid_delete_happy_paths(self):
+    def test_created(self):
         """
-        Tests the delete process of the oid field of the
-        BaseDataObject class
+        Tests the created field of the BaseDataObject class
         """
-        self.fail(
-            'test_oid_delete_happy_paths has not been '
-            'implemented yet'
-        )
+        # Arrange
+        good_values = self.ConcreteDataObject.created.examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'created'
+        }
+        for created in good_values:
+            with self.subTest(
+                msg=f'Testing creation with created '
+                f'{created} ({type(created).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['created'] = \
+                    datetime.utcnow()
+                # Act
+                inst = self.ConcreteDataObject(**args)
+                # Assert
+                self.assertEqual(
+                    inst.created, expected,
+                    'Creating a ConcreteDataObject with '
+                    f'a created value of "{created}" '
+                    f'({type(created).__name__}) '
+                    'should return that value in instance'
+                    f'.created, but "{inst.created}" '
+                    f'({type(created).__name__}) was '
+                    'returned instead.'
+                )
+        with self.subTest(msg='Testing default value'):
+            # Arrange
+            args = dict(base_args)
+            # Act
+            inst = self.ConcreteDataObject(**args)
+            # Assert
+            self.assertTrue(inst.created)
+            self.assertTrue(
+                isinstance(inst.created, datetime)
+            )
+        with self.subTest(
+            msg='Testing that a created cannot be '
+            'changed after it is set'
+        ):
+            with self.assertRaises(ValidationError):
+                inst.created = datetime.utcnow()
+        with self.subTest(
+            msg='Testing that n created cannot be deleted'
+        ):
+            with self.assertRaises(ValidationError):
+                del inst.created
 
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_active_get_happy_paths(self):
+    def test_modified(self):
         """
-        Tests the get process of the is_active field of
-        the BaseDataObject class
+        Tests the modified field of the BaseDataObject class
         """
-        self.fail(
-            'test_is_active_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_active_set_happy_paths(self):
-        """
-        Tests the set process of the is_active field of
-        the BaseDataObject class
-        """
-        self.fail(
-            'test_is_active_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_active_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        is_active field of the BaseDataObject class
-        """
-        self.fail(
-            'test_is_active_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_active_delete_happy_paths(self):
-        """
-        Tests the delete process of the is_active field
-        of the BaseDataObject class
-        """
-        self.fail(
-            'test_is_active_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_deleted_get_happy_paths(self):
-        """
-        Tests the get process of the is_deleted field of
-        the BaseDataObject class
-        """
-        self.fail(
-            'test_is_deleted_get_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_deleted_set_happy_paths(self):
-        """
-        Tests the set process of the is_deleted field of
-        the BaseDataObject class
-        """
-        self.fail(
-            'test_is_deleted_set_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_deleted_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        is_deleted field of the BaseDataObject class
-        """
-        self.fail(
-            'test_is_deleted_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_is_deleted_delete_happy_paths(self):
-        """
-        Tests the delete process of the is_deleted field
-        of the BaseDataObject class
-        """
-        self.fail(
-            'test_is_deleted_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_created_get_happy_paths(self):
-        """
-        Tests the get process of the created field of the
-        BaseDataObject class
-        """
-        self.fail(
-            'test_created_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_created_set_happy_paths(self):
-        """
-        Tests the set process of the created field of the
-        BaseDataObject class
-        """
-        self.fail(
-            'test_created_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_created_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        created field of the BaseDataObject class
-        """
-        self.fail(
-            'test_created_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_created_delete_happy_paths(self):
-        """
-        Tests the delete process of the created field of
-        the BaseDataObject class
-        """
-        self.fail(
-            'test_created_delete_happy_paths has not '
-            'been implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_modified_get_happy_paths(self):
-        """
-        Tests the get process of the modified field of
-        the BaseDataObject class
-        """
-        self.fail(
-            'test_modified_get_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_modified_set_happy_paths(self):
-        """
-        Tests the set process of the modified field of
-        the BaseDataObject class
-        """
-        self.fail(
-            'test_modified_set_happy_paths has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_modified_set_bad_value(self):
-        """
-        Tests the validation of the set process of the
-        modified field of the BaseDataObject class
-        """
-        self.fail(
-            'test_modified_set_bad_value has not been '
-            'implemented yet'
-        )
-
-    @unittest.skip('Test stubbed but not yet implemented')
-    def test_modified_delete_happy_paths(self):
-        """
-        Tests the delete process of the modified field of
-        the BaseDataObject class
-        """
-        self.fail(
-            'test_modified_delete_happy_paths has not '
-            'been implemented yet'
-        )
+        # Arrange
+        good_values = self.ConcreteDataObject.modified.examples
+        base_args = {
+            key: value for key, value
+            in self.EXAMPLE_ARGS.items()
+            if key != 'modified'
+        }
+        for modified in good_values:
+            with self.subTest(
+                msg=f'Testing creation with modified '
+                f'{modified} ({type(modified).__name__}'
+            ):
+                # Arrange
+                args = dict(base_args)
+                expected = args['modified'] = \
+                    datetime.utcnow()
+                # Act
+                inst = self.ConcreteDataObject(**args)
+                # Assert
+                self.assertEqual(
+                    inst.modified, expected,
+                    'Creating a ConcreteDataObject with '
+                    f'a modified value of "{modified}" '
+                    f'({type(modified).__name__}) '
+                    'should return that value in instance'
+                    f'.modified, but "{inst.modified}" '
+                    f'({type(modified).__name__}) was '
+                    'returned instead.'
+                )
+        with self.subTest(msg='Testing default value'):
+            # Arrange
+            args = dict(base_args)
+            # Act
+            inst = self.ConcreteDataObject(**args)
+            # Assert
+            self.assertEqual(inst.modified, None)
 
     # Test-methods for source methods
     @patch.dict(
@@ -1101,6 +1131,6 @@ if __name__ == '__main__':
     # ~ unittest.main()
 
     import pytest
-    pytest.main([__file__, '-v'])
-    # ~ pytest.main([f'{__file__}::test_BaseDataObject', '-v'])  # noqa: E501
-    # ~ pytest.main([f'{__file__}::test_BaseDataObject::test_delete_happy_paths', '-v'])  # noqa: E501
+    # ~ pytest.main([__file__, '-v'])
+    pytest.main([f'{__file__}::test_BaseDataObject', '-v'])  # noqa: E501
+    # ~ pytest.main([f'{__file__}::test_BaseDataObject::test_modified', '-vv'])  # noqa: E501

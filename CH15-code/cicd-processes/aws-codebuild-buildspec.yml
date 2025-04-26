@@ -1,0 +1,66 @@
+version: 0.2
+
+env:
+  variables:
+    IGNORED_PIPENV_CHECKS: "--ignore 123--ignore 456"
+  # Uncomment if you want to use AWS Secrets Manager
+  # secrets-manager:
+  #   TWINE_USERNAME: your-secret-name:TWINE_USERNAME
+  #   TWINE_PASSWORD: your-secret-name:TWINE_PASSWORD
+  #   PYPI_REPOSITORY_URL: your-secret-name:PYPI_REPOSITORY_URL
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing pipenv"
+      - pip install pipenv==2023.12.1
+
+  pre_build:
+    commands:
+      - echo "Environment info"
+      - uname -a
+      - pwd
+      - ls *
+      - python3 --version
+      - echo "Setting up environment"
+      - cp template.env .env
+      - pipenv sync --dev
+      - pipenv graph
+
+  build:
+    commands:
+      - echo "Running packaging tests"
+      - pipenv run pytest tests/packaging/
+
+      - echo "Running unit tests with coverage"
+      - pipenv run coverage run -m pytest tests/unit
+      - pipenv run coverage report -m
+
+      - echo "Building the package"
+      - pipenv sync --categories build
+      - pipenv graph
+      - pipenv run python -m build
+
+      - echo "Verifying the built package"
+      - TMP_ENV=$(mktemp -d)
+      - python -m venv $TMP_ENV/venv
+      - source $TMP_ENV/venv/bin/activate
+      - pip install dist/*.whl
+      - pytest tests/unit
+      - deactivate
+      - rm -rf $TMP_ENV
+
+      - echo "Running pipenv check"
+      - pipenv check $IGNORED_PIPENV_CHECKS
+
+  post_build:
+    commands:
+      - echo "Publishing the package"
+      - pipenv sync --categories publish
+      - pipenv graph
+      - twine upload --repository-url $PYPI_REPOSITORY_URL -u $TWINE_USERNAME -p $TWINE_PASSWORD dist/*
+artifacts:
+  files:
+    - '**/*'

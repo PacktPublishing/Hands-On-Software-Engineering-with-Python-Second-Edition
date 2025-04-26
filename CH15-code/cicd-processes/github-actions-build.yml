@@ -1,0 +1,77 @@
+name: Test, Build, and Publish Package
+
+on:
+  push:
+    branches:
+      - main
+  # pull_request:  # Uncomment if needed
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    container:
+      image: python:3.11.11-bullseye
+
+    env:
+      IGNORED_PIPENV_CHECKS: "--ignore 123"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Show build environment info
+        run: |
+          uname -a
+          pwd
+          ls *
+          python3.11 --version
+
+      - name: Install pipenv
+        run: python3.11 -m pip install pipenv==2023.12.1
+
+      - name: Setup environment
+        run: cp template.env .env
+
+      - name: Install dependencies
+        run: |
+          pipenv sync --dev
+          pipenv graph
+
+      - name: Packaging tests
+        run: pipenv run pytest tests/packaging/
+
+      - name: Run unit tests with coverage
+        run: |
+          pipenv run coverage run -m pytest tests/unit
+          pipenv run coverage report -m
+
+      - name: Build package
+        run: |
+          pipenv sync --categories build
+          pipenv graph
+          pipenv run python -m build
+
+      - name: Verify built package
+        run: |
+          TMP_ENV=$(mktemp -d)
+          python -m venv $TMP_ENV/venv
+          source $TMP_ENV/venv/bin/activate
+          pip install dist/*.whl
+          pytest tests/unit
+          deactivate
+          rm -rf $TMP_ENV
+
+      - name: Pipenv check
+        run: pipenv check $IGNORED_PIPENV_CHECKS
+
+      - name: Upload package to PyPI
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+          PYPI_REPOSITORY_URL: ${{ secrets.PYPI_REPOSITORY_URL }}
+        run: |
+          pipenv sync --categories publish
+          pipenv graph
+          twine upload --repository-url $PYPI_REPOSITORY_URL -u $TWINE_USERNAME -p $TWINE_PASSWORD dist/*

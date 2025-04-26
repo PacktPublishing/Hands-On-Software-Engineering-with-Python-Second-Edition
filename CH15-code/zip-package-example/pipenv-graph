@@ -1,0 +1,13 @@
+flake8==7.2.0
+├── mccabe [required: >=0.7.0,<0.8.0, installed: 0.7.0]
+├── pycodestyle [required: >=2.13.0,<2.14.0, installed: 2.13.0]
+└── pyflakes [required: >=3.3.0,<3.4.0, installed: 3.3.2]
+pytest==8.3.5
+├── iniconfig [required: Any, installed: 2.1.0]
+├── packaging [required: Any, installed: 24.2]
+└── pluggy [required: >=1.5,<2, installed: 1.5.0]
+requests==2.32.3
+├── certifi [required: >=2017.4.17, installed: 2025.1.31]
+├── charset-normalizer [required: >=2,<4, installed: 3.4.1]
+├── idna [required: >=2.5,<4, installed: 3.10]
+└── urllib3 [required: >=1.21.1,<3, installed: 2.4.0]

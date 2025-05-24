@@ -1,0 +1,32 @@
+query GetActiveArtisanWithProducts($artisanId: ID!) {
+  artisan(oid: $artisanId) {
+    # Only returned if the artisan is_active = true
+    # and is_deleted = false (enforced server-side)
+    honorific
+    givenName
+    middleName
+    familyName
+    suffix
+    companyName
+    address {
+      postalCode
+      country
+    }
+    # Only include active, non-deleted products
+    # (enforced server-side)
+    products {
+      oid
+      name
+      summary
+      price
+      # Only include the first active, non-deleted
+      # product images (enforced server-side)
+      productImages {
+        imageUrl
+        altText
+        width
+        height
+      }
+    }
+  }
+}

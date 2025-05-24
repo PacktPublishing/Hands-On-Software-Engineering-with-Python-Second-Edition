@@ -1,0 +1,230 @@
+"""Base object containing shared metadata fields"""
+interface BaseDataObject {
+  oid: ID!
+  isActive: Boolean!
+  isDeleted: Boolean!
+  created: DateTime!
+  modified: DateTime
+}
+
+"""Represents an Artisan"""
+type Artisan implements BaseDataObject {
+  oid: ID!
+  isActive: Boolean!
+  isDeleted: Boolean!
+  created: DateTime!
+  modified: DateTime
+  honorific: String
+  givenName: String!
+  middleName: String
+  familyName: String!
+  suffix: String
+  companyName: String
+  address: Address!
+  emailAddress: String!
+  products: [Product!]!
+}
+
+"""Represents a product created by an Artisan"""
+type Product implements BaseDataObject {
+  oid: ID!
+  isActive: Boolean!
+  isDeleted: Boolean!
+  created: DateTime!
+  modified: DateTime
+  artisanOid: ID!
+  name: String!
+  summary: String!
+  description: String!
+  productImages: [ProductImage!]!
+  price: Decimal!
+  shippingWeight: Decimal!
+  height: Decimal
+  length: Decimal
+  width: Decimal
+  artisan: Artisan!
+}
+
+"""Represents an image related to a Product"""
+type ProductImage implements BaseDataObject {
+  oid: ID!
+  isActive: Boolean!
+  isDeleted: Boolean!
+  created: DateTime!
+  modified: DateTime
+  artisanOid: ID!
+  imageUrl: String!
+  caption: String
+  altText: String
+  width: Int!
+  height: Int!
+}
+
+"""Represents a postal address"""
+type Address {
+  # Add address field definitions here
+  # For example:
+  street: String!
+  city: String!
+  state: String!
+  postalCode: String!
+  country: String!
+}
+
+"""Paginated product response"""
+type ProductPage {
+  items: [Product!]!
+  totalCount: Int!
+}
+
+### Queries ###
+
+type Query {
+  """
+  Retrieve a paginated list of products.
+  Defaults: sorted by creation date descending,
+  excludes inactive or deleted products unless overridden.
+  """
+  products(
+    offset: Int = 0,
+    limit: Int = 25,
+    includeInactive: Boolean = false,
+    includeDeleted: Boolean = false
+  ): ProductPage!
+
+  """
+  Retrieve a single artisan by ID, including all fields and their products.
+  """
+  artisan(oid: ID!): Artisan
+}
+
+### Input Types for Mutations ###
+
+input AddressInput {
+  # Match fields with Address type
+  street: String!
+  city: String!
+  state: String!
+  postalCode: String!
+  country: String!
+}
+
+input CreateArtisanInput {
+  honorific: String
+  givenName: String!
+  middleName: String
+  familyName: String!
+  suffix: String
+  companyName: String
+  address: AddressInput!
+  emailAddress: String!
+}
+
+input UpdateArtisanInput {
+  oid: ID!
+  honorific: String
+  givenName: String!
+  middleName: String
+  familyName: String!
+  suffix: String
+  companyName: String
+  address: AddressInput!
+  emailAddress: String!
+  isActive: Boolean
+  isDeleted: Boolean
+}
+
+input CreateProductInput {
+  artisanOid: ID!
+  name: String!
+  summary: String!
+  description: String!
+  price: Decimal!
+  shippingWeight: Decimal!
+  height: Decimal
+  length: Decimal
+  width: Decimal
+}
+
+input UpdateProductInput {
+  oid: ID!
+  name: String!
+  summary: String!
+  description: String!
+  price: Decimal!
+  shippingWeight: Decimal!
+  height: Decimal
+  length: Decimal
+  width: Decimal
+  isActive: Boolean
+  isDeleted: Boolean
+}
+
+
+### Queries ###
+
+# Root-level query type for retrieving domain objects
+type Query {
+  # Retrieve a single Artisan by its oid (UUID)
+  # - Returns null if not found or if is_active = false or is_deleted = true
+  artisan(oid: ID!): Artisan
+
+  # Retrieve a paginated list of Products
+  # - Only includes products that are is_active = true and is_deleted = false by default
+  # - Allows optional override of filters and pagination controls
+  products(
+    offset: Int = 0,                 # Offset for pagination (default: 0)
+    limit: Int = 10,                 # Page size (default: 10)
+    includeInactive: Boolean = false # Include inactive products
+    includeDeleted: Boolean = false  # Include deleted products
+    sortBy: ProductSortField = CREATED_DESC # Sort order
+  ): [Product!]!
+}
+
+# Enum to control sorting options for product queries
+enum ProductSortField {
+  CREATED_ASC     # Oldest first
+  CREATED_DESC    # Newest first (default)
+  PRICE_ASC       # Lowest price first
+  PRICE_DESC      # Highest price first
+  NAME_ASC        # Alphabetical by name
+  NAME_DESC       # Reverse alphabetical
+}
+
+### Mutations ###
+
+type Mutation {
+  """
+  Create a new artisan.
+  """
+  createArtisan(input: CreateArtisanInput!): Artisan!
+
+  """
+  Update an existing artisan by oid.
+  """
+  updateArtisan(input: UpdateArtisanInput!): Artisan!
+
+  """
+  Create a new product.
+  """
+  createProduct(input: CreateProductInput!): Product!
+
+  """
+  Update an existing product by oid.
+  """
+  updateProduct(input: UpdateProductInput!): Product!
+}
+
+### Scalars ###
+
+"""
+Custom scalar representing a date and time in ISO 8601 format.
+Example: "2025-05-17T14:30:00Z"
+"""
+scalar DateTime
+
+"""
+Custom scalar representing a high-precision decimal number.
+Serialized as a string to preserve precision.
+"""
+scalar Decimal

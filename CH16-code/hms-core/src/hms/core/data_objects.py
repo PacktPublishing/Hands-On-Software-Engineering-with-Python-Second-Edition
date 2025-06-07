@@ -472,7 +472,7 @@ class BaseDataObject(metaclass=abc.ABCMeta):
                 cursor.execute(final_sql, parameters)
             else:
                 cursor.execute(final_sql)
-        connector.commit()
+            connector.commit()
 
     @classmethod
     @typechecked
@@ -633,12 +633,14 @@ class BaseDataObject(metaclass=abc.ABCMeta):
             else:
                 cursor.execute(final_sql)
             rows = cursor.fetchall()
-        results = [
-            cls.from_record(
-                json.loads(row['object_state'])
-            )
-            for row in rows
-        ]
+            results = [
+                cls.from_record(
+                    json.loads(row['object_state'])
+                )
+                for row in rows
+            ]
+            cursor.nextset()
+
         return results
 
     @classmethod

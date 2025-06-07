@@ -59,6 +59,100 @@ for key, value in os.environ.items():
             or key.startswith('FLASK_'):
         logger.info(f'{key} '.ljust(24, '.') + f' {value}')
 
+
+@app.route('/api/v1/')
+def api_root():
+    return f"""
+<h1>api_root</h1>
+<p><code>vars()</code></p>
+<pre>{pprint.pformat(vars())}</pre>
+<p><code>request</code></p>
+<pre>{escape(repr(request))}</pre>
+"""
+
+
+@app.route('/api/v1/artisans/<oid>/', methods=['GET'])
+def get_artisan_by_oid(*args, **kwargs):
+    logger.info(vars())
+    try:
+        artisans = Artisan.get(kwargs['oid'], db_source_name='Artisan')
+        results = [
+            artisan.model_dump(mode='json')
+            for artisan in artisans
+        ]
+        return json.dumps(results), 200
+    except Exception as error:
+        result = {
+            'error': error.__class__.__name__,
+            'details': str(error)
+        }
+        logger.exception(
+            f'{error.__class__.__name__} encountered in '
+            f'get_artisans_root: {error}'
+        )
+        return json.dumps(result), 500
+
+
+@app.route('/api/v1/artisans/', methods=['GET'])
+def get_artisans_root():
+    try:
+        artisans = Artisan.get(db_source_name='Artisan')
+        results = [
+            artisan.model_dump(mode='json')
+            for artisan in artisans
+        ]
+        return json.dumps(results), 200
+    except Exception as error:
+        result = {
+            'error': error.__class__.__name__,
+            'details': str(error)
+        }
+        logger.exception(
+            f'{error.__class__.__name__} encountered in '
+            f'get_artisans_root: {error}'
+        )
+        return json.dumps(result), 500
+
+
+@app.route('/api/v1/artisans/<oid>/', methods=['PATCH'])
+def patch_artisan_by_oid(*args, **kwargs):
+    payload = json.loads(request.data)
+    logger.info(f'payload: {payload}')
+    artisan = Artisan.get(kwargs['oid'], db_source_name='Artisan')[0]
+    logger.info(f'Retrieved Artisan {artisan}')
+    try:
+        for key, value in payload.items():
+            if key == 'business_address':
+                setattr(artisan, key, Address(**value))
+            else:
+                setattr(artisan, key, value)
+        result = artisan.model_dump(mode='json')
+        artisan.save(db_source_name='Artisan')
+        status = 200
+    except Exception as error:
+        result = {
+            'error': error.__class__.__name__,
+            'details': str(error)
+        }
+        logger.exception(
+            f'{error.__class__.__name__} encountered in '
+            f'get_artisans_root: {error}'
+        )
+        status = 500
+    return result, status
+
+
+@app.route('/api/v1/artisans/', methods=['POST'])
+def post_artisans_root():
+    # Added JS form submission
+    payload = json.loads(request.data)
+    logger.info(f'payload: {payload}')
+    new_artisan = Artisan(**payload)
+    logger.info(f'Created Artisan {new_artisan}')
+    new_artisan.save(db_source_name='Artisan')
+    return new_artisan.model_dump(mode='json'), 200
+
+
 @app.route('/')
 def website_home():
     initial_vars = vars()
@@ -105,94 +199,3 @@ def website_home():
         'artisan_fields': artisan_fields
     }
     return render_template('main.html', **context)
-
-@app.route('/api/v1/')
-def api_root():
-    return f"""
-<h1>api_root</h1>
-<p><code>vars()</code></p>
-<pre>{pprint.pformat(vars())}</pre>
-<p><code>request</code></p>
-<pre>{escape(repr(request))}</pre>
-"""
-
-
-@app.route('/api/v1/artisans/', methods=['GET'])
-def get_artisans_root():
-    try:
-        artisans = Artisan.get(db_source_name='Artisan')
-        results = [
-            artisan.model_dump(mode='json')
-            for artisan in artisans
-        ]
-        return json.dumps(results), 200
-    except Exception as error:
-        result = {
-            'error': error.__class__.__name__,
-            'details': str(error)
-        }
-        logger.exception(
-            f'{error.__class__.__name__} encountered in '
-            f'get_artisans_root: {error}'
-        )
-        return json.dumps(result), 500
-
-
-@app.route('/api/v1/artisans/', methods=['POST'])
-def post_artisans_root():
-    # Added JS form submission
-    payload = json.loads(request.data)
-    logger.info(f'payload: {payload}')
-    new_artisan = Artisan(**payload)
-    logger.info(f'Created Artisan {new_artisan}')
-    new_artisan.save(db_source_name='Artisan')
-    return new_artisan.model_dump(mode='json'), 200
-
-
-@app.route('/api/v1/artisans/<oid>/', methods=['GET'])
-def get_artisan_by_oid(*args, **kwargs):
-    logger.info(vars())
-    try:
-        artisans = Artisan.get(kwargs['oid'], db_source_name='Artisan')
-        results = [
-            artisan.model_dump(mode='json')
-            for artisan in artisans
-        ]
-        return json.dumps(results), 200
-    except Exception as error:
-        result = {
-            'error': error.__class__.__name__,
-            'details': str(error)
-        }
-        logger.exception(
-            f'{error.__class__.__name__} encountered in '
-            f'get_artisans_root: {error}'
-        )
-        return json.dumps(result), 500
-
-@app.route('/api/v1/artisans/<oid>/', methods=['PATCH'])
-def patch_artisan_by_oid(*args, **kwargs):
-    payload = json.loads(request.data)
-    logger.info(f'payload: {payload}')
-    artisan = Artisan.get(kwargs['oid'], db_source_name='Artisan')[0]
-    logger.info(f'Retrieved Artisan {artisan}')
-    try:
-        for key, value in payload.items():
-            if key == 'business_address':
-                setattr(artisan, key, Address(**value))
-            else:
-                setattr(artisan, key, value)
-        result = artisan.model_dump(mode='json')
-        artisan.save(db_source_name='Artisan')
-        status = 200
-    except Exception as error:
-        result = {
-            'error': error.__class__.__name__,
-            'details': str(error)
-        }
-        logger.exception(
-            f'{error.__class__.__name__} encountered in '
-            f'get_artisans_root: {error}'
-        )
-        status = 500
-    return result, status

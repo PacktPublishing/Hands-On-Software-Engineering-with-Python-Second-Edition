@@ -1,0 +1,50 @@
+type Address {
+  streetAddress: String!
+  buildingAddress: String
+  city: String!
+  regionName: String
+  postalCode: String!
+  country: String
+}
+
+type Artisan {
+  oid: ID!
+  honorific: String
+  givenName: String!
+  middleName: String
+  familyName: String!
+  suffix: String
+  companyName: String
+  businessAddress: Address!
+  emailAddress: String!
+}
+
+input AddressInput {
+  streetAddress: String!
+  buildingAddress: String
+  city: String!
+  regionName: String
+  postalCode: String!
+  country: String
+}
+
+input ArtisanInput {
+  honorific: String
+  givenName: String!
+  middleName: String
+  familyName: String!
+  suffix: String
+  companyName: String
+  businessAddress: AddressInput!
+  emailAddress: String!
+}
+
+type Query {
+  get_artisans: [Artisan!]!
+  get_artisan_by_oid(oid: ID!): Artisan
+}
+
+type Mutation {
+  create_artisan(artisan: ArtisanInput!): Artisan!
+  update_artisan_by_oid(oid: ID!, artisan: ArtisanInput!): Artisan!
+}

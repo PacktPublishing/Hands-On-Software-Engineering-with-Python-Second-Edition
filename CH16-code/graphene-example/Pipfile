@@ -1,0 +1,27 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "==0.115.2"
+uvicorn = "==0.34.2"
+graphene = "<4"
+graphene-pydantic = "==0.6.1"
+starlette-graphene3 = "==0.6.0"
+annotated-types = "==0.7.0"
+dnspython = "==2.7.0"
+email-validator = "==2.2.0"
+idna = "==3.10"
+mysql-connector-python = "==9.2.0"
+pydantic = "==2.11.1"
+pydantic-core = "==2.33.0"
+typeguard = "==4.4.2"
+typing-extensions = "==4.13.0"
+typing-inspection = "==0.4.0"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"
+python_full_version = "3.11.0"

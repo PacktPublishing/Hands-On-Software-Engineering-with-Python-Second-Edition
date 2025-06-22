@@ -48,7 +48,7 @@ SQL_OPERATORS = {
 @typechecked
 def build_where_clause(
     criteria: dict[str, Any],
-    criteria_fields: list[str],
+    criteria_fields: list[str, ...] | tuple[str, ...],
 ) -> tuple[str, tuple[Any, ...]]:
     """
     Builds and returns a SQL `WHERE` clause based on
@@ -181,7 +181,7 @@ def build_limit_clause(
 @typechecked
 def build_order_by_clause(
     criteria: dict[str, Any],
-    criteria_fields: list[str],
+    criteria_fields: list[str, ...] | tuple[str, ...],
 ) -> str:
     """
     Builds and returns a SQL `ORDER BY` clause based on

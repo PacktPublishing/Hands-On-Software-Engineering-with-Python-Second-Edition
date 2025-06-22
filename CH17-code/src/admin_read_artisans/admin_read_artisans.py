@@ -11,6 +11,8 @@ import json
 from pathlib import Path
 
 # Third-Party Imports
+from hms.core.business_objects import Artisan
+
 from awslambdaric.lambda_context import LambdaContext
 from goblinfish.metrics.trackers import ProcessTracker
 
@@ -24,6 +26,21 @@ module = Path(__file__).stem
 
 LambdaProxyInput = dict[str, str]
 LambdaProxyOutput = dict[str, str]
+
+LIST_FIELD_NAMES = (
+    # Unique identifier
+    'oid',
+    # Status fields
+    'is_active', 'is_deleted',
+    # Date/time fields
+    'created', 'modified',
+    # Person name fields
+    'honorific',
+    'given_name', 'middle_name', 'family_name',
+    'suffix',
+    # Company fields
+    'company_name'
+)
 
 # Lambda Handlers
 
@@ -39,6 +56,17 @@ def api_handler(
     -----------
     event : LambdaProxyInput (dict)
         The API event to be handled.
+        Fields that contribute to the response include
+        queryStringParameters:
+        page_size: int
+            The number of items to return in a single
+            page of results.
+        page_number : int
+            The page-number of resuls to return
+            (zero-indexed)
+        sort_{field-name} : str ("asc" or "desc")
+            Sorts the {field-name} field in ascending
+            ("asc") or descending ("desc") order.
     context : LambdaContext
         The standard Lambda context object provided
         by AWS during a Lambda invocation.
@@ -47,11 +75,36 @@ def api_handler(
         logger.info(f'{module}.api_handler called')
         logger.debug(f'event: {json.dumps(event)}')
         logger.debug(f'context: {repr(context)}')
-        # TODO: Replace this with actual logic
+
+        # Convert the query-strings for pagination
+        get_params = event.get('queryStringParameters', {})
+        pagination_params = {
+            key: int(get_params.get(key, 0)) or None
+            for key in ('page_size', 'page_number')
+        }
+        get_params.update(pagination_params)
+        logger.debug(f'get_params: {get_params}')
+
+        # Get the Artisan objects, keeping track of how
+        # long the process takes for metrics purposes
+        with tracker.timer('artisan_db_access'):
+            artisans = Artisan.get(
+                db_source_name='Artisan', **get_params
+            )
+
+        # Filter the results' fields
+        results = [
+            {
+                key: value for key, value
+                in artisan.model_dump(mode='json').items()
+                if key in LIST_FIELD_NAMES
+            }
+            for artisan in artisans
+        ]
+        body = json.dumps(results)
         result = {
-            'statusCode': 501,
-            'body': 'Not Implemented '
-            f'({context.aws_request_id})'
+            'statusCode': 200,
+            'body': body
         }
 
     # TODO: Add other exception-handling if needed

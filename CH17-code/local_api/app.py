@@ -219,7 +219,7 @@ app.patch(
 
 # (public create artisan)
 app.post(
-    '/api/v1/artisan/{oid}/',
+    '/api/v1/artisan/',
     'public_create_artisan.public_create_artisan.api_handler'
 )()
 

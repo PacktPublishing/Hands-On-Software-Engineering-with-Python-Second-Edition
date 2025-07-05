@@ -13,9 +13,12 @@ from pathlib import Path
 # Third-Party Imports
 from awslambdaric.lambda_context import LambdaContext
 from goblinfish.metrics.trackers import ProcessTracker
+from pydantic import ValidationError
 
 # Path Manipulations (avoid these!) and "Local" Imports
 from logger import logger
+
+from hms.core.business_objects import Artisan
 
 # Module "Constants" and Other Attributes
 tracker = ProcessTracker()
@@ -26,6 +29,7 @@ LambdaProxyInput = dict[str, str]
 LambdaProxyOutput = dict[str, str]
 
 # Lambda Handlers
+
 
 @tracker
 def api_handler(
@@ -47,14 +51,43 @@ def api_handler(
         logger.info(f'{module}.api_handler called')
         logger.debug(f'event: {json.dumps(event)}')
         logger.debug(f'context: {repr(context)}')
-        # TODO: Replace this with actual logic
+        _authnz_preflight()
+        artisan_data = json.loads(event['body'])
+        new_artisan = Artisan(**artisan_data)
+        new_artisan.save(db_source_name='Artisan')
+        _authnz_reconcile()
         result = {
-            'statusCode': 501,
-            'body': 'Not Implemented '
-            f'({context.aws_request_id})'
+            'statusCode': 201,
+            'body': new_artisan.model_dump_json()
         }
 
-    # TODO: Add other exception-handling if needed
+    except ValidationError as error:
+        # Gather up the error information from
+        # the Pydantic ValidationError
+        invalid_fields = {
+            '.'.join(invalid_field['loc']).split('[')[0]:
+                invalid_field['msg']
+            for invalid_field in error.errors()
+        }
+        # Standard error-logging
+        logger.exception(
+            f'{error.__class__.__name__}: {error} '
+            'occured in api_handler'
+        )
+        logger.error(f'event: {json.dumps(event)}')
+        logger.error(f'context: {repr(context)}')
+        # Also log the fields that caused problems...
+        logger.error(f'invalid_fields: {invalid_fields}')
+        # ...and include them in the response:
+        reponse_body = {
+            'message': 'Bad Request: '
+            f'({context.aws_request_id})',
+            'fields': invalid_fields
+        }
+        result = {
+            'statusCode': 400,
+            'body': json.dumps(reponse_body)
+        }
 
     except Exception as error:
         logger.exception(
@@ -75,6 +108,13 @@ def api_handler(
 
 
 # Helper Functions
+def _authnz_preflight(*args, **kwargs):
+    ...
+
+
+def _authnz_reconcile(*args, **kwargs):
+    ...
+
 
 # Module Metaclasses (if any)
 

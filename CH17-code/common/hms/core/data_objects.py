@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.11
 """
 Provides classes and functionality for defining and
-working with businbess-object classes whose state-data
+working with business-object classes whose state-data
 is persisted in a back-end data-store.
 """
 from __future__ import annotations

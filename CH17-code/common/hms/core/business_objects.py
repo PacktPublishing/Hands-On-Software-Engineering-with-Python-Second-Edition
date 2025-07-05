@@ -492,6 +492,14 @@ class Artisan(BaseModel, BaseDataObject):
     )
 
 
+class ArtisanNotFoundError(Exception):
+    """
+    An exception to be raised if Artisan.get does not
+    return an expected collection of Artisan objects.
+    """
+    ...
+
+
 # Code to run if the module is executed directly
 if __name__ == '__main__':
 

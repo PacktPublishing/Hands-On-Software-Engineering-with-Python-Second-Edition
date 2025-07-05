@@ -11,6 +11,9 @@ import json
 from pathlib import Path
 
 # Third-Party Imports
+from hms.core.business_objects import Artisan, \
+    ArtisanNotFoundError, Product
+
 from awslambdaric.lambda_context import LambdaContext
 from goblinfish.metrics.trackers import ProcessTracker
 
@@ -25,8 +28,8 @@ module = Path(__file__).stem
 LambdaProxyInput = dict[str, str]
 LambdaProxyOutput = dict[str, str]
 
-# Lambda Handlers
 
+# Lambda Handlers
 @tracker
 def api_handler(
     event: LambdaProxyInput, context: LambdaContext
@@ -47,14 +50,65 @@ def api_handler(
         logger.info(f'{module}.api_handler called')
         logger.debug(f'event: {json.dumps(event)}')
         logger.debug(f'context: {repr(context)}')
-        # TODO: Replace this with actual logic
+        # Get the Artisan oid to retrieve
+        artisan_oid = event.get(
+            'pathParameters', {}
+        ).get('oid')
+        if artisan_oid is None \
+                or len(artisan_oid.split(',')) != 1:
+            raise ValueError(
+                f'{module}.api_handler requires a single '
+                'oid, but that path parameter resolved to '
+                f'"{artisan_oid}" ({type(artisan_oid).__name__}).'
+            )
+        # Get the Artisan objects, keeping track of how
+        # long the process takes for metrics purposes
+        with tracker.timer('artisan_db_access'):
+            artisans = Artisan.get(
+                artisan_oid, db_source_name='Artisan'
+            )
+        # Raise an error if no Artisan could be found
+        if len(artisans) == 0:
+            raise ArtisanNotFoundError(
+                'Could not retrieve an Artisan '
+                f'identified by "{artisan_oid}".'
+            )
+        artisan = artisans[0]
+        with tracker.timer('product_db_access'):
+            artisan.products = Product.get(
+                artisan_oid=artisan_oid,
+                db_source_name='Products'
+            )
         result = {
-            'statusCode': 501,
-            'body': 'Not Implemented '
+            'statusCode': 200,
+            'body': artisan.model_dump_json()
+        }
+
+    except ArtisanNotFoundError as error:
+        logger.exception(
+            f'{error.__class__.__name__}: {error} '
+            'occured in api_handler'
+        )
+        logger.error(f'event: {json.dumps(event)}')
+        logger.error(f'context: {repr(context)}')
+        result = {
+            'statusCode': 404,
+            'body': 'Not Found: '
             f'({context.aws_request_id})'
         }
 
-    # TODO: Add other exception-handling if needed
+    except ValueError as error:
+        logger.exception(
+            f'{error.__class__.__name__}: {error} '
+            'occured in api_handler'
+        )
+        logger.error(f'event: {json.dumps(event)}')
+        logger.error(f'context: {repr(context)}')
+        result = {
+            'statusCode': 400,
+            'body': 'Bad Request: '
+            f'({context.aws_request_id})'
+        }
 
     except Exception as error:
         logger.exception(

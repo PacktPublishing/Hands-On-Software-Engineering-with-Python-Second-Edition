@@ -87,10 +87,12 @@ def api_handler(
 
         # Get the Artisan objects, keeping track of how
         # long the process takes for metrics purposes
+        _authnz_preflight()
         with tracker.timer('artisan_db_access'):
             artisans = Artisan.get(
                 db_source_name='Artisan', **get_params
             )
+        _authnz_reconcile()
 
         # Filter the results' fields
         results = [
@@ -128,6 +130,13 @@ def api_handler(
 
 
 # Helper Functions
+def _authnz_preflight(*args, **kwargs):
+    ...
+
+
+def _authnz_reconcile(*args, **kwargs):
+    ...
+
 
 # Module Metaclasses (if any)
 

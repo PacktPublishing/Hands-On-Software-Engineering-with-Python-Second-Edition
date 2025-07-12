@@ -135,7 +135,7 @@ app.post(
 
 # (artisan create product)
 app.post(
-    '/api/v1/artisan/{artisan_oid}/product/{oid}/',
+    '/api/v1/artisan/{artisan_oid}/product/',
     'artisan_create_product.artisan_create_product.api_handler'
 )()
 

@@ -62,6 +62,7 @@ def api_handler(
                 'oid, but that path parameter resolved to '
                 f'"{product_oid}" ({type(product_oid).__name__}).'
             )
+        _authnz_preflight()
         # Get the Product objects, keeping track of how
         # long the process takes for metrics purposes
         with tracker.timer('product_db_access'):
@@ -80,6 +81,7 @@ def api_handler(
                 product_oid=product_oid,
                 db_source_name='ProductImages'
             )
+        _authnz_reconcile()
         result = {
             'statusCode': 200,
             'body': product.model_dump_json()
@@ -130,6 +132,13 @@ def api_handler(
 
 
 # Helper Functions
+def _authnz_preflight(*args, **kwargs):
+    ...
+
+
+def _authnz_reconcile(*args, **kwargs):
+    ...
+
 
 # Module Metaclasses (if any)
 

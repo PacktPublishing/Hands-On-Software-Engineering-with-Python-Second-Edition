@@ -111,6 +111,7 @@ def api_handler(
 
         # Retrieve the current Artisan and convert
         # it to a dict
+        _authnz_preflight()
         with tracker.timer('artisan_db_read_access'):
             artisans = Artisan.get(
                 artisan_oid, db_source_name='Artisan'
@@ -132,6 +133,7 @@ def api_handler(
             f'Modified Artisan {artisan_oid}: '
             f'{json.dumps(artisan_data)}'
         )
+        _authnz_reconcile()
         # Create a new Artisan instance with the
         # updated data and save it
         updated_artisan = Artisan(**artisan_data)
@@ -190,6 +192,13 @@ def api_handler(
 
 
 # Helper Functions
+def _authnz_preflight(*args, **kwargs):
+    ...
+
+
+def _authnz_reconcile(*args, **kwargs):
+    ...
+
 
 # Module Metaclasses (if any)
 

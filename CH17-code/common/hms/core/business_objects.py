@@ -352,7 +352,9 @@ class Product(BaseModel, BaseDataObject):
         If no metadata is supplied, existing metadata
         for the Product will be left untouched.
         """
-        BaseDataObject.save(self, db_source_name)
+        BaseDataObject.save(
+            self, db_source_name=db_source_name
+        )
         if metadata:
             self.save_metadata(**metadata)
 

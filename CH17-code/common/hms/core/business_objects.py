@@ -502,6 +502,14 @@ class ArtisanNotFoundError(Exception):
     ...
 
 
+class ProductNotFoundError(Exception):
+    """
+    An exception to be raised if Product.get does not
+    return an expected collection of Product objects.
+    """
+    ...
+
+
 # Code to run if the module is executed directly
 if __name__ == '__main__':
 

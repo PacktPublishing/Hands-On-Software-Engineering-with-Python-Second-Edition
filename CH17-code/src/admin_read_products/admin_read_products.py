@@ -92,10 +92,12 @@ def api_handler(
 
         # Get the Product objects, keeping track of how
         # long the process takes for metrics purposes
+        _authnz_preflight()
         with tracker.timer('product_db_access'):
             products = Product.get(
                 db_source_name='Products', **get_params
             )
+        _authnz_reconcile()
 
         # Filter the results' fields
         results = [
@@ -133,6 +135,13 @@ def api_handler(
 
 
 # Helper Functions
+def _authnz_preflight(*args, **kwargs):
+    ...
+
+
+def _authnz_reconcile(*args, **kwargs):
+    ...
+
 
 # Module Metaclasses (if any)
 

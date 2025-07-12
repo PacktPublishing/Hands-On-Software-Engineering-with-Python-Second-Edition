@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: http://localhost:5000/api/v1/admin/artisans/?page_size=2&page_number=1&is_active=1
+  url: http://localhost:5000/api/v1/admin/artisans/
   body: none
   auth: inherit
 }
 
 params:query {
-  page_size: 2
-  page_number: 1
-  is_active: 1
+  ~page_size: 2
+  ~page_number: 1
+  ~is_active: 1
 }

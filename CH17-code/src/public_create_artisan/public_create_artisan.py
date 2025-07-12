@@ -28,9 +28,8 @@ module = Path(__file__).stem
 LambdaProxyInput = dict[str, str]
 LambdaProxyOutput = dict[str, str]
 
+
 # Lambda Handlers
-
-
 @tracker
 def api_handler(
     event: LambdaProxyInput, context: LambdaContext

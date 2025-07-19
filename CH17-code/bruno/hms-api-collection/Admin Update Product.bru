@@ -1,0 +1,31 @@
+meta {
+  name: Admin Update Product
+  type: http
+  seq: 9
+}
+
+patch {
+  url: http://localhost:5000/api/v1/admin/product/:oid/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  oid: 6a5d3431-8ba4-41d2-923a-b45336663c15
+}
+
+body:json {
+  {
+      "is_active": true
+  }
+}
+
+docs {
+  This request expects either or both of the `is_active` or `is_deleted` fields to be supplied in its *Body*, and a Product `oid` to be specified in its *Params*. A typical use-case, activating an Product, can be accomplished by sending this payload:
+  
+  ```json
+  {
+      "is_active": true
+  }
+  ```
+}

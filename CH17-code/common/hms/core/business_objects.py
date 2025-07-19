@@ -129,18 +129,18 @@ class ProductImage(BaseModel, BaseDataObject):
     )
 
     # Image data
-    is_primary_image: bool = Field(
-        title='Primary Image Flag',
-        description='Flag indicating that this image is '
-        'the "primary" image for the product it relates '
-        'to, to be used in product lists, and as the '
-        '"main" image for product detail views.',
-        default=False,
-        examples=[
-            True,
-            False,
-        ]
-    )
+#    is_primary_image: bool = Field(
+#        title='Primary Image Flag',
+#        description='Flag indicating that this image is '
+#        'the "primary" image for the product it relates '
+#        'to, to be used in product lists, and as the '
+#        '"main" image for product detail views.',
+#        default=False,
+#        examples=[
+#            True,
+#            False,
+#        ]
+#    )
     image_url: HttpUrl = Field(
         title='Image URL',
         description='The required URL of the image',

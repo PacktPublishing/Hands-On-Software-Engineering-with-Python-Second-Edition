@@ -15,6 +15,8 @@ from awslambdaric.lambda_context import LambdaContext
 from goblinfish.metrics.trackers import ProcessTracker
 
 # Path Manipulations (avoid these!) and "Local" Imports
+from hms.core.business_objects import ProductImage
+
 from logger import logger
 
 # Module "Constants" and Other Attributes
@@ -24,6 +26,19 @@ module = Path(__file__).stem
 
 LambdaProxyInput = dict[str, str]
 LambdaProxyOutput = dict[str, str]
+
+LIST_FIELD_NAMES = (
+    # Unique identifier
+    'oid',
+    # Status fields
+    'is_active', 'is_deleted',
+    # Date/time fields
+#    'created', 'modified',
+    # Product fields
+    'product_oid',
+    # ProductImage fields
+    'is_primary_image', 'image_url'
+)
 
 # Lambda Handlers
 
@@ -47,11 +62,38 @@ def api_handler(
         logger.info(f'{module}.api_handler called')
         logger.debug(f'event: {json.dumps(event)}')
         logger.debug(f'context: {repr(context)}')
-        # TODO: Replace this with actual logic
+
+        # Convert the query-strings for pagination
+        get_params = event.get('queryStringParameters', {})
+        pagination_params = {
+            key: int(get_params.get(key, 0)) or None
+            for key in ('page_size', 'page_number')
+        }
+        get_params.update(pagination_params)
+        logger.debug(f'get_params: {get_params}')
+
+        # Get the Product objects, keeping track of how
+        # long the process takes for metrics purposes
+        _authnz_preflight()
+        with tracker.timer('product_db_access'):
+            product_images = ProductImage.get(
+                db_source_name='ProductImages', **get_params
+            )
+        _authnz_reconcile()
+
+        # Filter the results' fields
+        results = [
+            {
+                key: value for key, value
+                in product_image.model_dump(mode='json').items()
+                if key in LIST_FIELD_NAMES
+            }
+            for product_image in product_images
+        ]
+        body = json.dumps(results)
         result = {
-            'statusCode': 501,
-            'body': 'Not Implemented '
-            f'({context.aws_request_id})'
+            'statusCode': 200,
+            'body': body
         }
 
     # TODO: Add other exception-handling if needed
@@ -75,6 +117,13 @@ def api_handler(
 
 
 # Helper Functions
+def _authnz_preflight(*args, **kwargs):
+    ...
+
+
+def _authnz_reconcile(*args, **kwargs):
+    ...
+
 
 # Module Metaclasses (if any)
 

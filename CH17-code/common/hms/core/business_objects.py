@@ -502,6 +502,14 @@ class ArtisanNotFoundError(Exception):
     ...
 
 
+class ProductImageNotFoundError(Exception):
+    """
+    An exception to be raised if Product.get does not
+    return an expected collection of Product objects.
+    """
+    ...
+
+
 class ProductNotFoundError(Exception):
     """
     An exception to be raised if Product.get does not

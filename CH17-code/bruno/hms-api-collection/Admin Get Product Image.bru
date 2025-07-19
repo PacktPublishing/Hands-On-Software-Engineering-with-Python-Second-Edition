@@ -1,0 +1,15 @@
+meta {
+  name: Admin Get Product Image
+  type: http
+  seq: 11
+}
+
+get {
+  url: http://localhost:5000/api/v1/admin/product_image/:oid/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  oid: 6a5d3431-8ba4-41d2-923a-b45336663c15
+}

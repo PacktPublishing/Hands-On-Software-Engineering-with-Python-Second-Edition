@@ -15,6 +15,9 @@ from awslambdaric.lambda_context import LambdaContext
 from goblinfish.metrics.trackers import ProcessTracker
 
 # Path Manipulations (avoid these!) and "Local" Imports
+from hms.core.business_objects import ProductImage, \
+    ProductImageNotFoundError
+
 from logger import logger
 
 # Module "Constants" and Other Attributes
@@ -47,14 +50,65 @@ def api_handler(
         logger.info(f'{module}.api_handler called')
         logger.debug(f'event: {json.dumps(event)}')
         logger.debug(f'context: {repr(context)}')
-        # TODO: Replace this with actual logic
+
+        # Get the ProductImage oid to retrieve
+        product_image_oid = event.get(
+            'pathParameters', {}
+        ).get('oid')
+        if product_image_oid is None \
+                or len(product_image_oid.split(',')) != 1:
+            raise ValueError(
+                f'{module}.api_handler requires a single '
+                'oid, but that path parameter resolved to '
+                f'"{product_image_oid}" '
+                f'({type(product_image_oid).__name__}).'
+            )
+        _authnz_preflight()
+        # Get the Product objects, keeping track of how
+        # long the process takes for metrics purposes
+        with tracker.timer('product_db_access'):
+            product_images = ProductImage.get(
+                product_image_oid,
+                db_source_name='ProductImages'
+            )
+        # Raise an error if no ProductImage could be found
+        if len(product_images) == 0:
+            raise ProductImageNotFoundError(
+                'Could not retrieve a ProductImage '
+                f'identified by "{product_image_oid}".'
+            )
+        product_image = product_images[0]
+        _authnz_reconcile()
         result = {
-            'statusCode': 501,
-            'body': 'Not Implemented '
+            'statusCode': 200,
+            'body': product_image.model_dump_json()
+        }
+
+    except ProductImageNotFoundError as error:
+        logger.exception(
+            f'{error.__class__.__name__}: {error} '
+            'occured in api_handler'
+        )
+        logger.error(f'event: {json.dumps(event)}')
+        logger.error(f'context: {repr(context)}')
+        result = {
+            'statusCode': 404,
+            'body': 'Not Found: '
             f'({context.aws_request_id})'
         }
 
-    # TODO: Add other exception-handling if needed
+    except ValueError as error:
+        logger.exception(
+            f'{error.__class__.__name__}: {error} '
+            'occured in api_handler'
+        )
+        logger.error(f'event: {json.dumps(event)}')
+        logger.error(f'context: {repr(context)}')
+        result = {
+            'statusCode': 400,
+            'body': 'Bad Request: '
+            f'({context.aws_request_id})'
+        }
 
     except Exception as error:
         logger.exception(
@@ -75,6 +129,13 @@ def api_handler(
 
 
 # Helper Functions
+def _authnz_preflight(*args, **kwargs):
+    ...
+
+
+def _authnz_reconcile(*args, **kwargs):
+    ...
+
 
 # Module Metaclasses (if any)
 

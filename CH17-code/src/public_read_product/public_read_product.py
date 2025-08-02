@@ -11,6 +11,9 @@ import json
 from pathlib import Path
 
 # Third-Party Imports
+from hms.core.business_objects import Product, \
+    ProductNotFoundError, ProductImage
+
 from awslambdaric.lambda_context import LambdaContext
 from goblinfish.metrics.trackers import ProcessTracker
 
@@ -47,14 +50,69 @@ def api_handler(
         logger.info(f'{module}.api_handler called')
         logger.debug(f'event: {json.dumps(event)}')
         logger.debug(f'context: {repr(context)}')
-        # TODO: Replace this with actual logic
+
+        # Get the Product oid to retrieve
+        product_oid = event.get(
+            'pathParameters', {}
+        ).get('oid')
+        if product_oid is None \
+                or len(product_oid.split(',')) != 1:
+            raise ValueError(
+                f'{module}.api_handler requires a single '
+                'oid, but that path parameter resolved to '
+                f'"{product_oid}" ({type(product_oid).__name__}).'
+            )
+
+        # Get the Product objects, keeping track of how
+        # long the process takes for metrics purposes
+        with tracker.timer('product_db_access'):
+            products = Product.get(
+                product_oid, db_source_name='Products',
+                is_active=True, is_deleted=False,
+            )
+        # Raise an error if no Product could be found
+        if len(products) == 0:
+            raise ProductNotFoundError(
+                'Could not retrieve a Product '
+                f'identified by "{product_oid}".'
+            )
+        product = products[0]
+        with tracker.timer('product_image_db_access'):
+            product.product_images = ProductImage.get(
+                product_oid=product_oid,
+                db_source_name='ProductImages',
+                is_active=True, is_deleted=False,
+            )
         result = {
-            'statusCode': 501,
-            'body': 'Not Implemented '
+            'statusCode': 200,
+            'body': product.model_dump_json()
+        }
+
+    except ProductNotFoundError as error:
+        logger.exception(
+            f'{error.__class__.__name__}: {error} '
+            'occured in api_handler'
+        )
+        logger.error(f'event: {json.dumps(event)}')
+        logger.error(f'context: {repr(context)}')
+        result = {
+            'statusCode': 404,
+            'body': 'Not Found: '
             f'({context.aws_request_id})'
         }
 
-    # TODO: Add other exception-handling if needed
+    except ValueError as error:
+        logger.exception(
+            f'{error.__class__.__name__}: {error} '
+            'occured in api_handler'
+        )
+        logger.error(f'event: {json.dumps(event)}')
+        logger.error(f'context: {repr(context)}')
+        result = {
+            'statusCode': 400,
+            'body': 'Bad Request: '
+            f'({context.aws_request_id})'
+        }
 
     except Exception as error:
         logger.exception(

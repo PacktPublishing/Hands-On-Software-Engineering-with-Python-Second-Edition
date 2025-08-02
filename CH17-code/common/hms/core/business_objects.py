@@ -103,6 +103,25 @@ class Address(BaseModel):
         ]
     )
 
+class ProductImageSize(BaseModel):
+    """
+    Provides a common data structure to describe the size (width and height) of a ProductImage variant -- original, detail, and thumbnail sizes.
+    """  # noqa E501
+
+    width: int=Field(
+        title='Image Width',
+        description='The width of the image, in pixels.',
+        gt=0,
+        examples=[320, 240],
+    )
+
+    height: int=Field(
+        title='Image Height',
+        description='The height of the image, in pixels.',
+        gt=0,
+        examples=[320, 240],
+    )
+
 
 class ProductImage(BaseModel, BaseDataObject):
     """
@@ -111,7 +130,7 @@ class ProductImage(BaseModel, BaseDataObject):
 
     CRITERIA_FIELDS: ClassVar[list[str]] = \
         BaseDataObject.CRITERIA_FIELDS + [
-            'product_oid', 'is_primary_image'
+            'product_oid',
         ]
 
     # Relational links
@@ -129,24 +148,16 @@ class ProductImage(BaseModel, BaseDataObject):
     )
 
     # Image data
-#    is_primary_image: bool = Field(
-#        title='Primary Image Flag',
-#        description='Flag indicating that this image is '
-#        'the "primary" image for the product it relates '
-#        'to, to be used in product lists, and as the '
-#        '"main" image for product detail views.',
-#        default=False,
-#        examples=[
-#            True,
-#            False,
-#        ]
-#    )
-    image_url: HttpUrl = Field(
-        title='Image URL',
-        description='The required URL of the image',
+    is_primary_image: bool = Field(
+        title='Primary Image Flag',
+        description='Flag indicating that this image is '
+        'the "primary" image for the product it relates '
+        'to, to be used in product lists, and as the '
+        '"main" image for product detail views.',
+        default=False,
         examples=[
-            'https://cdn.hms.com/products/images/'
-            'file.png',
+            True,
+            False,
         ]
     )
     caption: Optional[str] | None = Field(
@@ -167,22 +178,28 @@ class ProductImage(BaseModel, BaseDataObject):
             'visual impairments. Plain text only.',
         ]
     )
-    width: int = Field(
-        title='Image Width (pixels)',
-        description='The width of the image, in pixels, '
-        'as originally uploaded',
+    original_image_size: ProductImageSize = Field(
+        title='Original Image Dimensions',
+        description='The width and height, in pixels, '
+        'of the original image.',
         examples=[
-            1800,
-            1200
+            ProductImageSize(width=900, height=1600),
         ]
     )
-    height: int = Field(
-        title='Image Height (pixels)',
-        description='The height of the image, in pixels, '
-        'as originally uploaded',
+    detail_image_size: ProductImageSize = Field(
+        title='Detail Image Dimensions',
+        description='The width and height, in pixels, '
+        'of the detail image.',
         examples=[
-            1200,
-            1800
+            ProductImageSize(width=270, height=480),
+        ]
+    )
+    thumbnail_image_size: ProductImageSize = Field(
+        title='Thumbnail Image Dimensions',
+        description='The width and height, in pixels, '
+        'of the thumbnail image.',
+        examples=[
+            ProductImageSize(width=68, height=120),
         ]
     )
 

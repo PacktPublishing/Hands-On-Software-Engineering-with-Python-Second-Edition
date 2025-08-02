@@ -80,6 +80,8 @@ goblinfish-metrics-trackers = "<2"
 
 [artisan_create_product_image]
 goblinfish-metrics-trackers = "<2"
+requests = "<3"
+pillow = "<12"
 
 [artisan_delete_artisan]
 goblinfish-metrics-trackers = "<2"

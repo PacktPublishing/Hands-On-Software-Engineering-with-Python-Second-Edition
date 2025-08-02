@@ -13,7 +13,7 @@ pipenv run uvicorn local_api.app:app --port 5000 --reload
 import logging
 import sys
 
-from os import sep, extsep
+from os import sep, extsep, environ
 
 from pathlib import Path
 
@@ -30,10 +30,13 @@ formatter = logging.Formatter(
 handler = logging.StreamHandler()
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
 from goblinfish.aws.local.api_gateway.fastapi import (
     FastAPI, Request
 )
+
+environ['API_ROOT_DIR'] = str(Path(__file__).parent.resolve())
 
 app = FastAPI()
 
@@ -141,7 +144,7 @@ app.post(
 
 # (artisan create product_image)
 app.post(
-    '/api/v1/artisan/{artisan_oid}/product_image/{oid}/',
+    '/api/v1/artisan/products/{oid}/product_image/',
     'artisan_create_product_image.artisan_create_product_image.api_handler'
 )()
 
@@ -231,7 +234,7 @@ app.post(
 
 # (public create product_image)
 app.post(
-    '/api/v1/product_image/{oid}/',
+    '/api/v1/product_image/{product_oid}/',
     'public_create_product_image.public_create_product_image.api_handler'
 )()
 

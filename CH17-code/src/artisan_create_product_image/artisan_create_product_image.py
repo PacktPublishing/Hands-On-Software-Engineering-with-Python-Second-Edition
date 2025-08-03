@@ -197,6 +197,9 @@ def api_handler(
         new_product_image = ProductImage(
             **image_params | request_params
         )
+        new_product_image.save(
+            db_source_name='ProductImages'
+        )
 
         result = {
             'statusCode': 200,

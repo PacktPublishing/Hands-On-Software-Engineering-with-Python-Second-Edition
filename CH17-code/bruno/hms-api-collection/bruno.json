@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "name": "hms-api-collection",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "size": 0.00029850006103515625,
+  "filesCount": 2,
+  "presets": {
+    "requestType": "http",
+    "requestUrl": "http://localhost:5000"
+  }
+}

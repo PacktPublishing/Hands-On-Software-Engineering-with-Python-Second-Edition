@@ -1,0 +1,15 @@
+meta {
+  name: Admin Get Product
+  type: http
+  seq: 7
+}
+
+get {
+  url: http://localhost:5000/api/v1/admin/product/:oid/
+  body: none
+  auth: inherit
+}
+
+params:path {
+  oid: 
+}

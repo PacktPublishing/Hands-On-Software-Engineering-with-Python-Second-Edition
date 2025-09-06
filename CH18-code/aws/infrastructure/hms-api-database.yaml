@@ -1,0 +1,125 @@
+Description:
+  The infrastructure definition for the Serverless MySQL database for the HMS API.
+
+Parameters:
+  Environment:
+    Type: String
+    Description: |
+      The "environment" that the stack will be deployed
+      to (dev, test, stage, production). Used to identify
+      and name resources based on their environment.
+    AllowedValues:
+      - dev
+      - test
+      - stage
+      - production
+  Application:
+    Type: String
+    Description: |
+      The name of the service/application.
+    Default: hms-api-db
+  DatabaseEngineVersion:
+    Type: String
+    Default: 8.0.mysql_aurora.3.08.2
+    Description: |
+      The Aurora RDS MySQL-compatible engine version.
+  SubnetID1:
+    Type: AWS::EC2::Subnet::Id
+    Description: |
+      The first networking subnet that the database has access to.
+  SubnetID2:
+    Type: AWS::EC2::Subnet::Id
+    Description: |
+      The second networking subnet that the database has access to.
+  SecurityGroup:
+    Type: String
+    Default: sg-0786458eb809e0070
+    Description: |
+      The network security group that controls access to the database.
+      Look this up in VPC > Security Groups if needed.
+  VPCID:
+    Type: AWS::EC2::VPC::Id
+    Description: |
+      The ID of the VPC that this stack deploys to.
+
+Resources:
+
+  APIMySQLSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: !Sub ${Environment}_mysql_subnets
+      SubnetIds:
+        - !Ref SubnetID1
+        - !Ref SubnetID2
+
+  APIServerlessMySQLCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      Engine: aurora-mysql
+      EngineVersion: !Ref DatabaseEngineVersion
+      EngineMode: provisioned
+      DBClusterIdentifier: !Sub ${Environment}-serverless-mysql-cluster
+      DBSubnetGroupName: !Ref APIMySQLSubnetGroup
+      MasterUsername: !Sub "{{resolve:secretsmanager:/${Environment}/hms-backend/${Application}/database/master-secret:SecretString:username}}"
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:/${Environment}/hms-backend/${Application}/database/master-secret:SecretString:password}}"
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: 0.5
+        MaxCapacity: 16
+      VpcSecurityGroupIds:
+        - !Ref SecurityGroup
+
+  APIMySQLDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBClusterIdentifier: !Ref APIServerlessMySQLCluster
+      DBInstanceClass: db.serverless
+      Engine: aurora-mysql
+      EngineVersion: !Ref DatabaseEngineVersion
+      DBSubnetGroupName: !Ref APIMySQLSubnetGroup
+
+Outputs:
+  DBMasterUserSecret:
+    Description: The name of the Secrets Manager secret that tracks the master user username and password values.
+    Value: !Sub /${Environment}/hms-backend/${Application}/database/master-secret
+    Export:
+      Name: !Sub ${Environment}-${Application}-master-user-secret
+  DBClusterARN:
+    Description: The Amazon Resource Name (ARN) for the DB cluster.
+    Value: !GetAtt APIServerlessMySQLCluster.DBClusterArn
+    Export:
+      Name: !Sub ${Environment}-${Application}-cluster-arn
+  DBClusterEndpointAddress:
+    Description: The connection endpoint for the DB cluster.
+    Value: !GetAtt APIServerlessMySQLCluster.Endpoint.Address
+    Export:
+      Name: !Sub ${Environment}-${Application}-cluster-endpoint-address
+  DBClusterEndpointPort:
+    Description: The port number that will accept connections on the DB cluster.
+    Value: !GetAtt APIServerlessMySQLCluster.Endpoint.Port
+    Export:
+      Name: !Sub ${Environment}-${Application}-cluster-endpoint-port
+  DBInstanceARN:
+    Description: The Amazon Resource Name (ARN) for the DB instance.
+    Value: !GetAtt APIMySQLDatabase.DBInstanceArn
+    Export:
+      Name: !Sub ${Environment}-${Application}-instance-arn
+  DBInstanceEndpointAddress:
+    Description: The connection endpoint for the DB instance.
+    Value: !GetAtt APIMySQLDatabase.Endpoint.Address
+    Export:
+      Name: !Sub ${Environment}-${Application}-instance-endpoint-address
+  DBInstanceEndpointPort:
+    Description: The port number that will accept connections on the DB instance.
+    Value: !GetAtt APIMySQLDatabase.Endpoint.Port
+    Export:
+      Name: !Sub ${Environment}-${Application}-instance-endpoint-port
+  Subnet1Export:
+    Description: Subnet 1 ID for Lambda VPC config
+    Value: !Ref SubnetID1
+    Export:
+      Name: !Sub ${Environment}-${Application}-subnet1
+  Subnet2Export:
+    Description: Subnet 2 ID for Lambda VPC config
+    Value: !Ref SubnetID2
+    Export:
+      Name: !Sub ${Environment}-${Application}-subnet2

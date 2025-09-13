@@ -115,3 +115,5 @@ CH08-code/unit-test-examples.geany
 
 
 CH18-code/.aws-sam/
+
+CH18-code/packaged/*.zip

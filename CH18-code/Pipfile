@@ -7,6 +7,7 @@ name = "pypi"
 
 [dev-packages]
 awslambdaric = "<4"
+boto3 = "<2"
 coverage = "<8"
 flake8 = "<8"
 goblinfish-testing-pact = "<2"
@@ -15,13 +16,13 @@ pyyaml = "<7"
 
 [requires]
 python_version = "3.11"
-python_full_version = "3.11.0"
+# python_full_version = "3.11.0"
 
 [common]
 email-validator = "<3"
-mysql-connector-python = "<10"
 pydantic = "<3"
 typeguard = "<5"
+pymysql = "<2"
 
 [local-api]
 goblinfish-aws-local-lpi-apis = "<2"
@@ -163,3 +164,12 @@ goblinfish-metrics-trackers = "<2"
 
 [public_update_product_image]
 goblinfish-metrics-trackers = "<2"
+
+[db_cluster_test]
+pymysql = "<2"
+
+[developer-tools]
+toml = "<1"
+
+[scripts]
+"packaging" = "python developer-tools/package-lambdas.py"

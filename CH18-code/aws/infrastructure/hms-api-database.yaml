@@ -1,3 +1,5 @@
+Transform: AWS::Serverless-2016-10-31
+
 Description:
   The infrastructure definition for the Serverless MySQL database for the HMS API.
 
@@ -25,10 +27,12 @@ Parameters:
       The Aurora RDS MySQL-compatible engine version.
   SubnetID1:
     Type: AWS::EC2::Subnet::Id
+    Default: subnet-03b02967bf1e1c096
     Description: |
       The first networking subnet that the database has access to.
   SubnetID2:
     Type: AWS::EC2::Subnet::Id
+    Default: subnet-014e6936b99d92025
     Description: |
       The second networking subnet that the database has access to.
   SecurityGroup:
@@ -39,6 +43,7 @@ Parameters:
       Look this up in VPC > Security Groups if needed.
   VPCID:
     Type: AWS::EC2::VPC::Id
+    Default: vpc-0378d86cb667eea52
     Description: |
       The ID of the VPC that this stack deploys to.
 
@@ -76,6 +81,96 @@ Resources:
       Engine: aurora-mysql
       EngineVersion: !Ref DatabaseEngineVersion
       DBSubnetGroupName: !Ref APIMySQLSubnetGroup
+
+  # -- Lambda SG with explicit egress rules --------------
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub Lambda SG for ${Environment}-${Application}
+      VpcId: !Ref VPCID
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          DestinationSecurityGroupId: !Ref SecurityGroup
+
+  # -- SG to allow access to the Secrets Manager service -
+  SecretsEndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub Secrets Manager VPCE SG for ${Environment}-${Application}
+      VpcId: !Ref VPCID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !Ref LambdaSecurityGroup   # allow Lambda -> endpoint
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0  # default egress (endpoint will initiate back to AWS infra)
+
+  # -- Secrets Manager VPC Endpoint ----------------------
+  SecretsManagerVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.secretsmanager
+      VpcId: !Ref VPCID
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetID1
+        - !Ref SubnetID2
+      SecurityGroupIds:
+        - !Ref SecretsEndpointSecurityGroup
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "secretsmanager:*"
+            Resource: "*"
+
+  # -- Lambda SG with explicit egress rules --------------
+  DBAccessFromLambda:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroup
+      SourceSecurityGroupId: !Ref LambdaSecurityGroup
+      IpProtocol: tcp
+      FromPort: 3306
+      ToPort: 3306
+
+  # -- Placeholder Lambda Function for testing DB access -
+  DBClusterTestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Environment}-${Application}-cluster-test-function
+      Runtime: python3.11
+      Handler: db_cluster_test.lambda_handler
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/db_cluster_test.zip
+      MemorySize: 512
+      Timeout: 30
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref SubnetID1
+          - !Ref SubnetID2
+      Environment:
+        Variables:
+          DB_SECRET_NAME: !Sub /${Environment}/hms-backend/${Application}/database/master-secret
+          DB_ENDPOINT: !GetAtt APIServerlessMySQLCluster.Endpoint.Address
+          DB_PORT: !GetAtt APIServerlessMySQLCluster.Endpoint.Port
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: secretsmanager:GetSecretValue
+              Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/hms-backend/${Application}/database/master-secret*
 
 Outputs:
   DBMasterUserSecret:
@@ -123,3 +218,32 @@ Outputs:
     Value: !Ref SubnetID2
     Export:
       Name: !Sub ${Environment}-${Application}-subnet2
+  LambdaSecurityGroupExport:
+    Description: Security group that allows Lambda to talk to the DB
+    Value: !Ref LambdaSecurityGroup
+    Export:
+      Name: !Sub ${Environment}-${Application}-lambda-access-sg
+
+# To use these imports in another stack that defines one or more Lambdas that use their values:
+
+# Globals:
+#   Function:
+#     Runtime: python3.11
+#     VpcConfig:
+#       SecurityGroupIds:
+#         - !ImportValue ${Environment}-hms-api-db-lambda-access-sg
+#       SubnetIds:
+#         - !ImportValue ${Environment}-hms-api-db-subnet1
+#         - !ImportValue ${Environment}-hms-api-db-subnet2
+#     Environment:
+#       Variables:
+#         DB_SECRET_NAME: !Sub /${Environment}/hms-backend/${Application}/database/master-secret
+#         DB_ENDPOINT: !ImportValue ${Environment}-hms-api-db-cluster-endpoint-address
+#         DB_PORT: !ImportValue ${Environment}-hms-api-db-cluster-endpoint-port
+
+# Resources:
+#   MyOtherLambda:
+#     Type: AWS::Serverless::Function
+#     Properties:
+#       Handler: my_func.lambda_handler
+#       CodeUri: src/my_func/

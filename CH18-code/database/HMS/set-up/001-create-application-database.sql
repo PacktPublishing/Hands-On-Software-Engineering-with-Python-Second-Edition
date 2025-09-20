@@ -10,7 +10,7 @@
  * Can't create database 'HMS_DEV'; database exists
  */
 
-CREATE DATABASE HMS_DEV
+CREATE DATABASE {MYSQL_DB}
     CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_unicode_ci
 ;

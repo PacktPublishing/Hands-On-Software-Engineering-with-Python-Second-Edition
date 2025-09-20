@@ -14,43 +14,39 @@ if not sql_files:
     sys.exit()
 
 # Get user and password info
-password = os.getenv('DEV_PASS', None)
-username = os.getenv('DEV_USER', None)
-
-if username is None:
-    default_user = getpass.getuser()
-    user_prompt = f'Input your username [{default_user}]: '
-    username = input(user_prompt) or default_user
-
-if password is None:
-    pass_prompt = 'Input your password to the ' \
-        '{MYSQL_DB} database at {MYSQL_HOST}:\n> ' \
-        .format(**os.environ)
-    password = getpass.getpass(prompt=pass_prompt)
+password = os.getenv('MYSQL_MASTER_USER', None)
+username = os.getenv('MYSQL_MASTER_PASS', None)
 
 # Back the database up before touching it!
+rds = boto3.client('rds')
 backup_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-backup_name = os.environ['MYSQL_DB'] + f'_{backup_time}.backup'
-backup_dir = Path(__file__).parent.parent / 'backups'
-if not backup_dir.exists():
-    backup_dir.mkdir()
-backup_file = backup_dir / backup_name
-backup_cmd = [
-    'mysqldump',
-    # Host, port, and database
-    '-B', os.environ['MYSQL_DB'],
-    '-h', os.environ['MYSQL_HOST'],
-    # ~ '-P', os.environ['MYSQL_PORT'],
-    # Access controls
-    '-u', username,
-    '-p',
-]
-display_backup_cmd = ' '.join(backup_cmd) \
-    .replace(password, 'REDACTED')
-print(f'== Backing the database up '.ljust(80, '='))
-print(f'Running {display_backup_cmd}')
-with open(backup_file, 'w') as f:
-    run(backup_cmd, stdout=f)
+backup_name = (
+    os.environ['MYSQL_DB'] + f'_{backup_time}.backup'
+).lower()
+# Start the backup (snapshot)
+snapshot_response = rds.create_db_snapshot(
+    DBSnapshotIdentifier=backup_name,
+    DBInstanceIdentifier=os.environ['MYSQL_INSTANCE_NAME'],
+)
+# Wait for it to complete
+waiter = rds.get_waiter('db_snapshot_completed')
+try:
+    waiter.wait(
+        DBSnapshotIdentifier=backup_name,
+        # Check four times per minute,
+        # for no more than 10 minutes
+        WaiterConfig={
+            'Delay': 15,
+            'MaxAttempts': 40,
+        }
+    )
+except Exception as error:
+    print(
+        f'{error.__class__.__name__} encountered while '
+        'waiting for the snapshot of the database to '
+        'complete.'
+    )
+    sys.exit(1)
 
 # Connect to the database
 with pymysql.connect(

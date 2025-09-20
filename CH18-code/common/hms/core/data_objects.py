@@ -19,10 +19,7 @@ from typing import Any, ClassVar, Self
 from uuid import UUID, uuid4
 
 # Third-Party Imports
-import mysql.connector
-
-from mysql.connector.connection_cext import \
-    CMySQLConnection
+import pymysql
 
 from pydantic import BaseModel, Field, PydanticUserError
 from typeguard import typechecked
@@ -219,7 +216,7 @@ def build_order_by_clause(
 
 @cache
 @typechecked
-def get_env_database_connector() -> CMySQLConnection:
+def get_env_database_connector():
     """
     Creates, caches and returns a MySQL connector object,
     supporting cursors, suitable for making requests
@@ -249,7 +246,7 @@ def get_env_database_connector() -> CMySQLConnection:
     development purposes, but will be managed in a
     more secure fashion in production.
     """
-    connector = mysql.connector.connect(
+    connector = pymysql.connect(
         host=os.environ['MYSQL_HOST'],
         port=os.environ['MYSQL_PORT'],
         user=os.environ['MYSQL_USER'],

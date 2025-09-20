@@ -172,6 +172,40 @@ Resources:
               Action: secretsmanager:GetSecretValue
               Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/hms-backend/${Application}/database/master-secret*
 
+  # -- CodeBuild to run the database updates, and related resources
+#  DBUpdaterProject:
+#    Type: AWS::CodeBuild::Project
+#    Properties:
+#      Artifacts:
+#        Type: NO_ARTIFACTS
+#      Environment:
+#        ComputeType: BUILD_GENERAL1_SMALL
+#        Image: Amazon Linux 2 x86_64 Lambda standard:python3.11
+#        Type: LINUX_CONTAINER
+#        EnvironmentVariables:
+#          - Name: MYSQL_MASTER_USER
+#            Value: !Sub /${Environment}/hms-backend/${Application}/database/master-secret:username
+#            Type: SECRETS_MANAGER
+#          - Name: MYSQL_MASTER_PASS
+#            Value: !Sub /${Environment}/hms-backend/${Application}/database/master-secret:password
+#            Type: SECRETS_MANAGER
+#          - Name: MYSQL_HOST
+#            Value: !Ref APIMySQLDatabase
+#          - Name: MYSQL_PORT
+#            Value: !GetAtt APIMySQLDatabase.Endpoint.Port
+#          - Name: MYSQL_DB
+#            Value: !Sub ${Environment}_api_database
+#          - Name: MYSQL_SERVICE_USER
+#            Value: !Sub /${Environment}/hms-backend/${Application}/database/service-user
+#            Type: PARAMETER_STORE
+#          - Name: MYSQL_SERVICE_PASS
+#            Value: !Sub /${Environment}/hms-backend/${Application}/database/service-pass
+#            Type: PARAMETER_STORE
+#      Source:
+#        Type: NO_SOURCE
+#        BuildSpec:aws/buildspec-examples/database-population-buildspec.yaml
+#      ServiceRole: # TODO: Create a role and reference it here
+
 Outputs:
   DBMasterUserSecret:
     Description: The name of the Secrets Manager secret that tracks the master user username and password values.
@@ -183,6 +217,21 @@ Outputs:
     Value: !GetAtt APIServerlessMySQLCluster.DBClusterArn
     Export:
       Name: !Sub ${Environment}-${Application}-cluster-arn
+  DBClusterName:
+    Description: The Name of the DB cluster.
+    Value: !Ref APIServerlessMySQLCluster
+    Export:
+      Name: !Sub ${Environment}-${Application}-cluster-name
+  DBInstanceName:
+    Description: The Name of the DB instance.
+    Value: !Ref APIMySQLDatabase
+    Export:
+      Name: !Sub ${Environment}-${Application}-instance-name
+  DBName:
+    Description: The name of the API database.
+    Value: !Sub ${Environment}_api_database
+    Export:
+      Name: !Sub ${Environment}-${Application}-database-name
   DBClusterEndpointAddress:
     Description: The connection endpoint for the DB cluster.
     Value: !GetAtt APIServerlessMySQLCluster.Endpoint.Address

@@ -10,6 +10,6 @@
  * Operation CREATE USER failed for 'hms-service-user'@'%'
  */
 
-CREATE USER 'hms-service-user'@'%'
-    IDENTIFIED BY 'hms-service-password'
+CREATE USER '{MYSQL_SERVICE_USER}'@'%'
+    IDENTIFIED BY '{MYSQL_SERVICE_PASS}'
 ;

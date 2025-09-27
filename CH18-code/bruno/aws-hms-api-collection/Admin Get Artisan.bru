@@ -1,0 +1,15 @@
+meta {
+  name: Admin Get Artisan
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://{{api_id}}.execute-api.us-east-1.amazonaws.com/Stage/api/v1/admin/artisan/:oid
+  body: none
+  auth: inherit
+}
+
+params:path {
+  oid: 40a8df0e-68f2-4249-9a01-4ecb28674292
+}

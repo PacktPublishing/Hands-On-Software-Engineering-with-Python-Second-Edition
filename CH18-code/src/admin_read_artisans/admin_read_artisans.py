@@ -77,7 +77,7 @@ def api_handler(
         logger.debug(f'context: {repr(context)}')
 
         # Convert the query-strings for pagination
-        get_params = event.get('queryStringParameters', {})
+        get_params = event.get('queryStringParameters') or {}
         pagination_params = {
             key: int(get_params.get(key, 0)) or None
             for key in ('page_size', 'page_number')

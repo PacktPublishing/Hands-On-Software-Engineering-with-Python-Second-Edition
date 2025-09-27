@@ -1,0 +1,57 @@
+meta {
+  name: Public Artisan Sign-up
+  type: http
+  seq: 3
+}
+
+post {
+  url: https://{{api_id}}.execute-api.us-east-1.amazonaws.com/Stage/api/v1/artisan
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "oid": "40a8df0e-68f2-4249-9a01-4ecb28674292",
+      "honorific": "Lady",
+      "given_name": "Sibyl",
+      "middle_name": null,
+      "family_name": "Vimes",
+      "suffix": null,
+      "company_name": null,
+      "business_address": {
+          "street_address": "Scoone Avenue",
+          "building_address": null,
+          "city": "Ankh-Morpork",
+          "region_name": null,
+          "postal_code": "N/A",
+          "country": "Ankh-Morpork"
+      },
+      "email_address": "sibyl@sunshine-sanctuary.com"
+  }
+}
+
+docs {
+    **JSON payload structure:**
+  
+  ```json
+  {
+      "oid": null,
+      "honorific": null,
+      "given_name": null,
+      "middle_name": null,
+      "family_name": null,
+      "suffix": null,
+      "company_name": null,
+      "business_address": {
+          "street_address": null,
+          "building_address": null,
+          "city": null,
+          "region_name": null,
+          "postal_code": null,
+          "country": null
+      },
+      "email_address": null
+  }
+  ```
+}

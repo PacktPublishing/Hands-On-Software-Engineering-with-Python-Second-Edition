@@ -134,6 +134,45 @@ Resources:
             Action: "secretsmanager:*"
             Resource: "*"
 
+  # -- SG to allow access to the Secrets Manager service -
+  SSMEndpointSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub SSM VPCE SG for ${Environment}-${Application}
+      VpcId: !Ref VPCID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          SourceSecurityGroupId: !Ref LambdaSecurityGroup   # allow Lambda -> endpoint
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0  # default egress (endpoint will initiate back to AWS infra)
+
+  # -- SSM VPC Endpoint ----------------------------------
+  SSMVPCEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPCID
+      VpcEndpointType: Interface
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssm
+      PrivateDnsEnabled: true
+      SubnetIds:
+        - !Ref SubnetID1
+        - !Ref SubnetID2
+      SecurityGroupIds:
+        - !Ref SSMEndpointSecurityGroup
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action:
+              - "ssm:GetParameter"
+              - "ssm:GetParameters"
+              - "ssm:GetParametersByPath"
+            Resource: "*"
+
   # -- Lambda SG with explicit egress rules --------------
   DBAccessFromLambda:
     Type: AWS::EC2::SecurityGroupIngress
@@ -196,10 +235,10 @@ Resources:
 #          - Name: MYSQL_DB
 #            Value: !Sub ${Environment}_api_database
 #          - Name: MYSQL_SERVICE_USER
-#            Value: !Sub /${Environment}/hms-backend/${Application}/database/service-user
+#            Value: !Sub /${Environment}/hms-backend/${Application}/database/MYSQL_USER
 #            Type: PARAMETER_STORE
 #          - Name: MYSQL_SERVICE_PASS
-#            Value: !Sub /${Environment}/hms-backend/${Application}/database/service-pass
+#            Value: !Sub /${Environment}/hms-backend/${Application}/database/MYSQL_PASS
 #            Type: PARAMETER_STORE
 #      Source:
 #        Type: NO_SOURCE

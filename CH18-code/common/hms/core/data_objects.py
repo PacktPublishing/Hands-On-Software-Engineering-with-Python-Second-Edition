@@ -25,6 +25,8 @@ from pydantic import BaseModel, Field, PydanticUserError
 from typeguard import typechecked
 
 # Path Manipulations (avoid these!) and "Local" Imports
+from hms.environment import get_env_vars
+from logger import logger
 
 # Module "Constants" and Other Attributes
 SQL_OPERATORS = {
@@ -246,12 +248,22 @@ def get_env_database_connector():
     development purposes, but will be managed in a
     more secure fashion in production.
     """
+    expected_env_vars = {
+        'MYSQL_HOST', 'MYSQL_PORT', 'MYSQL_DB',
+        'MYSQL_USER', 'MYSQL_PASS',
+    }
+    missing_env_vars = expected_env_vars.difference(
+        set(os.environ.keys())
+    )
+    if missing_env_vars:
+        get_env_vars(*missing_env_vars)
     connector = pymysql.connect(
         host=os.environ['MYSQL_HOST'],
-        port=os.environ['MYSQL_PORT'],
+        port=int(os.environ['MYSQL_PORT']),
         user=os.environ['MYSQL_USER'],
         password=os.environ['MYSQL_PASS'],
         database=os.environ['MYSQL_DB'],
+        cursorclass=pymysql.cursors.DictCursor
     )
     return connector
 
@@ -566,6 +578,8 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         """
         # Build the WHERE clause from **criteria,
         # including any oids values specified
+        logger.info(f'{cls.__name__}.get called')
+        logger.debug(vars())
         if oids:
             try:
                 if len(oids) == 1:
@@ -590,11 +604,14 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         where, parameters = build_where_clause(
             criteria, cls.CRITERIA_FIELDS
         )
+        logger.debug(f'where: {where or None}')
+        logger.debug(f'parameters: {parameters or None}')
 
         # Build the ORDER BY clause from **criteria
         order_by = build_order_by_clause(
             criteria, cls.CRITERIA_FIELDS
         )
+        logger.debug(f'order_by: {order_by or None}')
 
         # Build the LIMIT clause, if one is called for
         if page_size is not None:
@@ -612,6 +629,7 @@ class BaseDataObject(metaclass=abc.ABCMeta):
             )
         else:
             limit = ''
+        logger.debug(f'limit: {limit or None}')
 
         # Generate the final SQL to execute
         final_sql = cls.GET_TEMPLATE.format(
@@ -623,19 +641,26 @@ class BaseDataObject(metaclass=abc.ABCMeta):
         # Get a connector, create a cursor, execute the
         # query (with parameters if any are supplied)
         connector = get_env_database_connector()
+        logger.debug(f'connector: {connector}')
         final_sql = final_sql.strip()
-        with connector.cursor(dictionary=True) as cursor:
+        logger.debug(f'final_sql: {final_sql}')
+        with connector.cursor() as cursor:
+            logger.debug(f'cursor: {cursor}')
             if parameters:
+                logger.debug('Executing cursor.execute(final_sql, parameters)')
                 cursor.execute(final_sql, parameters)
             else:
+                logger.debug('Executing cursor.execute(final_sql)')
                 cursor.execute(final_sql)
             rows = cursor.fetchall()
+            logger.debug(f'rows: {rows}')
             results = [
                 cls.from_record(
                     json.loads(row['object_state'])
                 )
                 for row in rows
             ]
+            logger.debug(f'results: {results}')
             cursor.nextset()
 
         return results

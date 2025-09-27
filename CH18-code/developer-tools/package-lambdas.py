@@ -102,6 +102,7 @@ def _copy_source_code(target, tmp_src, tempdir, include_common):
     categories = [target]
     if include_common:
         print(f'- Copying files from {common_dir.name}')
+        copy_contents(common_dir, tempdir)
         categories.append(common_dir.name)
     return categories
 
@@ -251,7 +252,7 @@ def __main__(
 
         # Make a date/time-stamped copy of the package
         build_timestamp = datetime.now() \
-            .strftime("%Y%m%d-%H%M%S")
+            .strftime("%Y%m%d-%H%M00")
         date_name = f'{target}-{build_timestamp}.zip'
         timestamped_path = packaged_dir / date_name
         print(

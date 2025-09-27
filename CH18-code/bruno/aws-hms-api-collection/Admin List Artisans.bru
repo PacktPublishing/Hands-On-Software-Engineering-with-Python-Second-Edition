@@ -1,0 +1,17 @@
+meta {
+  name: Admin List Artisans
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://{{api_id}}.execute-api.us-east-1.amazonaws.com/Stage/api/v1/admin/artisans
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~page_size: 2
+  ~page_number: 1
+  ~is_active: 0
+}

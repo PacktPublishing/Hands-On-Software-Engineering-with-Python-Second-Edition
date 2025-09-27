@@ -1,0 +1,50 @@
+meta {
+  name: Artisan Create Product
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:5000/api/v1/artisan/:artisan_oid/product/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  artisan_oid: 
+}
+
+docs {
+  **JSON payload structure** (Fields with `null` are *optional*, all others are **required**)**:**
+  
+  ```json
+  {
+      "name": "required",
+      "summary": "required",
+      "description": "required",
+      "price": "1.00",
+      "shipping_weight": "1.00",
+      "height": null,
+      "length": null,
+      "width": null,
+      "size": null
+  }
+  ```
+  
+  The example JSON payload used in Chapter 17 was:
+  
+  ```json
+  {
+    "name": "Fireproof Dragon-Cradle Blanket",
+    "summary": "Handwoven blanket with fire-resistant lining.",
+    "description": "Perfect for young swamp dragons or high-end decor, this blanket features traditional Ramtop stitching and fire-retardant charmwork. Hand-labeled by Sybil’s own kennelmaids.",
+    "price": 89.00,
+    "shipping_weight": "1.2",
+    "height": null,
+    "length": null,
+    "width": null,
+    "size": null
+  }
+  ```
+  
+}

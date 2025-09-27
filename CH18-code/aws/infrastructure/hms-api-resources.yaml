@@ -1,0 +1,329 @@
+Transform: AWS::Serverless-2016-10-31
+
+Description:
+  The infrastructure definition for the actual HMS API.
+
+Parameters:
+  Environment:
+    Type: String
+    Description: |
+      The "environment" that the stack will be deployed
+      to (dev, test, stage, production). Used to identify
+      and name resources based on their environment.
+    AllowedValues:
+      - dev
+      - test
+      - stage
+      - production
+  Application:
+    Type: String
+    Description: |
+      The name of the service/application.
+    Default: hms-api
+  VPCID:
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-0378d86cb667eea52
+    Description: |
+      The ID of the VPC that this stack deploys to.
+  PacakgeBucketName:
+    Type: String
+    Default: hosewp-hms-dev-lambda-package-bucket
+    Description: |
+      The name of the S3 bucket where Lambda Function code
+      packages will be retrieved from.
+
+Conditions:
+  IsProduction: !Equals [!Ref Environment, production]
+
+Globals:
+  Function:
+    Runtime: python3.11
+    Timeout: 6
+    VpcConfig:
+      SecurityGroupIds:
+      - !ImportValue dev-hms-api-db-lambda-access-sg
+      SubnetIds:
+      - !ImportValue dev-hms-api-db-subnet1
+      - !ImportValue dev-hms-api-db-subnet2
+    Environment:
+      Variables:
+        DB_SECRET_NAME: /dev/hms-backend/hms-api-db/database/master-secret
+        MYSQL_HOST: !ImportValue dev-hms-api-db-cluster-endpoint-address
+        MYSQL_PORT: !ImportValue dev-hms-api-db-cluster-endpoint-port
+        MYSQL_DB: !ImportValue dev-hms-api-db-database-name
+        SERVICE_PARAMS_PATH: /dev/hms-backend/hms-api-db/database/
+        # REMOVE THESE - They are for local purposes only!
+        MYSQL_USER: "hms_api_db_service_user"
+        MYSQL_PASS: "hms-api-db-service-password:Fl0bn4R!"
+
+Resources:
+
+  MainAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub ${Environment}-${Application}
+      StageName: Prod
+
+  SharedLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-lambda-execution-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        # AWS-managed policies for common Lambda execution
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: LambdaCloudWatchLogging
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "arn:aws:logs:*:*:*"
+        - PolicyName: LambdaParameterStoreRead
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Environment}/hms-backend/hms-api-db/database/*"
+
+  AdminReadArtisansEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/admin_read_artisans.zip
+      Handler: admin_read_artisans.api_handler
+      Description: The admin API's artisan-list endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /api/v1/admin/artisans
+            RestApiId: !Ref MainAPI
+
+  AdminReadArtisanEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/admin_read_artisan.zip
+      Handler: admin_read_artisan.api_handler
+      Description: The admin API's artisan-details endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /api/v1/admin/artisan/{oid}
+            RestApiId: !Ref MainAPI
+
+  PublicCreateArtisanEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/public_create_artisan.zip
+      Handler: public_create_artisan.api_handler
+      Description: The public API's artisan sign-up endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: post
+            Path: /api/v1/artisan
+            RestApiId: !Ref MainAPI
+
+  PublicReadProductsEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      # If use of the AWS SAM cli (sam) is available,
+      # and the build and deploy processes, this can
+      # point to a local file-system path:
+      # CodeUri: ../../../src/public_read_products
+      # It would *also* require that a requirements.txt
+      # file be available in that directory, which could
+      # be created with pipenv:
+      # pipenv requirements \
+      #     --categories public_read_products \
+      #     > src/public_read_products/requirements.txt
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/public_read_products.zip
+      Handler: public_read_products.api_handler
+      Description: The public API's products-list endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /api/v1/products
+            RestApiId: !Ref MainAPI
+            #Auth:
+              #ApiKeyRequired: Boolean
+              #AuthorizationScopes: List
+              #Authorizer: String
+              #InvokeRole: String
+              #OverrideApiAuth: Boolean
+              #ResourcePolicy: ResourcePolicyStatement
+
+  PublicReadProductEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/public_read_product.zip
+      Handler: public_read_product.api_handler
+      Description: The public API's products-detail endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /api/v1/product/{oid}
+            RestApiId: !Ref MainAPI
+
+  AdminUpdateArtisanEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/admin_update_artisan.zip
+      Handler: admin_update_artisan.api_handler
+      Description: The admin API's artisan-update endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: patch
+            Path: /api/v1/admin/artisan/{oid}
+            RestApiId: !Ref MainAPI
+
+  AdminReadProductsEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/admin_read_products.zip
+      Handler: admin_read_products.api_handler
+      Description: The admin API's products-list endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /api/v1/admin/products
+            RestApiId: !Ref MainAPI
+
+  AdminReadProductEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/admin_read_product.zip
+      Handler: admin_read_product.api_handler
+      Description: The admin API's product-details endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /api/v1/admin/product/{oid}
+            RestApiId: !Ref MainAPI
+
+  ArtisanCreateProductEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/artisan_create_product.zip
+      Handler: artisan_create_product.api_handler
+      Description: The artisan product-creation endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: post
+            Path: /api/v1/artisan/{artisan_oid}/product
+            RestApiId: !Ref MainAPI
+
+  AdminUpdateProductEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/admin_update_product.zip
+      Handler: admin_update_product.api_handler
+      Description: The admin API's product-update endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: patch
+            Path: /api/v1/admin/product/{oid}
+            RestApiId: !Ref MainAPI
+
+  AdminReadProductImagesEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/admin_read_product_images.zip
+      Handler: admin_read_product_images.api_handler
+      Description: The admin API's product-image-list endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /api/v1/admin/product_images
+            RestApiId: !Ref MainAPI
+
+  AdminReadProductImageEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/admin_read_product_image.zip
+      Handler: admin_read_product_image.api_handler
+      Description: The admin API's product-image-details endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /api/v1/admin/product_image/{oid}
+            RestApiId: !Ref MainAPI
+
+  AdminUpdateProductImageEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/admin_update_product_image.zip
+      Handler: admin_update_product_image.api_handler
+      Description: The admin API's product-update endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: patch
+            Path: /api/v1/admin/product_image/{oid}
+            RestApiId: !Ref MainAPI
+
+  ArtisanCreateProductImageEndpoint:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://hosewp-hms-dev-lambda-package-bucket/artisan_create_product_image.zip
+      Handler: artisan_create_product_image.api_handler
+      Description: The artisan API's product-image-creation endpoint.
+      Role: !GetAtt SharedLambdaExecutionRole.Arn
+      Events:
+        APIGetEvent:
+          Type: Api
+          Properties:
+            Method: patch
+            Path: /api/v1/artisan/products/{oid}/product_image
+            RestApiId: !Ref MainAPI

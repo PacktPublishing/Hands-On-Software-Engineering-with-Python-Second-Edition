@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "name": "hms-api-collection-aws",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ],
+  "size": 0.010729789733886719,
+  "filesCount": 16,
+  "presets": {
+    "requestType": "http",
+    "requestUrl": "https://dm1yg3y7dc.execute-api.us-east-1.amazonaws.com/Stage/api"
+  }
+}

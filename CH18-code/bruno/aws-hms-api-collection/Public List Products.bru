@@ -1,0 +1,11 @@
+meta {
+  name: Public List Products
+  type: http
+  seq: 13
+}
+
+get {
+  url: https://{{api_id}}.execute-api.us-east-1.amazonaws.com/Stage/api/v1/products
+  body: none
+  auth: inherit
+}

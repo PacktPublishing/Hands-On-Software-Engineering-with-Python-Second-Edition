@@ -1,0 +1,31 @@
+meta {
+  name: Admin Update Product Image
+  type: http
+  seq: 12
+}
+
+patch {
+  url: https://{{api_id}}.execute-api.us-east-1.amazonaws.com/Stage/api/v1/admin/product_image/:oid
+  body: json
+  auth: inherit
+}
+
+params:path {
+  oid: 
+}
+
+body:json {
+  {
+      "is_active": true
+  }
+}
+
+docs {
+  This request expects either or both of the `is_active` or `is_deleted` fields to be supplied in its *Body*, and a ProductImage `oid` to be specified in its *Params*. A typical use-case, activating a ProductImage, can be accomplished by sending this payload:
+  
+  ```json
+  {
+      "is_active": true
+  }
+  ```
+}

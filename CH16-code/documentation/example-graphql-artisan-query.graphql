@@ -1,0 +1,61 @@
+query GetActiveArtisanWithProducts($artisanId: ID!) {
+  artisan(oid: $artisanId) {
+    # Only returned if the artisan is_active = true and is_deleted = false (enforced by resolver)
+    oid
+    isActive
+    isDeleted
+    created
+    modified
+
+    honorific
+    givenName
+    middleName
+    familyName
+    suffix
+    companyName
+    emailAddress
+
+    address {
+      street
+      city
+      state
+      postalCode
+      country
+    }
+
+    # Only includes active, non-deleted products
+    products {
+      oid
+      isActive
+      isDeleted
+      created
+      modified
+
+      artisanOid
+      name
+      summary
+      description
+      price
+      shippingWeight
+      height
+      length
+      width
+
+      # Only includes active, non-deleted product images
+      productImages {
+        oid
+        isActive
+        isDeleted
+        created
+        modified
+
+        artisanOid
+        imageUrl
+        caption
+        altText
+        width
+        height
+      }
+    }
+  }
+}

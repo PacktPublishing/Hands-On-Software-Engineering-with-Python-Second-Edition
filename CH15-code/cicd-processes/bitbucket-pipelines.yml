@@ -1,0 +1,95 @@
+# Use a container with an appropriate
+# Python version already installed
+image: python:3.11.11-bullseye
+
+options:
+  # How many MINUTES is the pipeline allowed
+  # to run for before timing out
+  max-time: 2
+
+pipelines:
+  branches:
+    # Trigger when code is merged into the main branch
+    main:
+      - step:
+          name: Test, build and publish the package
+          variables:
+            # Equivalent to the Makefile definition
+            IGNORED_PIPENV_CHECKS: "--ignore 123"
+          script:
+            # Output build-environment info;
+            # useful for debugging!
+            # Show build environment info
+            - uname -a
+            # Show build home directory
+            - pwd
+            # Show project structure
+            - ls *
+            # Show python version
+            - python3.11 --version
+
+            # Install system-level prerequisites
+            - python3.11 -m pip install pipenv==2023.12.1
+
+            # Copy the template.env file to .env
+            # for pipenv to use
+            - cp template.env .env
+
+            # Equivalent to the Makefile init target
+            # Install package dependencies, and show them
+            - pipenv sync --dev
+            - pipenv graph
+
+            # Equivalent to the Makefile
+            # packaging-test target
+            # Packaging test first
+            # If it fails, there's no need to run
+            # anything else!
+            - pipenv run pytest tests/packaging/
+
+            # Equivalent to the Makefile test target
+            # Then unit tests
+            - pipenv run coverage run -m pytest tests/unit
+            # Show a coverage report.
+            # There's no set target, but reviewing it
+            # after a build is not a bad idea.
+            - pipenv run coverage report -m
+
+            # Equivalent to the Makefile build target
+            # Build the package
+            - pipenv sync --categories build
+            - pipenv graph
+            - pipenv run python -m build
+
+            # Equivalent to the Makefile verify target
+            - TMP_ENV=$$(mktemp -d)
+            - python -m venv $$TMP_ENV/venv
+            - $$TMP_ENV/venv/bin/activate
+            - pip install dist/*.whl
+            - pytest tests/unit
+            - deactivate
+            - rm -rf $$TMP_ENV
+
+            # Equivalent to the Makefile check target
+            - export IGNORED_PIPENV_CHECKS="--ignore 123"
+            - pipenv check $(IGNORED_PIPENV_CHECKS)
+
+            # Upload the built package
+            - pipenv sync --categories publish
+            - pipenv graph
+            # These use repository variables
+            - twine upload
+                --repository-url $PYPI_REPOSITORY_URL
+                -u $TWINE_USERNAME
+                -p $TWINE_PASSWORD dist/*
+
+  # Execute for all pull requests.
+  # Right now, this is inactive
+  # pull-requests:
+    # '**':
+      # - step:
+          # name: Show Build Environment Info
+          # script:
+            # - echo "Build environment: `uname -a`"
+            # - echo "Current working directory: `pwd`"
+            # - echo "Path to python3.11: `which python3.11`"

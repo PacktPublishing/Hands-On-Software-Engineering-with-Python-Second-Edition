@@ -1,0 +1,50 @@
+meta {
+  name: Artisan Create Product Image
+  type: http
+  seq: 13
+}
+
+post {
+  url: http://localhost:5000/api/v1/artisan/products/:oid/product_image/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  oid: 
+}
+
+body:json {
+  {
+      "product_oid": null,
+      "caption": "Optional caption for the image",
+      "alt_text": "Required alt-text for the image",
+      "image_data": "{Base64-encoded binary data: The image being uploaded}"
+  }
+}
+
+docs {
+  **JSON payload structure** (Fields with `null` are *optional*, all others are **required**)**:**
+  
+  ```json
+  {
+      "product_oid": null,
+      "caption": "Optional caption for the image",
+      "alt_text": "Required alt-text for the image",
+      "image_data": "{Base64-encoded binary data: The image being uploaded}"
+  }
+  ```
+  
+  The example JSON payload used in Chapter 17, with an explicit `oid` value to force a known `oid` fo rthe resulting object was:
+  
+  ```json
+  {
+      "oid": "00000000-0000-0000-0000-00000000000a",
+      "product_oid": "6a5d3431-8ba4-41d2-923a-b45336663c15",
+      "caption": "Optional caption for the image",
+      "alt_text": "Required alt-text for the image",
+      "image_data": "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"
+  }
+  ```
+  
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Admin Get Product
+  type: http
+  seq: 7
+}
+
+get {
+  url: https://{{api_id}}.execute-api.us-east-1.amazonaws.com/Stage/api/v1/admin/product/:oid
+  body: none
+  auth: inherit
+}
+
+params:path {
+  oid: b7cd4791-9395-4d10-9415-5e1b74515119
+}

@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  install:
+    on-failure: ABORT
+    runtime-versions:
+      python: 3.11
+    commands:
+      - pip install pipenv==2023.12.1
+      - pipenv sync --dev
+      - pipenv sync --categories "common"
+
+  build:
+    on-failure: ABORT
+    commands:
+      - pipenv run python database/HMS/implementation/apply-sql-cloud.py
+

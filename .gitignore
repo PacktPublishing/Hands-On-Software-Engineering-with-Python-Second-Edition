@@ -107,3 +107,13 @@ CH08-code/unit-test-examples.geany
 
 # Ignore database backups
 *.backup
+
+# Ignore product_images
+**/local_api/product_images/detail/
+**/local_api/product_images/original/
+**/local_api/product_images/thumbnail/
+
+
+CH18-code/.aws-sam/
+
+CH18-code/packaged/*.zip

@@ -1,0 +1,16 @@
+meta {
+  name: Artisan Delete Product
+  type: http
+  seq: 15
+}
+
+delete {
+  url: https://{{api_id}}.execute-api.us-east-1.amazonaws.com/Stage/api/v1/artisan/:artisan_oid/product/:oid
+  body: none
+  auth: inherit
+}
+
+params:path {
+  oid: 
+  artisan_oid: 
+}

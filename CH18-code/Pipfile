@@ -1,0 +1,175 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+
+[dev-packages]
+awslambdaric = "<4"
+boto3 = "<2"
+coverage = "<8"
+flake8 = "<8"
+goblinfish-testing-pact = "<2"
+pytest = "<9"
+pyyaml = "<7"
+
+[requires]
+python_version = "3.11"
+# python_full_version = "3.11.0"
+
+[common]
+email-validator = "<3"
+pydantic = "<3"
+typeguard = "<5"
+pymysql = "<2"
+
+[local-api]
+goblinfish-aws-local-lpi-apis = "<2"
+jinja2 = "<4"
+
+[admin_create_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[admin_create_product]
+goblinfish-metrics-trackers = "<2"
+
+[admin_create_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[admin_delete_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[admin_delete_product]
+goblinfish-metrics-trackers = "<2"
+
+[admin_delete_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[admin_read_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[admin_read_artisans]
+goblinfish-metrics-trackers = "<2"
+
+[admin_read_product]
+goblinfish-metrics-trackers = "<2"
+
+[admin_read_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[admin_read_product_images]
+goblinfish-metrics-trackers = "<2"
+
+[admin_read_products]
+goblinfish-metrics-trackers = "<2"
+
+[admin_update_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[admin_update_product]
+goblinfish-metrics-trackers = "<2"
+
+[admin_update_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_create_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_create_product]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_create_product_image]
+goblinfish-metrics-trackers = "<2"
+requests = "<3"
+pillow = "<12"
+
+[artisan_delete_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_delete_product]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_delete_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_read_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_read_artisans]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_read_product]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_read_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_read_product_images]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_read_products]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_update_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_update_product]
+goblinfish-metrics-trackers = "<2"
+
+[artisan_update_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[public_create_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[public_create_product]
+goblinfish-metrics-trackers = "<2"
+
+[public_create_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[public_delete_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[public_delete_product]
+goblinfish-metrics-trackers = "<2"
+
+[public_delete_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[public_read_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[public_read_artisans]
+goblinfish-metrics-trackers = "<2"
+
+[public_read_product]
+goblinfish-metrics-trackers = "<2"
+
+[public_read_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[public_read_product_images]
+goblinfish-metrics-trackers = "<2"
+
+[public_read_products]
+goblinfish-metrics-trackers = "<2"
+
+[public_update_artisan]
+goblinfish-metrics-trackers = "<2"
+
+[public_update_product]
+goblinfish-metrics-trackers = "<2"
+
+[public_update_product_image]
+goblinfish-metrics-trackers = "<2"
+
+[db_cluster_test]
+pymysql = "<2"
+
+[developer-tools]
+toml = "<1"
+
+[scripts]
+"packaging" = "python developer-tools/package-lambdas.py"

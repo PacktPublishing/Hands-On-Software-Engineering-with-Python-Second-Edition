@@ -1,0 +1,31 @@
+meta {
+  name: Admin Update Artisan
+  type: http
+  seq: 4
+}
+
+patch {
+  url: http://localhost:5000/api/v1/admin/artisan/:oid/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  oid: 
+}
+
+body:json {
+  {
+      "is_active": true
+  }
+}
+
+docs {
+  This request expects either or both of the `is_active` or `is_deleted` fields to be supplied in its *Body*, and an Artisan `oid` to be specified in its *Params*. A typical use-case, activating an Artisan, can be accomplished by sending this payload:
+  
+  ```json
+  {
+      "is_active": true
+  }
+  ```
+}

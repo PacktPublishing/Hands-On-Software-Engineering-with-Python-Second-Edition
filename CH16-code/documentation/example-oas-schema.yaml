@@ -1,0 +1,158 @@
+openapi: 3.1.0
+info:
+  title: HMS Back-end API
+  version: 2.0.0
+servers:
+- url: /
+paths:
+  /v1/artisan:
+    get:
+      deprecated: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artisan'
+          description: The complete Artisan data
+components:
+  schemas:
+    Address:
+      description: Represents a physical addresaas, where mail could be sent.
+      properties:
+        building_address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: The "building address" (an apartment number, suite, etc.) portion
+            of the address that the instance represents
+          examples:
+          - null
+          - Apt. 56
+          - Suite 321
+          title: Building Address
+        city:
+          description: The city portion of the address that the instance represents
+          examples:
+          - Springfield
+          title: City
+          type: string
+        country:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: The country portion of the address that the instance represents.
+            Typically omitted, indicating that the address is "local" to the country
+            of origin.
+          examples:
+          - null
+          - United States
+          - Great Britain
+          - Canada
+          title: Country
+        postal_code:
+          description: The postal code portion (a ZIP Code in the US, for example)
+            of the address that the instance represents
+          examples:
+          - '12345'
+          - 12345-6789
+          - SW1A 2AA
+          - M5V 3L9
+          title: Postal Code
+          type: string
+        region:
+          description: The region portion (a state in the US, or a province in Canada,
+            for example) of the address that the instance represents
+          examples:
+          - Some Place
+          title: Region
+          type: string
+        street_address:
+          description: The street address portion of the address that the instance
+            represents. May also contain a post office box
+          examples:
+          - 1234 Main Street
+          - PO Box 1234
+          title: Street Address
+          type: string
+      required:
+      - street_address
+      - city
+      - region
+      - postal_code
+      title: Address
+      type: object
+    Artisan:
+      description: Represents an Artisan for those systems and endpoints with access
+        to all Artisan data structure
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+          description: The mailing address for the Artisan that the instance represents
+          title: Mailing Address
+        email_address:
+          description: The email address for the Artisan that the instance represents
+          examples:
+          - jsmith@gmail.com
+          pattern: ^[a-zA-Z0-9\._%+\-]+@[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}$
+          title: Email Address
+          type: string
+        family_name:
+          description: The family name of the artisan that the instance represents
+          examples:
+          - Smith
+          - Jones
+          minLength: 2
+          title: Family Name
+          type: string
+        given_name:
+          description: The given name of the artisan that the instance represents
+          examples:
+          - John
+          - Jane
+          minLength: 2
+          title: Given Name
+          type: string
+        honorific:
+          anyOf:
+          - maxLength: 7
+            minLength: 2
+            type: string
+          - type: 'null'
+          description: The honorific of the Artisan that the instance represents
+          examples:
+          - null
+          - Mr.
+          - Ms.
+          - Mrs.
+          - Dr.
+          title: Honorific
+        phone:
+          description: The phone number address for the Artisan that the instance
+            represents
+          examples:
+          - 303-555-1212
+          - (303) 555-1212
+          pattern: ^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$
+          title: Phone Number
+          type: string
+        suffix:
+          anyOf:
+          - maxLength: 7
+            minLength: 2
+            type: string
+          - type: 'null'
+          description: The name suffix of the Artisan that the instance represents
+          examples:
+          - null
+          - Jr.
+          - III
+          title: Suffix
+      required:
+      - given_name
+      - family_name
+      - address
+      - phone
+      - email_address
+      title: Artisan
+      type: object

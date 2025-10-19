@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+# Add your production dependencies here
+
+[dev-packages]
+pytest = "<9.0.0"
+flake8 = "<7.0.0"
+coverage = "<8.0.0"
+
+[build]
+build = "<1.0.0"
+
+[publish]
+twine = "<5.0.0"
+
+[requires]
+python_version = "3.9"

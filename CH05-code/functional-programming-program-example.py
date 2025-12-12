@@ -15,7 +15,7 @@ if os.name == 'posix':
 else:
     tmp_dir = 'C:\\Temp\\'
 if not os.path.exists(tmp_dir):
-    os.mkdirs(tmp_dir)
+    os.makedirs(tmp_dir)
 
 # Defining our functions
 

@@ -6,6 +6,7 @@
   - Make a copy of the `template.env` file, calling it `.env` .
   - Run `pipenv install` and wait for installation of package dependencies to complete.
   - Run `pipenv graph` to make sure that all installations are accounted for (see *Package requirements list*, below).
+- Run `pipenv run uvicorn app:app`
 
 # Package requirements list
 
